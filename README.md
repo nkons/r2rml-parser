@@ -1,6 +1,3 @@
-r2rml-parser
-============
-
 # R2RML Parser
 
 A parser that exposes relational database contents as RDF graphs, based on an R2RML mapping document.
