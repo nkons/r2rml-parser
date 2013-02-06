@@ -1,6 +1,6 @@
 # R2RML Parser
 
-A parser that exposes relational database contents as RDF graphs, based on an R2RML mapping document.
+A parser that exposes relational database contents as RDF graphs, based on an R2RML mapping document. Contains a mapping file for the DSpace institutional repository solution.
 
 ## Licence
 
