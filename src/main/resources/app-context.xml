@@ -8,8 +8,21 @@
 		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<description>Example configuration to get you started.</description>
+	<description>Spring configuration.</description>
 
-	<context:component-scan base-package="gr.ekt.r2rml" />
-
+	<!-- <context:component-scan base-package="gr.ekt.r2rml" /> -->
+	
+	<bean id="util" class="gr.ekt.r2rml.beans.UtilImpl" />
+	
+	<bean id="db" class="gr.ekt.r2rml.beans.DatabaseImpl">
+		<constructor-arg value="src/main/resources/r2rml.properties" />
+		<property name="util" ref="util" />
+	</bean>
+	
+	<bean id="parser" class="gr.ekt.r2rml.beans.Parser">
+		<constructor-arg value="src/main/resources/r2rml.properties" />
+		<property name="db" ref="db" />
+		<property name="util" ref="util" />
+	</bean>
+	
 </beans>
