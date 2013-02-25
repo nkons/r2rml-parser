@@ -20,11 +20,12 @@ public class PredicateObjectMap {
 	 */
 	private Template objectTemplate;
 	
-	
 	/**
 	 * Holds the value of an rr:column definition. It is null in the case of templates.
 	 */
 	private String objectColumn;
+	
+	private String language;
 	
 	/**
 	 * 
@@ -68,4 +69,13 @@ public class PredicateObjectMap {
 	public void setObjectColumn(String objectColumn) {
 		this.objectColumn = objectColumn;
 	}
+	
+	public String getLanguage() {
+		return language;
+	}
+	
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+	
 }

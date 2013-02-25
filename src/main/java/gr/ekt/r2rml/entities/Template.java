@@ -22,24 +22,31 @@ public class Template {
 	 */
 	private String text;
 	
-	
 	/**
 	 * The fields, enclosed in brackets. Must correspond to database fields
 	 */
 	private ArrayList<String> fields;
 	
 	/**
+	 * Returns true if the template refers to a literal, false if it refers to a node.
+	 */
+	private boolean literal;
+	
+	/**
 	 * Default constructor. Once called, it finds the included fields.
 	 */
-	public Template(String text) {
+	public Template(String text, boolean literal) {
 		this.text = text;
 		this.fields = createTemplateFields();
+		this.literal = literal;
 		
 		String msg = "Template has " + fields.size() + ((fields.size() == 1)? " field: " : " fields: ");
 		for (String f : fields) {
 			msg += f + ", ";
 		}
-		msg = msg.substring(0, msg.lastIndexOf(','));
+		if (msg.lastIndexOf(',') > 0) {
+			msg = msg.substring(0, msg.lastIndexOf(','));
+		}
 		log.info(msg);
 	}
 	
@@ -79,6 +86,14 @@ public class Template {
 	 */
 	public void setFields(ArrayList<String> fields) {
 		this.fields = fields;
+	}
+	
+	public boolean isLiteral() {
+		return literal;
+	}
+	
+	public void setLiteral(boolean literal) {
+		this.literal = literal;
 	}
 	
 }

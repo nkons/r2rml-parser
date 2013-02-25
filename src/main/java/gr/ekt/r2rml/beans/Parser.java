@@ -106,16 +106,6 @@ public class Parser {
 
 		init();
 		
-		//test source database
-		db.openConnection();
-				
-		//test destination database
-		if (p.getProperty("jena.storeOutputModelInDatabase").contains("true")) {
-			db.openJenaConnection();
-		}
-		
-		
-		
 		try {
 			//First find the logical table views
 			ArrayList<LogicalTableView> logicalTableViews = findLogicalTableViews();
@@ -173,15 +163,20 @@ public class Parser {
 						if (predicateObjectMap.getObjectTemplate() != null) {
 							//Literal o = resultModel.createLiteral(u.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
 							if (!util.isUriTemplate(resultModel, predicateObjectMap.getObjectTemplate())) {
-								Literal o = resultModel.createLiteral(util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
+								Literal o;
+								if (StringUtils.isBlank(predicateObjectMap.getLanguage())) {
+									o = resultModel.createLiteral(util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
+									if (this.p.containsKey("default.verbose")) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
+								} else {
+									o = resultModel.createLiteral(util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs), predicateObjectMap.getLanguage());
+									if (this.p.containsKey("default.verbose")) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + o.getLanguage());
+								}
 								
-								if (this.p.containsKey("default.verbose")) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.getString() + ">");
 								Statement st = resultModel.createStatement(s, p, o);
 								resultModel.add(st);
 								triples.add(st);
 							} else {
 								RDFNode o = resultModel.createResource(util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
-								
 								if (this.p.containsKey("default.verbose")) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
 								Statement st = resultModel.createStatement(s, p, o);
 								resultModel.add(st);
@@ -251,10 +246,19 @@ public class Parser {
 	    	NodeIterator iterTemplate = mapModel.listObjectsOfProperty(rn.asResource(), mapModel.getProperty(rrNs + "template"));
 		    while (iterTemplate.hasNext()) {
 		    	RDFNode rnTemplate = iterTemplate.next();
-		    	log.info("Processing subject template: " + rnTemplate.asLiteral().toString());
-		    	Template template = new Template(rnTemplate.asLiteral().toString());
-		    	subjectMap.setTemplate(template);
-			    subjectMap.setSelectQuery(mappingDocument.findLogicalTableMappingByUri(r.getURI()).getView().getQuery());
+		    	
+		    	
+		    	if (rnTemplate.isLiteral()) {
+			    	log.info("Processing subject template: " + rnTemplate.asLiteral().toString() + ". Treating it as a template with no fields.");
+			    	Template template = new Template(rnTemplate.asLiteral().toString(), true);
+			    	subjectMap.setTemplate(template);
+	    		} else {
+	    			log.info("Processing subject template: " + rnTemplate.asNode().toString() + ". Treating it as a template with no fields.");
+			    	Template template = new Template(rnTemplate.asNode().toString(), false);
+			    	subjectMap.setTemplate(template);
+	    		}
+		    	
+		    	subjectMap.setSelectQuery(mappingDocument.findLogicalTableMappingByUri(r.getURI()).getView().getQuery());
 		    }
 		    
 		    NodeIterator iterClass = mapModel.listObjectsOfProperty(rn.asResource(), mapModel.getProperty(rrNs + "class"));
@@ -284,32 +288,76 @@ public class Parser {
 		    	predicateObjectMap.setPredicate(rnPredicate.asResource().getURI());
 		    }
 	    	
-	    	NodeIterator iterObjectMap = mapModel.listObjectsOfProperty(rnPredicateObject.asResource(), mapModel.getProperty(rrNs + "objectMap"));
-	    	while (iterObjectMap.hasNext()) {
-		    	RDFNode rnObjectMap = iterObjectMap.next();
+	    	NodeIterator iterObject1 = mapModel.listObjectsOfProperty(rnPredicateObject.asResource(), mapModel.getProperty(rrNs + "object"));
+	    	while (iterObject1.hasNext()) {
+	    		log.info("Found object: " + iterObject1.toString());
+	    		RDFNode rnTemplate = iterObject1.next();
+	    		if (rnTemplate.isLiteral()) {
+			    	log.info("Adding object map constant: " + rnTemplate.asLiteral().toString() + ". Treating it as a template with no fields.");
+			    	Template template = new Template(rnTemplate.asLiteral().toString(), true);
+			    	predicateObjectMap.setObjectTemplate(template);
+	    		} else {
+	    			log.info("Adding object map constant: " + rnTemplate.asNode().toString() + ". Treating it as a template with no fields.");
+			    	Template template = new Template(rnTemplate.asNode().toString(), false);
+			    	predicateObjectMap.setObjectTemplate(template);
+	    		}
+	    	}
+	    	
+	    	NodeIterator iterObjectMap2 = mapModel.listObjectsOfProperty(rnPredicateObject.asResource(), mapModel.getProperty(rrNs + "objectMap"));
+	    	while (iterObjectMap2.hasNext()) {
+		    	RDFNode rnObjectMap = iterObjectMap2.next();
 		    	
-		    	//Must have here either an rr:column or an rr:template
+		    	//Must have here an rr:column, an rr:template, or an rr:constant
 		    	
 		    	NodeIterator iterTemplate = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "template"));
 			    while (iterTemplate.hasNext()) { //should return only 1
 			    	RDFNode rnTemplate = iterTemplate.next();
-			    	log.info("Processing object map template: " + rnTemplate.asLiteral().toString());
-			    	Template template = new Template(rnTemplate.asLiteral().toString());
 			    	
-			    	predicateObjectMap.setObjectTemplate(template);
+			    	if (rnTemplate.isLiteral()) {
+				    	log.info("Processing object map template: " + rnTemplate.asLiteral().toString() + ". Treating it as a template with no fields.");
+				    	Template template = new Template(rnTemplate.asLiteral().toString(), true);
+				    	predicateObjectMap.setObjectTemplate(template);
+		    		} else {
+		    			log.info("Processing object map template: " + rnTemplate.asNode().toString() + ". Treating it as a template with no fields.");
+				    	Template template = new Template(rnTemplate.asNode().toString(), false);
+				    	predicateObjectMap.setObjectTemplate(template);
+		    		}
 			    	//predicateObjectMap.setObjectColumn(predicateObjectMap.getObjectTemplate().getFields().get(0));
 			    	//System.out.println("added objectQuery " + "SELECT " + predicateObjectMap.getObjectTemplate().getFields().get(0) + " FROM " + mappingDocument.findLogicalTableMappingByUri(r.getURI()).getView().getQuery().getTables().get(0).getName());
 			    	//System.out.println("added objectTemplate " + rnTemplate.asLiteral().toString());
 			    }
 			    
-		    	NodeIterator iterTemplate2 = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "column"));
-			    while (iterTemplate2.hasNext()) {
-			    	RDFNode rnTemplate = iterTemplate2.next();
+		    	NodeIterator iterColumn = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "column"));
+			    while (iterColumn.hasNext()) {
+			    	RDFNode rnTemplate = iterColumn.next();
 			    	String tempField = rnTemplate.asLiteral().toString();
 			    	
 			    	//objectFields.add(tempField);
 			    	predicateObjectMap.setObjectColumn(tempField);
 			    	log.info("Added object column: " + tempField);
+			    }
+			    
+			    NodeIterator iterLanguage = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "language"));
+			    while (iterLanguage.hasNext()) {
+			    	RDFNode rnTemplate = iterLanguage.next();
+			    	String language = rnTemplate.asLiteral().toString();
+			    	
+			    	predicateObjectMap.setLanguage(language);
+			    	log.info("Added language: " + language);
+			    }
+			    
+			    NodeIterator iterConstant = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "constant"));
+			    while (iterConstant.hasNext()) {
+			    	RDFNode rnTemplate = iterConstant.next();
+			    	if (rnTemplate.isLiteral()) {
+				    	log.info("Adding object map constant: " + rnTemplate.asLiteral().toString() + ". Treating it as a template with no fields.");
+				    	Template template = new Template(rnTemplate.asLiteral().toString(), true);
+				    	predicateObjectMap.setObjectTemplate(template);
+		    		} else {
+		    			log.info("Adding object map constant: " + rnTemplate.asNode().toString() + ". Treating it as a template with no fields.");
+				    	Template template = new Template(rnTemplate.asNode().toString(), false);
+				    	predicateObjectMap.setObjectTemplate(template);
+		    		}
 			    }
 		    }
 	    	predicateObjectMaps.add(predicateObjectMap);
@@ -440,6 +488,15 @@ public class Parser {
 	public void init() {
 		try {
 			p.load(new FileInputStream(propertiesFilename));
+			
+			//test source database
+			db.openConnection();
+					
+			//test destination database
+			if (p.getProperty("jena.storeOutputModelInDatabase").contains("true")) {
+				db.openJenaConnection();
+			}
+			
 			this.baseNs = p.getProperty("default.namespace");
 			String mappingFilename = p.getProperty("mapping.file");
 			
