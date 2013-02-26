@@ -16,6 +16,10 @@ public class LogicalTableView {
 	 * The uri of this view. It has a value for declared sql queries and is null when the mapping is on a table
 	 */
 	private String uri;
+	
+	/**
+	 * 
+	 */
 	private SelectQuery query;
 	
 	/**

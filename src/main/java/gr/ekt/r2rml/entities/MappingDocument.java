@@ -60,8 +60,7 @@ public class MappingDocument {
 	/**
 	 * @param logicalTableMappings the logicalTableMappings to set
 	 */
-	public void setLogicalTableMappings(
-			ArrayList<LogicalTableMapping> logicalTableMappings) {
+	public void setLogicalTableMappings(ArrayList<LogicalTableMapping> logicalTableMappings) {
 		this.logicalTableMappings = logicalTableMappings;
 	}
 }

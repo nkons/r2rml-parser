@@ -36,7 +36,7 @@ public class LogicalTableMapping {
 	private ArrayList<PredicateObjectMap> predicateObjectMaps = new ArrayList<PredicateObjectMap>();
 	
 	/**
-	 * 
+	 * TODO Hold the resulting triples
 	 */
 	private ArrayList<Statement> triples;
 	

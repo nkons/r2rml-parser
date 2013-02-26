@@ -4,6 +4,7 @@
 package gr.ekt.r2rml.beans;
 
 import gr.ekt.r2rml.entities.Template;
+import gr.ekt.r2rml.entities.sparql.LocalResultSet;
 
 import java.sql.ResultSet;
 
@@ -15,9 +16,14 @@ import com.hp.hpl.jena.rdf.model.Model;
  */
 public interface Util {
 	
-	public String fillTemplate(Template template, ResultSet rs);
+	String fillTemplate(Template template, ResultSet rs);
 	
-	public String findDatabaseType(String driver);
+	String findDatabaseType(String driver);
 	
-	public boolean isUriTemplate(Model model, Template template);
+	boolean isUriTemplate(Model model, Template template);
+	
+	String stripQuotes(String input);
+	
+	LocalResultSet sparql(Model model, String query);
+	
 }

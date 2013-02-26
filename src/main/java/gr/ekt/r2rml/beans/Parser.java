@@ -9,6 +9,9 @@ import gr.ekt.r2rml.entities.MappingDocument;
 import gr.ekt.r2rml.entities.PredicateObjectMap;
 import gr.ekt.r2rml.entities.SubjectMap;
 import gr.ekt.r2rml.entities.Template;
+import gr.ekt.r2rml.entities.sparql.LocalResource;
+import gr.ekt.r2rml.entities.sparql.LocalResultRow;
+import gr.ekt.r2rml.entities.sparql.LocalResultSet;
 import gr.ekt.r2rml.entities.sql.SelectQuery;
 
 import java.io.File;
@@ -68,7 +71,7 @@ public class Parser {
 	/**
 	 * The resulting model, containing the input model and all the generated triples
 	 */
-	private InfModel resultModel;
+	private Model resultModel;
 
 	/**
 	 * The base namespace for the result model
@@ -137,7 +140,7 @@ public class Parser {
 			ArrayList<Statement> triples = new ArrayList<Statement>();
 		    try {
 				SelectQuery selectQuery = logicalTableMapping.getView().getQuery();
-				
+				//log.info("About to execute " + selectQuery.getQuery());
 				java.sql.ResultSet rs = db.query(selectQuery.getQuery());
 				rs.beforeFirst();
 				int tripleCount = 0;
@@ -184,7 +187,12 @@ public class Parser {
 								
 							}
 						} else if (predicateObjectMap.getObjectColumn() != null) {
-							String test = rs.getString(predicateObjectMap.getObjectColumn());
+							String field = predicateObjectMap.getObjectColumn();
+							if (field.startsWith("\"") && field.endsWith("\"")) {
+								field = field.replaceAll("\"", "");
+								log.info("Cleaning. Field is now " + field);
+							}
+							String test = rs.getString(field);
 							Literal o = resultModel.createLiteral(test == null? "" : test);
 
 							if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
@@ -207,7 +215,7 @@ public class Parser {
 	    }
 		
 		if (p.getProperty("jena.storeOutputModelInDatabase").contains("false")) {
-			log.info("Writing model to file. Model has " + resultModel.listStatements().toList().size() + " statements.");
+			log.info("Writing model to " + p.getProperty("jena.destinationFileName") + ". Model has " + resultModel.listStatements().toList().size() + " statements.");
 			try {
 				resultModel.write(new FileOutputStream(p.getProperty("jena.destinationFileName")), p.getProperty("jena.destinationFileSyntax"));
 			} catch (FileNotFoundException e) {
@@ -247,18 +255,26 @@ public class Parser {
 		    while (iterTemplate.hasNext()) {
 		    	RDFNode rnTemplate = iterTemplate.next();
 		    	
-		    	
 		    	if (rnTemplate.isLiteral()) {
-			    	log.info("Processing subject template: " + rnTemplate.asLiteral().toString() + ". Treating it as a template with no fields.");
+			    	log.info("Processing literal subject template: " + rnTemplate.asLiteral().toString());
 			    	Template template = new Template(rnTemplate.asLiteral().toString(), true);
 			    	subjectMap.setTemplate(template);
 	    		} else {
-	    			log.info("Processing subject template: " + rnTemplate.asNode().toString() + ". Treating it as a template with no fields.");
+	    			log.info("Processing node subject template: " + rnTemplate.asNode().toString());
 			    	Template template = new Template(rnTemplate.asNode().toString(), false);
 			    	subjectMap.setTemplate(template);
 	    		}
 		    	
-		    	subjectMap.setSelectQuery(mappingDocument.findLogicalTableMappingByUri(r.getURI()).getView().getQuery());
+				for (LogicalTableMapping ltm : mappingDocument.getLogicalTableMappings()) {
+					log.info("LTM " + ltm.getUri() + " " + ltm.getView());
+					
+				}
+				
+		    	log.info("Logical table mapping uri is " + r.getURI());
+		    	LogicalTableMapping ltm = mappingDocument.findLogicalTableMappingByUri(r.getURI());
+		    	LogicalTableView ltv = ltm.getView(); 
+		    	SelectQuery sq = ltv.getQuery();
+		    	subjectMap.setSelectQuery(sq);
 		    }
 		    
 		    NodeIterator iterClass = mapModel.listObjectsOfProperty(rn.asResource(), mapModel.getProperty(rrNs + "class"));
@@ -376,10 +392,16 @@ public class Parser {
 			NodeIterator iter1b = mapModel.listObjectsOfProperty(r, logicalTable);
 			while (iter1b.hasNext()) { //should be only 1
 		    	RDFNode rn = iter1b.next();
-		    	LogicalTableMapping logicalTableMapping = new LogicalTableMapping();
-		    	logicalTableMapping.setUri(r.getURI());
-		    	logicalTableMapping.setView(mappingDocument.findLogicalTableViewByUri(rn.asResource().getURI()));
-		    	results.add(logicalTableMapping);
+		    	if (r.getURI() != null) {
+			    	LogicalTableMapping logicalTableMapping = new LogicalTableMapping();
+			    	logicalTableMapping.setUri(r.getURI());
+			    	logicalTableMapping.setView(mappingDocument.findLogicalTableViewByUri(rn.asResource().getURI()));
+			    	if (!contains(results, logicalTableMapping.getUri())) results.add(logicalTableMapping);
+			    	log.info("Added logical table mapping from uri <" + r.getURI() + ">");
+		    	} else {
+		    		log.info("Did not add logical table mapping from NULL uri");
+		    	}
+		    	
 		    }
 		}
 		
@@ -387,24 +409,54 @@ public class Parser {
 		ResIterator iter2 = mapModel.listSubjectsWithProperty(tableName);
 		while (iter2.hasNext()) {
 		    Resource r = iter2.nextResource();
-	    	log.info("Found table name: <" + r.getURI() + ">");
+		    if (r.isLiteral()) {
+		    	log.info("Found literal with a table name: <" + r.asLiteral().toString() + ">");
+		    } else {
+		    	log.info("Found resource with a table name: <" + r.getURI() + ">");
+		    }
+		    
 		    NodeIterator iter2b = mapModel.listObjectsOfProperty(r, tableName);
 		    while (iter2b.hasNext()) { //should be only 1
 		    	RDFNode rn = iter2b.next();
 		    	LogicalTableMapping logicalTableMapping = new LogicalTableMapping();
-		    	logicalTableMapping.setUri(r.getURI());
-		    		LogicalTableView logicalTableView = new LogicalTableView();
-		    		String newTable = rn.asLiteral().toString();
-		    		logicalTableView.setQuery(new SelectQuery(createQueryForTable(newTable), p));
+
+	    		LogicalTableView logicalTableView = new LogicalTableView();
+	    		String newTable = rn.asLiteral().toString();
+	    		newTable = util.stripQuotes(newTable);
+	    		log.info("Found table name: " + newTable);
+	    		SelectQuery sq = new SelectQuery(createQueryForTable(newTable), p);
+	    		log.info("Setting SQL query for table " + newTable + ": " + sq.getQuery());
+	    		logicalTableView.setQuery(sq);
+	    		if (r.getURI() == null) {
+			    	//figure out to which TriplesMap this rr:tableName belongs
+			    	log.info("Found rr:tableName without parent.");
+			    	LocalResultSet sparqlResults = util.sparql(mapModel, "SELECT ?x WHERE { ?x rr:logicalTable ?z . ?z rr:tableName \"\\\"" + newTable + "\\\"\" . } ");
+			    	
+			    	String triplesMapUri = sparqlResults.getRows().get(0).getResources().get(0).getUri();
+			    	if (triplesMapUri != null) {
+			    		logicalTableMapping.setUri(triplesMapUri);
+			    	} else {
+			    		log.error("Could not find triples map.");
+			    	}
+			    } else {
+			    	logicalTableMapping.setUri(r.getURI());
+			    }
 		    	logicalTableMapping.setView(logicalTableView);
-		    	results.add(logicalTableMapping);
+
+	    		results.add(logicalTableMapping);
+	    		
 		    }
+		    
 		}
-		
+
+		for (LogicalTableMapping l : results) {
+			if (l.getView() == null ) {
+				results.remove(l);
+			}
+		}
+    	
 		return results;
 	}
-	
-
 	
 	public ArrayList<LogicalTableView> findLogicalTableViews() {
 		ArrayList<LogicalTableView> results = new ArrayList<LogicalTableView>();
@@ -438,19 +490,6 @@ public class Parser {
 		}
 		return results;
 	}
-
-	public void sparql(String query, Model model) {
-
-		Query q = QueryFactory.create(query);
-		QueryExecution qexec = QueryExecutionFactory.create(q, model);
-		ResultSet results = qexec.execSelect();
-
-		try {
-			ResultSetFormatter.out(System.out, results, q);
-		} finally {
-			qexec.close();
-		}
-	}
 	
 	public String createQueryForTable(String tableName) {
 		String result = "SELECT ";
@@ -468,7 +507,7 @@ public class Parser {
 			rs.beforeFirst();
 			while (rs.next()) {
 				//mysql: fields.add(rs.getString("Field"));
-				fields.add(rs.getString(1));
+				fields.add("\"" + rs.getString(1) + "\"");
 			}
 			for (String f : fields) {
 				result += f + ", ";
@@ -480,7 +519,7 @@ public class Parser {
 			e.printStackTrace();
 		}
 		
-		result += " FROM " + tableName;
+		result += " FROM " + "\"" + tableName + "\"";
 		log.info("result is: " + result);
 		return result;
 	}
@@ -548,7 +587,8 @@ public class Parser {
 			    //Model resultDbModel = ModelFactory.createModelRDBMaker(db.getJenaConnection()).createModel("fresh");
 				resultDbModel.add(resultBaseModel);
 				
-				resultModel = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), resultDbModel);
+				//resultModel = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), resultDbModel);
+				resultModel = ModelFactory.createDefaultModel();
 
 				Map<String, String> prefixes = mapModel.getNsPrefixMap();
 				log.info("Copy " + prefixes.size() + " prefixes from map model to persistent.");
@@ -558,7 +598,8 @@ public class Parser {
 				resultModel.setNsPrefixes(prefixes);
 				
 			} else {
-				resultModel = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), resultBaseModel);
+				//resultModel = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), resultBaseModel);
+				resultModel = ModelFactory.createDefaultModel();
 				resultModel.setNsPrefixes(mapModel.getNsPrefixMap());
 			}
 						
@@ -584,6 +625,13 @@ public class Parser {
 	
 	public String getPropertiesFilename() {
 		return propertiesFilename;
+	}
+	
+	boolean contains(ArrayList<LogicalTableMapping> logicalTableMappings, String uri) {
+		for (LogicalTableMapping logicalTableMapping : logicalTableMappings) {
+			if (logicalTableMapping.getUri().equals(uri)) return true;
+		}
+		return false;
 	}
 	
 	public void setPropertiesFilename(String propertiesFilename) {
