@@ -1,3 +1,4 @@
+@prefix map: <#>.
 @prefix rr: <http://www.w3.org/ns/r2rml#>.
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
@@ -8,159 +9,159 @@
 @prefix dcam: <http://purl.org/dc/dcam/>.
 @prefix skos: <http://www.w3.org/2004/02/skos/core#>.
 
-<#items>
+map:items
     rr:logicalTable <#item-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/item_{item_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
         rr:class dcterms:BibliographicResource;
     ].
     
-<#persons>
-    rr:tableName "eperson";
+map:persons
+    rr:logicalTable [ rr:tableName '"eperson"'; ];
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/Agent/agent_{eperson_id}";
+        rr:template 'http://purl.org/dc/terms/Agent/agent_{"eperson_id"}';
 		rr:class dcterms:Agent;
     ];
 	
 	rr:predicateObjectMap [
       rr:predicate rdf:value;
-      rr:objectMap [ rr:template "{firstname} {lastname}" ]
+      rr:objectMap [ rr:template '{"firstname"}%20{"lastname"}' ]
     ].
 
 	
-<#collections>
-    rr:tableName "collection";
+map:collections
+    rr:logicalTable [ rr:tableName '"collection"'; ];
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/collection_{collection_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/collection_{"collection_id"}';
 		rr:class dcterms:BibliographicResource;
     ];
 	rr:predicateObjectMap [
       rr:predicate rdf:value;
-      rr:objectMap [ rr:column "name" ];
+      rr:objectMap [ rr:column '"name"' ];
     ].
 
-<#communities>
-    rr:tableName "community";
+map:communities
+    rr:logicalTable [ rr:tableName '"community"'; ];
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/Agent/community_{community_id}";
+        rr:template 'http://purl.org/dc/terms/Agent/community_{"community_id"}';
 		rr:class dcterms:Agent;
     ];
 	rr:predicateObjectMap [
       rr:predicate rdf:value;
-      rr:objectMap [ rr:column "name" ];
+      rr:objectMap [ rr:column '"name"' ];
     ].
 
 # DSpace general mappings end here, beginning DC descriptions
 
-<#dc-contributor-author>
+map:dc-contributor-author
     rr:logicalTable <#dc-contributor-author-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/item_{item_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:creator;
-        rr:objectMap [ rr:template "http://purl.org/dc/terms/Agent/agent_{text_value}" ];
+        rr:objectMap [ rr:template 'http://purl.org/dc/terms/Agent/agent_{"text_value"}' ];
     ].
     
-
-<#dc-coverage-spatial>
+map:dc-coverage-spatial
     rr:logicalTable <#dc-coverage-spatial-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/item_{item_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:coverage;
-        rr:objectMap [ rr:template "http://purl.org/dc/terms/Location/location_{item_id}" ];
+        rr:objectMap [ rr:template 'http://purl.org/dc/terms/Location/location_{"item_id"}' ];
     ].
-<#dc-location>
+    
+map:dc-location
     rr:logicalTable <#dc-coverage-spatial-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/Location/location_{item_id}";
+        rr:template 'http://purl.org/dc/terms/Location/location_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate rdf:value;
-        rr:objectMap [ rr:column "text_value" ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 	
-<#dc-creator>
+map:dc-creator
     rr:logicalTable <#dc-creator-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/item_{item_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:creator;
-        rr:objectMap [ rr:column "text_value" ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
     
-<#dc-date-available>
+map:dc-date-available
     rr:logicalTable <#dc-date-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/item_{item_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:available;
-        rr:objectMap [ rr:column "text_value" ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
-<#dc-format-extent>
+map:dc-format-extent
     rr:logicalTable <#dc-format-extent-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/item_{item_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:extent;
-        rr:objectMap [ rr:column "text_value" ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
-<#dc-identifier>
+map:dc-identifier
     rr:logicalTable <#dc-identifier-uri-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/item_{item_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:identifier;
-        rr:objectMap [ rr:column "text_value" ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
-<#dc-language>
+map:dc-language
     rr:logicalTable <#dc-language-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/item_{item_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:language;
-        rr:objectMap [ rr:column "text_value" ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
     
-<#dc-publisher>
+map:dc-publisher
     rr:logicalTable <#dc-publisher-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/item_{item_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:publisher;
-        rr:objectMap [ rr:column "text_value" ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
-<#dc-title>
+map:dc-title
     rr:logicalTable <#dc-title-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/item_{item_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:title;
-        rr:objectMap [ rr:column "text_value" ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
-<#dc-type>
+map:dc-type
     rr:logicalTable <#dc-type-view>;
     rr:subjectMap [
-        rr:template "http://purl.org/dc/terms/BibliographicResource/item_{item_id}";
+        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:type;
-        rr:objectMap [ rr:column "text_value" ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 
@@ -722,7 +723,7 @@
 	mfr.qualifier='iso'
 	""".
 
-<#dc-Publisher-view>
+<#dc-publisher-view>
 	rr:sqlQuery """
 	SELECT i.item_id AS item_id, mv.text_value AS text_value
 	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE

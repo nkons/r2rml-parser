@@ -20,8 +20,6 @@ public interface Util {
 	
 	String findDatabaseType(String driver);
 	
-	boolean isUriTemplate(Model model, Template template);
-	
 	String stripQuotes(String input);
 	
 	LocalResultSet sparql(Model model, String query);

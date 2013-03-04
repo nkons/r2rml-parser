@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 /**
  * The template is a component of the form http://data.example.com/film/{film_id}. Encloses fields in brackets.
  * @see SubjectMap
@@ -28,17 +30,29 @@ public class Template {
 	private ArrayList<String> fields;
 	
 	/**
-	 * Returns true if the template refers to a literal, false if it refers to a node.
+	 * Returns literal, blank node or iri.
 	 */
-	private boolean literal;
+	private TermType termType;
+	
+	/**
+	 * Is used as a prefix, in case of IRIs.
+	 */
+	private String namespace;
+
+	/**
+	 * The model.
+	 */
+	private Model model;
 	
 	/**
 	 * Default constructor. Once called, it finds the included fields.
 	 */
-	public Template(String text, boolean literal) {
+	public Template(String text, TermType termType, String namespace, Model model) {
 		this.text = text;
 		this.fields = createTemplateFields();
-		this.literal = literal;
+		this.termType = termType;
+		this.namespace = namespace;
+		this.model = model;
 		
 		String msg = "Template has " + fields.size() + ((fields.size() == 1)? " field: " : " fields: ");
 		for (String f : fields) {
@@ -61,6 +75,21 @@ public class Template {
 			template = template.substring(to + 1, template.length());
 		}
 		return results;
+	}
+	
+	public boolean isUri() {
+		String s = text;
+		
+		for (String key : model.getNsPrefixMap().keySet()) {
+			//log.info("checking if " + s + " contains '" + key + ":' or " + model.getNsPrefixMap().get(key));
+			if (s.contains(key + ":") || s.contains(model.getNsPrefixMap().get(key))) return true;
+		}
+		
+		if (s.contains("http")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -88,12 +117,28 @@ public class Template {
 		this.fields = fields;
 	}
 	
-	public boolean isLiteral() {
-		return literal;
+	public TermType getTermType() {
+		return termType;
 	}
 	
-	public void setLiteral(boolean literal) {
-		this.literal = literal;
+	public void setTermType(TermType termType) {
+		this.termType = termType;
 	}
 	
+	public String getNamespace() {
+		return namespace;
+	}
+	
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+	}
+	
+	public Model getModel() {
+		return model;
+	}
+	
+	public void setModel(Model model) {
+		this.model = model;
+	}
+		
 }

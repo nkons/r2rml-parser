@@ -9,8 +9,7 @@ import gr.ekt.r2rml.entities.MappingDocument;
 import gr.ekt.r2rml.entities.PredicateObjectMap;
 import gr.ekt.r2rml.entities.SubjectMap;
 import gr.ekt.r2rml.entities.Template;
-import gr.ekt.r2rml.entities.sparql.LocalResource;
-import gr.ekt.r2rml.entities.sparql.LocalResultRow;
+import gr.ekt.r2rml.entities.TermType;
 import gr.ekt.r2rml.entities.sparql.LocalResultSet;
 import gr.ekt.r2rml.entities.sql.SelectQuery;
 
@@ -32,13 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -49,7 +41,6 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.reasoner.ReasonerRegistry;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.util.FileManager;
@@ -145,62 +136,75 @@ public class Parser {
 				rs.beforeFirst();
 				int tripleCount = 0;
 				while (rs.next()) {
-
 					String resultSubject = util.fillTemplate(logicalTableMapping.getSubjectMap().getTemplate(), rs);
 					
-					if (StringUtils.isNotEmpty(logicalTableMapping.getSubjectMap().getClassUri())) {
-						Resource s = resultModel.createResource(resultSubject);
-						Property p = RDF.type;
-						Resource o = resultModel.createResource(logicalTableMapping.getSubjectMap().getClassUri());
-						Statement st = resultModel.createStatement(s, p, o);
-						if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.getURI() + ">");
-						resultModel.add(st);
-						triples.add(st);
-					}
-					
-					//for (int i = 0; i < logicalTableMapping.getPredicateObjectMaps()  resultPredicates.size(); i++) {
-					for (PredicateObjectMap predicateObjectMap : logicalTableMapping.getPredicateObjectMaps()) {
-						Resource s = resultModel.createResource(resultSubject);
-						Property p = resultModel.createProperty(predicateObjectMap.getPredicate());
-						
-						if (predicateObjectMap.getObjectTemplate() != null) {
-							//Literal o = resultModel.createLiteral(u.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
-							if (!util.isUriTemplate(resultModel, predicateObjectMap.getObjectTemplate())) {
-								Literal o;
-								if (StringUtils.isBlank(predicateObjectMap.getLanguage())) {
-									o = resultModel.createLiteral(util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
-									if (this.p.containsKey("default.verbose")) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
-								} else {
-									o = resultModel.createLiteral(util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs), predicateObjectMap.getLanguage());
-									if (this.p.containsKey("default.verbose")) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + o.getLanguage());
-								}
-								
-								Statement st = resultModel.createStatement(s, p, o);
-								resultModel.add(st);
-								triples.add(st);
-							} else {
-								RDFNode o = resultModel.createResource(util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
-								if (this.p.containsKey("default.verbose")) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
-								Statement st = resultModel.createStatement(s, p, o);
-								resultModel.add(st);
-								triples.add(st);
-								
-							}
-						} else if (predicateObjectMap.getObjectColumn() != null) {
-							String field = predicateObjectMap.getObjectColumn();
-							if (field.startsWith("\"") && field.endsWith("\"")) {
-								field = field.replaceAll("\"", "");
-								log.info("Cleaning. Field is now " + field);
-							}
-							String test = rs.getString(field);
-							Literal o = resultModel.createLiteral(test == null? "" : test);
-
-							if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
+					if (resultSubject != null) {
+						if (StringUtils.isNotEmpty(logicalTableMapping.getSubjectMap().getClassUri())) {
+							Resource s = resultModel.createResource(resultSubject);
+							Property p = RDF.type;
+							Resource o = resultModel.createResource(logicalTableMapping.getSubjectMap().getClassUri());
 							Statement st = resultModel.createStatement(s, p, o);
+							if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.getURI() + ">");
 							resultModel.add(st);
 							triples.add(st);
-
-						} 
+						}
+						
+						//for (int i = 0; i < logicalTableMapping.getPredicateObjectMaps()  resultPredicates.size(); i++) {
+						for (PredicateObjectMap predicateObjectMap : logicalTableMapping.getPredicateObjectMaps()) {
+							Resource s = resultModel.createResource(resultSubject);
+							Property p = resultModel.createProperty(predicateObjectMap.getPredicate());
+							
+							if (predicateObjectMap.getObjectTemplate() != null) {
+								//Literal o = resultModel.createLiteral(u.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
+								//if (!util.isUriTemplate(resultModel, predicateObjectMap.getObjectTemplate())) {
+								if (!predicateObjectMap.getObjectTemplate().isUri()) {
+									Literal o = null;
+									if (StringUtils.isBlank(predicateObjectMap.getLanguage())) {
+										String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
+										if (value != null)  {
+											o = resultModel.createLiteral(value);
+											if (verbose) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
+										}
+									} else {
+										String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
+										if (value != null) {
+											o = resultModel.createLiteral(value, predicateObjectMap.getLanguage());
+											if (verbose) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + o.getLanguage());
+										}
+									}
+									
+									if (o != null) {
+										Statement st = resultModel.createStatement(s, p, o);
+										resultModel.add(st);
+										triples.add(st);
+									}
+								} else {
+									String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
+									if (value != null) {
+										RDFNode o = resultModel.createResource(value);
+										if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
+										Statement st = resultModel.createStatement(s, p, o);
+										resultModel.add(st);
+										triples.add(st);
+									}
+								}
+							} else if (predicateObjectMap.getObjectColumn() != null) {
+								String field = predicateObjectMap.getObjectColumn();
+								if (field.startsWith("\"") && field.endsWith("\"")) {
+									field = field.replaceAll("\"", "");
+									//log.info("Cleaning. Field is now " + field);
+								}
+								String test = rs.getString(field);
+								Literal o = resultModel.createLiteral(test == null? "" : test);
+	
+								if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
+								Statement st = resultModel.createStatement(s, p, o);
+								resultModel.add(st);
+								triples.add(st);
+	
+							} 
+						}
+						
 					}
 
 					tripleCount++;
@@ -257,19 +261,41 @@ public class Parser {
 		    	
 		    	if (rnTemplate.isLiteral()) {
 			    	log.info("Processing literal subject template: " + rnTemplate.asLiteral().toString());
-			    	Template template = new Template(rnTemplate.asLiteral().toString(), true);
-			    	subjectMap.setTemplate(template);
+			    	
+			    	//Verify that it is indeed a literal and not some other type. Property rr:termType can have one of the following
+			    	//values: rr:IRI, rr:BlankNode or rr:Literal
+			    	NodeIterator iterTermType = mapModel.listObjectsOfProperty(rn.asResource(), mapModel.getProperty(rrNs + "termType"));
+			    	if (iterTermType.hasNext()) {
+				    	while (iterTermType.hasNext()) {
+				    		RDFNode rnTermType = iterTermType.next();
+				    		if (rnTermType.isResource() && rnTermType.asResource().getNameSpace().equals(rrNs)) {
+				    			String termType = rnTermType.asResource().getLocalName();
+				    			log.info("found rr:termType " + termType);
+				    			if ("IRI".equals(termType)) {
+				    				Template template = new Template(rnTemplate.asLiteral().toString(), TermType.IRI, baseNs, resultModel);
+							    	subjectMap.setTemplate(template);
+				    			} else if ("BlankNode".equals(termType)) {
+				    				Template template = new Template(rnTemplate.asLiteral().toString(), TermType.BLANKNODE, baseNs, resultModel);
+							    	subjectMap.setTemplate(template);
+				    			} else if ("Literal".equals(termType)) {
+				    				Template template = new Template(rnTemplate.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
+							    	subjectMap.setTemplate(template);
+				    			} else {
+				    				log.error("Unknown term type: " + termType + ". Terminating.");
+				    				System.exit(0);
+				    			}
+				    		}
+				    	}
+		    		} else {
+		    			Template template = new Template(rnTemplate.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
+				    	subjectMap.setTemplate(template);
+		    		}
 	    		} else {
 	    			log.info("Processing node subject template: " + rnTemplate.asNode().toString());
-			    	Template template = new Template(rnTemplate.asNode().toString(), false);
+			    	Template template = new Template(rnTemplate.asNode().toString(), TermType.IRI, baseNs, resultModel);
 			    	subjectMap.setTemplate(template);
 	    		}
 		    	
-				for (LogicalTableMapping ltm : mappingDocument.getLogicalTableMappings()) {
-					log.info("LTM " + ltm.getUri() + " " + ltm.getView());
-					
-				}
-				
 		    	log.info("Logical table mapping uri is " + r.getURI());
 		    	LogicalTableMapping ltm = mappingDocument.findLogicalTableMappingByUri(r.getURI());
 		    	LogicalTableView ltv = ltm.getView(); 
@@ -310,11 +336,11 @@ public class Parser {
 	    		RDFNode rnTemplate = iterObject1.next();
 	    		if (rnTemplate.isLiteral()) {
 			    	log.info("Adding object map constant: " + rnTemplate.asLiteral().toString() + ". Treating it as a template with no fields.");
-			    	Template template = new Template(rnTemplate.asLiteral().toString(), true);
+			    	Template template = new Template(rnTemplate.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
 			    	predicateObjectMap.setObjectTemplate(template);
 	    		} else {
 	    			log.info("Adding object map constant: " + rnTemplate.asNode().toString() + ". Treating it as a template with no fields.");
-			    	Template template = new Template(rnTemplate.asNode().toString(), false);
+			    	Template template = new Template(rnTemplate.asNode().toString(), TermType.IRI, baseNs, resultModel);
 			    	predicateObjectMap.setObjectTemplate(template);
 	    		}
 	    	}
@@ -331,11 +357,11 @@ public class Parser {
 			    	
 			    	if (rnTemplate.isLiteral()) {
 				    	log.info("Processing object map template: " + rnTemplate.asLiteral().toString() + ". Treating it as a template with no fields.");
-				    	Template template = new Template(rnTemplate.asLiteral().toString(), true);
+				    	Template template = new Template(rnTemplate.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
 				    	predicateObjectMap.setObjectTemplate(template);
 		    		} else {
 		    			log.info("Processing object map template: " + rnTemplate.asNode().toString() + ". Treating it as a template with no fields.");
-				    	Template template = new Template(rnTemplate.asNode().toString(), false);
+				    	Template template = new Template(rnTemplate.asNode().toString(), TermType.IRI, baseNs, resultModel);
 				    	predicateObjectMap.setObjectTemplate(template);
 		    		}
 			    	//predicateObjectMap.setObjectColumn(predicateObjectMap.getObjectTemplate().getFields().get(0));
@@ -367,11 +393,11 @@ public class Parser {
 			    	RDFNode rnTemplate = iterConstant.next();
 			    	if (rnTemplate.isLiteral()) {
 				    	log.info("Adding object map constant: " + rnTemplate.asLiteral().toString() + ". Treating it as a template with no fields.");
-				    	Template template = new Template(rnTemplate.asLiteral().toString(), true);
+				    	Template template = new Template(rnTemplate.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
 				    	predicateObjectMap.setObjectTemplate(template);
 		    		} else {
 		    			log.info("Adding object map constant: " + rnTemplate.asNode().toString() + ". Treating it as a template with no fields.");
-				    	Template template = new Template(rnTemplate.asNode().toString(), false);
+				    	Template template = new Template(rnTemplate.asNode().toString(), TermType.IRI, baseNs, resultModel);
 				    	predicateObjectMap.setObjectTemplate(template);
 		    		}
 			    }
@@ -395,13 +421,17 @@ public class Parser {
 		    	if (r.getURI() != null) {
 			    	LogicalTableMapping logicalTableMapping = new LogicalTableMapping();
 			    	logicalTableMapping.setUri(r.getURI());
-			    	logicalTableMapping.setView(mappingDocument.findLogicalTableViewByUri(rn.asResource().getURI()));
-			    	if (!contains(results, logicalTableMapping.getUri())) results.add(logicalTableMapping);
+			    	log.info("Looking up logical table view " + rn.asResource().getURI());
+			    	if (rn.asResource().getURI() != null) {
+			    		logicalTableMapping.setView(mappingDocument.findLogicalTableViewByUri(rn.asResource().getURI()));
+			    	
+			    		if (!contains(results, logicalTableMapping.getUri()))
+			    			results.add(logicalTableMapping);
+			    	}
 			    	log.info("Added logical table mapping from uri <" + r.getURI() + ">");
 		    	} else {
 		    		log.info("Did not add logical table mapping from NULL uri");
 		    	}
-		    	
 		    }
 		}
 		
@@ -554,7 +584,7 @@ public class Parser {
 			String storeInDatabase = p.getProperty("jena.storeOutputModelInDatabase");
 			String cleanDbOnStartup = p.getProperty("jena.cleanDbOnStartup");
 			
-			verbose = p.getProperty("default.verbose").contains("true");
+			verbose =  p.containsKey("default.verbose") && (p.getProperty("default.verbose").contains("true") || p.getProperty("default.verbose").contains("yes"));
 				
 			log.info("Initialising");
 			

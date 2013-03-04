@@ -4,10 +4,13 @@
 package gr.ekt.r2rml.beans;
 
 import gr.ekt.r2rml.entities.Template;
+import gr.ekt.r2rml.entities.TermType;
 import gr.ekt.r2rml.entities.sparql.LocalResource;
 import gr.ekt.r2rml.entities.sparql.LocalResultRow;
 import gr.ekt.r2rml.entities.sparql.LocalResultSet;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -47,12 +50,26 @@ public class UtilImpl implements Util {
 			for (String field : template.getFields()) {
 				if (field.startsWith("\"") && field.endsWith("\"")) {
 					field = field.replaceAll("\"", "");
-					log.info("Cleaning. Field is now " + field);
+					//log.info("Cleaning. Field is now " + field);
 				}
-				String before = result.substring(0, result.indexOf('{'));
-				String after = result.substring(result.indexOf('}') + 1);
-				result = before + rs.getString(field) + after;
+				if (rs.getString(field) != null) {
+					String before = result.substring(0, result.indexOf('{'));
+					String after = result.substring(result.indexOf('}') + 1);
+					result = before + rs.getString(field) + after;
+				} else {
+					result = null;
+				}
 			}
+			
+			if (template.getTermType() == TermType.IRI && !template.isUri()) {
+				try {
+					result = template.getNamespace() + "/" + URLEncoder.encode(result, "UTF-8");;
+				} catch (UnsupportedEncodingException e) {
+					log.error("An error occurred: " + e.getMessage());
+					System.exit(0);
+				}
+			}
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -70,23 +87,6 @@ public class UtilImpl implements Util {
 			System.exit(1);
 		}
 		return null;
-	}
-	
-	public boolean isUriTemplate(Model model, Template template) {
-		String s = template.getText();
-		
-		for (String key : model.getNsPrefixMap().keySet()) {
-			//log.info("checking if " + s + " contains '" + key + ":' or " + model.getNsPrefixMap().get(key));
-			if (s.contains(key + ":") || s.contains(model.getNsPrefixMap().get(key))) return true;
-		}
-		
-		if (s.contains("http")) {
-			//log.info("returning true");
-			return true;
-		} else {
-			//log.info("returning false");
-			return false;
-		}
 	}
 
 	public String stripQuotes(String input) {
