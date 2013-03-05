@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -208,7 +209,7 @@ public class Parser {
 					}
 
 					tripleCount++;
-					if (tripleCount % 100 == 0) log.info("at " + tripleCount + " triples");
+					if (tripleCount % 1000 == 0) log.info("at " + tripleCount + " triples");
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -225,25 +226,64 @@ public class Parser {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
+		} else {
+			log.info("Writing model to database. Model has " + resultModel.listStatements().toList().size() + " statements.");
+			//SYNC START
+			//before writing the result, check the existing
+			Store store = db.jenaStore();
+		    Model existingDbModel = SDBFactory.connectDefaultModel(store);
+			//log.info("Existing model has " + existingDbModel.listStatements().toList().size() + " statements.");
+			
+			List<Statement> statementsToRemove = new ArrayList<Statement>();
+			List<Statement> statementsToAdd = new ArrayList<Statement>();
+			
+			//first clear the ones from the old model
+			StmtIterator stmtExistingIter = existingDbModel.listStatements();
+			while (stmtExistingIter.hasNext()) {
+				Statement stmt = stmtExistingIter.nextStatement();
+				if (!resultModel.contains(stmt)) {
+					statementsToRemove.add(stmt);
+				}
+			}
+			log.info("Will remove " + statementsToRemove.size() + " statements.");
+			
+			//then add the new ones
+			StmtIterator stmtResultIter = resultModel.listStatements();
+			while (stmtResultIter.hasNext()) {
+				Statement stmt = stmtResultIter.nextStatement();
+				if (!existingDbModel.contains(stmt)) {
+					statementsToAdd.add(stmt);
+				}
+			}
+			log.info("Will add " + statementsToAdd.size() + " statements.");
+			
+			existingDbModel.remove(statementsToRemove);
+			existingDbModel.add(statementsToAdd);
 		}
 		
 		//log the results
 		try {
-			File logFile = new File(p.getProperty("default.log"));
-			log.info("Writing results to " + logFile.getAbsolutePath());
-			FileOutputStream fop = new FileOutputStream(logFile);
-			String header = "Mapping URI\tTriples Size\tTimestamp\n";
-			fop.write(header.getBytes());
-			//run again on the table mappings
+			Model logModel = ModelFactory.createDefaultModel();
+			
+			String logFile = p.getProperty("default.log");
+			log.info("Writing results to " + new File(logFile).getAbsolutePath());
+
+			//run on the table mappings
 			for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
-				String line = logicalTableMapping.getUri() + "\t" + logicalTableMapping.getTriples().size() + "\t" + new Date() + "\n";
-				fop.write(line.getBytes());
+				Resource s = logModel.createResource(logicalTableMapping.getUri());
+				
+				Property p1 = logModel.createProperty("tripleCount");
+				Literal o1 = logModel.createLiteral(String.valueOf(logicalTableMapping.getTriples().size()));
+				logModel.add(s, p1, o1);
+				
+				Property p2 = logModel.createProperty("timestamp");
+				Literal o2 = logModel.createLiteral(String.valueOf(new Date()));
+				logModel.add(s, p2, o2);
+				
 			}
-			fop.flush();
-			fop.close();
+			
+			logModel.write(new FileOutputStream(p.getProperty("default.log")), p.getProperty("jena.destinationFileSyntax"));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -574,8 +614,8 @@ public class Parser {
 			mapModel.read(isMap, baseNs, p.getProperty("mapping.file.type"));
 			//mapModel.write(System.out, properties.getProperty("mapping.file.type"));
 			
-			String resultModelFileName = p.getProperty("input.model");
-			InputStream isRes = FileManager.get().open(resultModelFileName);
+			String inputModelFileName = p.getProperty("input.model");
+			InputStream isRes = FileManager.get().open(inputModelFileName);
 			
 			Model resultBaseModel = ModelFactory.createDefaultModel();
 			resultBaseModel.read(isRes, baseNs, p.getProperty("input.model.type"));
@@ -602,17 +642,15 @@ public class Parser {
 			    Model resultDbModel = SDBFactory.connectDefaultModel(store);
 			    
 			    resultDbModel.read(isRes, baseNs, p.getProperty("input.model.type"));
-			    log.info("store size is " + store.getSize());
-			    if (store.getSize() > 0) {
-				    StmtIterator sIter = resultDbModel.listStatements() ;
-				    for ( ; sIter.hasNext() ; )
-				    {
-				        Statement stmt = sIter.nextStatement() ;
-				        log.info("stmt " + stmt) ;
-				    }
-				    sIter.close() ;
-				    //store.close() ;
-			    }
+			    log.info("Store size is " + store.getSize());
+//			    if (store.getSize() > 0) {
+//				    StmtIterator sIter = resultDbModel.listStatements();
+//				    for ( ; sIter.hasNext() ; ) {
+//				        Statement stmt = sIter.nextStatement() ;
+//				        log.info("stmt " + stmt) ;
+//				    }
+//				    sIter.close() ;
+//			    }
 			    
 			    //Model resultDbModel = ModelFactory.createModelRDBMaker(db.getJenaConnection()).createModel("fresh");
 				resultDbModel.add(resultBaseModel);

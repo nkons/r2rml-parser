@@ -92,9 +92,18 @@ public class DatabaseImpl implements Database {
 				
 				jenaConnection = new SDBConnection(jenaConnectionString, p.getProperty("jena.db.login"), p.getProperty("jena.db.password")) ;
 				
-				StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL) ;
+				StoreDesc storeDesc = null;
+				if ("postgresql".equals(jenaDatabaseType)) {
+					storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash, DatabaseType.PostgreSQL);
+				} else if ("mysql".equals(jenaDatabaseType)) {
+					storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL);
+				}
 				store = SDBFactory.connectStore(jenaConnection, storeDesc);
-				store.getTableFormatter().create();
+				
+				if ("true".equals(p.getProperty("jena.cleanDbOnStartup"))) {
+					log.info("Cleaning up database");
+					store.getTableFormatter().create();
+				}
 
 				log.info("Established target (jena/triplestore) connection.");
 				
