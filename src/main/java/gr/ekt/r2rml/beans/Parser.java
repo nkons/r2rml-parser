@@ -131,7 +131,7 @@ public class Parser {
 		for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
 			ArrayList<Statement> triples = new ArrayList<Statement>();
 		    try {
-				SelectQuery selectQuery = logicalTableMapping.getView().getQuery();
+				SelectQuery selectQuery = logicalTableMapping.getView().getSelectQuery();
 				//log.info("About to execute " + selectQuery.getQuery());
 				java.sql.ResultSet rs = db.query(selectQuery.getQuery());
 				rs.beforeFirst();
@@ -339,7 +339,7 @@ public class Parser {
 		    	log.info("Logical table mapping uri is " + r.getURI());
 		    	LogicalTableMapping ltm = mappingDocument.findLogicalTableMappingByUri(r.getURI());
 		    	LogicalTableView ltv = ltm.getView(); 
-		    	SelectQuery sq = ltv.getQuery();
+		    	SelectQuery sq = ltv.getSelectQuery();
 		    	subjectMap.setSelectQuery(sq);
 		    }
 		    
@@ -463,11 +463,29 @@ public class Parser {
 			    	logicalTableMapping.setUri(r.getURI());
 			    	log.info("Looking up logical table view " + rn.asResource().getURI());
 			    	if (rn.asResource().getURI() != null) {
-			    		logicalTableMapping.setView(mappingDocument.findLogicalTableViewByUri(rn.asResource().getURI()));
-			    	
-			    		if (!contains(results, logicalTableMapping.getUri()))
+			    		LogicalTableView ltv = mappingDocument.findLogicalTableViewByUri(rn.asResource().getURI());
+			    		logicalTableMapping.setView(ltv);
+			    		
+				    	if (!contains(results, logicalTableMapping.getUri()))
 			    			results.add(logicalTableMapping);
+			    	} else {
+			    		LocalResultSet sparqlResults = util.sparql(mapModel, "SELECT ?z2 WHERE { <" + r.getURI() + "> rr:logicalTable ?z1 . ?z1 rr:sqlQuery ?z2 . } ");
+			    		String sqlQuery = sparqlResults.getRows().get(0).getResources().get(0).getLocalName();
+				    	if (sqlQuery != null) {
+				    		sqlQuery = sqlQuery.replaceAll("[\r\n]+", " ");
+					    	if (sqlQuery.indexOf(';') != -1) sqlQuery = sqlQuery.replace(';', ' ');
+					    	
+				    		SelectQuery test = new SelectQuery(sqlQuery, p);
+				    		LogicalTableView ltv = mappingDocument.findLogicalTableViewByQuery(test.getQuery());
+				    		logicalTableMapping.setView(ltv);
+				    		
+					    	if (!contains(results, logicalTableMapping.getUri()))
+				    			results.add(logicalTableMapping);
+				    	} else {
+				    		log.error("Could not find rr:sqlQuery.");
+				    	}
 			    	}
+			    	
 			    	log.info("Added logical table mapping from uri <" + r.getURI() + ">");
 		    	} else {
 		    		log.info("Did not add logical table mapping from NULL uri");
@@ -496,7 +514,7 @@ public class Parser {
 	    		log.info("Found table name: " + newTable);
 	    		SelectQuery sq = new SelectQuery(createQueryForTable(newTable), p);
 	    		log.info("Setting SQL query for table " + newTable + ": " + sq.getQuery());
-	    		logicalTableView.setQuery(sq);
+	    		logicalTableView.setSelectQuery(sq);
 	    		if (r.getURI() == null) {
 			    	//figure out to which TriplesMap this rr:tableName belongs
 			    	log.info("Found rr:tableName without parent.");
@@ -542,6 +560,7 @@ public class Parser {
 		    	String query = rn.asLiteral().toString();
 		    	//Windows standard line separator is "\r\n"--a carriage-return followed by a linefeed. The regex below matches any number of either of the two characters
 		    	query = query.replaceAll("[\r\n]+", " ");
+		    	if (query.indexOf(';') != -1) query = query.replace(';', ' ');
 		    	
 		    	log.info("Found query: <" + r.getURI() + "> with value: " + query);
 		    	//Testing. Add a LIMIT 10 to avoid large datasets.
@@ -554,7 +573,7 @@ public class Parser {
 				}
 		    	
 		    	SelectQuery selectQuery = new SelectQuery(query, p);
-		    	logicalTableView.setQuery(selectQuery);
+		    	logicalTableView.setSelectQuery(selectQuery);
 		    	results.add(logicalTableView);
 		    }
 		}
@@ -686,6 +705,7 @@ public class Parser {
 		Parser parser = (Parser) context.getBean("parser");
 		parser.parse();
 		
+		context.close();
 		Calendar c1 = Calendar.getInstance();
         long t1 = c1.getTimeInMillis();
         log.info("Finished in " + (t1 - t0) + " milliseconds.");

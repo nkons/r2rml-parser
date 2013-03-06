@@ -18,9 +18,9 @@ public class LogicalTableView {
 	private String uri;
 	
 	/**
-	 * 
+	 * The SQL Select query that is associated with this view
 	 */
-	private SelectQuery query;
+	private SelectQuery selectQuery;
 	
 	/**
 	 * Default no-argument constructor
@@ -41,16 +41,16 @@ public class LogicalTableView {
 		this.uri = uri;
 	}
 	/**
-	 * @return the query
+	 * @return the selectQuery
 	 */
-	public SelectQuery getQuery() {
-		return query;
+	public SelectQuery getSelectQuery() {
+		return selectQuery;
 	}
 	/**
-	 * @param query the query to set
+	 * @param query the selectQuery to set
 	 */
-	public void setQuery(SelectQuery query) {
-		this.query = query;
+	public void setSelectQuery(SelectQuery selectQuery) {
+		this.selectQuery = selectQuery;
 	}
 	
 	
