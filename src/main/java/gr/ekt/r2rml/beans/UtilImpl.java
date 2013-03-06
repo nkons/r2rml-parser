@@ -19,6 +19,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.datatypes.BaseDatatype;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -156,4 +158,95 @@ public class UtilImpl implements Util {
 		
 		return result;
 	}
+	
+	public BaseDatatype findDataType(String dataType) {
+		if ("anyURI".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDanyURI;
+    	} else if ("base64Binary".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDbase64Binary;
+    	} else if ("boolean".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDboolean;
+    	} else if ("byte".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDbyte;
+    	} else if ("date".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDdate;
+    	} else if ("dateTime".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDdateTime;
+    	} else if ("decimal".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDdecimal;
+    	} else if ("double".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDdouble;
+    	} else if ("duration".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDduration;
+    	} else if ("ENTITY".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDENTITY;
+    	} else if ("float".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDfloat;
+    	} else if ("gDay".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDgDay;
+    	} else if ("gMonth".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDgMonth;
+    	} else if ("gMonthDay".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDgMonthDay;
+    	} else if ("gYear".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDgYear;
+    	} else if ("gYearMonth".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDgYearMonth;
+    	} else if ("hexBinary".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDhexBinary;
+    	} else if ("ID".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDID;
+    	} else if ("IDREF".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDIDREF;
+    	} else if ("int".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDint;
+    	} else if ("integer".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDinteger;
+    	} else if ("language".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDlanguage;
+    	} else if ("long".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDlong;
+    	} else if ("Name".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDName;
+    	} else if ("NCName".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDNCName;
+    	} else if ("negativeInteger".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDnegativeInteger;
+    	} else if ("NMTOKEN".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDNMTOKEN;
+    	} else if ("nonNegativeInteger".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDnonNegativeInteger;
+    	} else if ("nonPositiveInteger".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDnonPositiveInteger;
+    	} else if ("normalizedString".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDnormalizedString;
+    	} else if ("NOTATION".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDNOTATION;
+    	} else if ("positiveInteger".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDpositiveInteger;
+    	} else if ("QName".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDQName;
+    	} else if ("short".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDshort;
+    	} else if ("string".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDstring;
+    	} else if ("time".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDtime;
+    	} else if ("token".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDtoken;
+    	} else if ("unsignedByte".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDunsignedByte;
+    	} else if ("unsignedInt".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDunsignedInt;
+    	} else if ("unsignedLong".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDunsignedLong;
+    	} else if ("unsignedShort".equalsIgnoreCase(dataType)) {
+    		return XSDDatatype.XSDunsignedShort;
+    	} else {
+    		log.info("Found unknown datatype " + dataType);
+    		System.exit(0);
+    	}
+		return null;
+	}
+	
 }

@@ -13,26 +13,19 @@ import gr.ekt.r2rml.entities.TermType;
 import gr.ekt.r2rml.entities.sparql.LocalResultSet;
 import gr.ekt.r2rml.entities.sql.SelectQuery;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.datatypes.BaseDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
@@ -40,12 +33,9 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.util.FileManager;
-import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
  * Parses a valid R2RML Mapping Document and produces the associated triples.
@@ -70,11 +60,15 @@ public class Parser {
 	 */
 	private String baseNs;
 	
-	
 	/**
 	 * The rr namespace. Should not be changed.
 	 */
 	private final String rrNs = "http://www.w3.org/ns/r2rml#";
+	
+	/**
+	 * The xsd namespace. Should not be changed.
+	 */	
+	private final String xsdNs = "http://www.w3.org/2001/XMLSchema#";
 
 	/**
 	 * @see MappingDocument
@@ -97,7 +91,7 @@ public class Parser {
 		this.propertiesFilename = propertiesFilename;
 	}
 	
-	public void parse() {
+	public MappingDocument parse() {
 
 		init();
 		
@@ -116,7 +110,7 @@ public class Parser {
 			    mappingDocument.getLogicalTableMappings().set(i, logicalTableMapping);
 			}
 						
-			createTriples();
+			
 			
 			//resultModel.write(System.out, "TURTLE");
 			
@@ -125,167 +119,8 @@ public class Parser {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public void createTriples() {
-		for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
-			ArrayList<Statement> triples = new ArrayList<Statement>();
-		    try {
-				SelectQuery selectQuery = logicalTableMapping.getView().getSelectQuery();
-				//log.info("About to execute " + selectQuery.getQuery());
-				java.sql.ResultSet rs = db.query(selectQuery.getQuery());
-				rs.beforeFirst();
-				int tripleCount = 0;
-				while (rs.next()) {
-					String resultSubject = util.fillTemplate(logicalTableMapping.getSubjectMap().getTemplate(), rs);
-					
-					if (resultSubject != null) {
-						if (StringUtils.isNotEmpty(logicalTableMapping.getSubjectMap().getClassUri())) {
-							Resource s = resultModel.createResource(resultSubject);
-							Property p = RDF.type;
-							Resource o = resultModel.createResource(logicalTableMapping.getSubjectMap().getClassUri());
-							Statement st = resultModel.createStatement(s, p, o);
-							if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.getURI() + ">");
-							resultModel.add(st);
-							triples.add(st);
-						}
-						
-						//for (int i = 0; i < logicalTableMapping.getPredicateObjectMaps()  resultPredicates.size(); i++) {
-						for (PredicateObjectMap predicateObjectMap : logicalTableMapping.getPredicateObjectMaps()) {
-							Resource s = resultModel.createResource(resultSubject);
-							Property p = resultModel.createProperty(predicateObjectMap.getPredicate());
-							
-							if (predicateObjectMap.getObjectTemplate() != null) {
-								//Literal o = resultModel.createLiteral(u.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
-								//if (!util.isUriTemplate(resultModel, predicateObjectMap.getObjectTemplate())) {
-								if (!predicateObjectMap.getObjectTemplate().isUri()) {
-									Literal o = null;
-									if (StringUtils.isBlank(predicateObjectMap.getLanguage())) {
-										String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
-										if (value != null)  {
-											o = resultModel.createLiteral(value);
-											if (verbose) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
-										}
-									} else {
-										String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
-										if (value != null) {
-											o = resultModel.createLiteral(value, predicateObjectMap.getLanguage());
-											if (verbose) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + o.getLanguage());
-										}
-									}
-									
-									if (o != null) {
-										Statement st = resultModel.createStatement(s, p, o);
-										resultModel.add(st);
-										triples.add(st);
-									}
-								} else {
-									String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
-									if (value != null) {
-										RDFNode o = resultModel.createResource(value);
-										if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
-										Statement st = resultModel.createStatement(s, p, o);
-										resultModel.add(st);
-										triples.add(st);
-									}
-								}
-							} else if (predicateObjectMap.getObjectColumn() != null) {
-								String field = predicateObjectMap.getObjectColumn();
-								if (field.startsWith("\"") && field.endsWith("\"")) {
-									field = field.replaceAll("\"", "");
-									//log.info("Cleaning. Field is now " + field);
-								}
-								String test = rs.getString(field);
-								Literal o = resultModel.createLiteral(test == null? "" : test);
-	
-								if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
-								Statement st = resultModel.createStatement(s, p, o);
-								resultModel.add(st);
-								triples.add(st);
-	
-							} 
-						}
-						
-					}
-
-					tripleCount++;
-					if (tripleCount % 1000 == 0) log.info("at " + tripleCount + " triples");
-				}
-				rs.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		    logicalTableMapping.setTriples(triples);
-		    log.info("Generated " + triples.size() + " statements from table mapping <" + logicalTableMapping.getUri() + ">");
-	    }
 		
-		if (p.getProperty("jena.storeOutputModelInDatabase").contains("false")) {
-			log.info("Writing model to " + p.getProperty("jena.destinationFileName") + ". Model has " + resultModel.listStatements().toList().size() + " statements.");
-			try {
-				resultModel.write(new FileOutputStream(p.getProperty("jena.destinationFileName")), p.getProperty("jena.destinationFileSyntax"));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		} else {
-			log.info("Writing model to database. Model has " + resultModel.listStatements().toList().size() + " statements.");
-			//SYNC START
-			//before writing the result, check the existing
-			Store store = db.jenaStore();
-		    Model existingDbModel = SDBFactory.connectDefaultModel(store);
-			//log.info("Existing model has " + existingDbModel.listStatements().toList().size() + " statements.");
-			
-			List<Statement> statementsToRemove = new ArrayList<Statement>();
-			List<Statement> statementsToAdd = new ArrayList<Statement>();
-			
-			//first clear the ones from the old model
-			StmtIterator stmtExistingIter = existingDbModel.listStatements();
-			while (stmtExistingIter.hasNext()) {
-				Statement stmt = stmtExistingIter.nextStatement();
-				if (!resultModel.contains(stmt)) {
-					statementsToRemove.add(stmt);
-				}
-			}
-			log.info("Will remove " + statementsToRemove.size() + " statements.");
-			
-			//then add the new ones
-			StmtIterator stmtResultIter = resultModel.listStatements();
-			while (stmtResultIter.hasNext()) {
-				Statement stmt = stmtResultIter.nextStatement();
-				if (!existingDbModel.contains(stmt)) {
-					statementsToAdd.add(stmt);
-				}
-			}
-			log.info("Will add " + statementsToAdd.size() + " statements.");
-			
-			existingDbModel.remove(statementsToRemove);
-			existingDbModel.add(statementsToAdd);
-		}
-		
-		//log the results
-		try {
-			Model logModel = ModelFactory.createDefaultModel();
-			
-			String logFile = p.getProperty("default.log");
-			log.info("Writing results to " + new File(logFile).getAbsolutePath());
-
-			//run on the table mappings
-			for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
-				Resource s = logModel.createResource(logicalTableMapping.getUri());
-				
-				Property p1 = logModel.createProperty("tripleCount");
-				Literal o1 = logModel.createLiteral(String.valueOf(logicalTableMapping.getTriples().size()));
-				logModel.add(s, p1, o1);
-				
-				Property p2 = logModel.createProperty("timestamp");
-				Literal o2 = logModel.createLiteral(String.valueOf(new Date()));
-				logModel.add(s, p2, o2);
-				
-			}
-			
-			logModel.write(new FileOutputStream(p.getProperty("default.log")), p.getProperty("jena.destinationFileSyntax"));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		return mappingDocument;
 	}
 	
 	public SubjectMap createSubjectMapForResource(Resource r) {
@@ -428,15 +263,27 @@ public class Parser {
 			    	log.info("Added language: " + language);
 			    }
 			    
+			    NodeIterator iterDataType = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "datatype"));
+			    while (iterDataType.hasNext()) {
+			    	RDFNode rnDataType = iterDataType.next();
+			    	
+			    	if (xsdNs.equals(rnDataType.asResource().getNameSpace())) {
+				    	String dataType = rnDataType.asResource().getLocalName();
+				    	log.info("Found datatype xsd:" + dataType);
+				    	BaseDatatype baseDataType = util.findDataType(dataType);
+				    	predicateObjectMap.setDataType(baseDataType);
+			    	}
+			    }
+			    
 			    NodeIterator iterConstant = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "constant"));
 			    while (iterConstant.hasNext()) {
 			    	RDFNode rnTemplate = iterConstant.next();
 			    	if (rnTemplate.isLiteral()) {
-				    	log.info("Adding object map constant: " + rnTemplate.asLiteral().toString() + ". Treating it as a template with no fields.");
+				    	log.info("Adding object map constant literal: " + rnTemplate.asLiteral().toString() + ". Treating it as a template with no fields.");
 				    	Template template = new Template(rnTemplate.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
 				    	predicateObjectMap.setObjectTemplate(template);
 		    		} else {
-		    			log.info("Adding object map constant: " + rnTemplate.asNode().toString() + ". Treating it as a template with no fields.");
+		    			log.info("Adding object map constant iri: " + rnTemplate.asNode().toString() + ". Treating it as a template with no fields.");
 				    	Template template = new Template(rnTemplate.asNode().toString(), TermType.IRI, baseNs, resultModel);
 				    	predicateObjectMap.setObjectTemplate(template);
 		    		}
@@ -645,7 +492,7 @@ public class Parser {
 			
 			verbose =  p.containsKey("default.verbose") && (p.getProperty("default.verbose").contains("true") || p.getProperty("default.verbose").contains("yes"));
 				
-			log.info("Initialising");
+			log.info("Initialising Parser");
 			
 			if (Boolean.valueOf(storeInDatabase)) {
 				if (Boolean.valueOf(cleanDbOnStartup)) {
@@ -697,29 +544,15 @@ public class Parser {
 		}
 	}
 	
-	public static void main(String[] args) {
-		Calendar c0 = Calendar.getInstance();
-        long t0 = c0.getTimeInMillis();
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("app-context.xml");
-		
-		Parser parser = (Parser) context.getBean("parser");
-		parser.parse();
-		
-		context.close();
-		Calendar c1 = Calendar.getInstance();
-        long t1 = c1.getTimeInMillis();
-        log.info("Finished in " + (t1 - t0) + " milliseconds.");
-	}
-	
-	public String getPropertiesFilename() {
-		return propertiesFilename;
-	}
-	
 	boolean contains(ArrayList<LogicalTableMapping> logicalTableMappings, String uri) {
 		for (LogicalTableMapping logicalTableMapping : logicalTableMappings) {
 			if (logicalTableMapping.getUri().equals(uri)) return true;
 		}
 		return false;
+	}
+
+	public String getPropertiesFilename() {
+		return propertiesFilename;
 	}
 	
 	public void setPropertiesFilename(String propertiesFilename) {
@@ -740,6 +573,18 @@ public class Parser {
 	
 	public void setUtil(Util util) {
 		this.util = util;
+	}
+	
+	public Model getResultModel() {
+		return resultModel;
+	}
+	
+	public Properties getP() {
+		return p;
+	}
+	
+	public void setP(Properties p) {
+		this.p = p;
 	}
 	
 }

@@ -25,4 +25,9 @@
 		<property name="util" ref="util" />
 	</bean>
 	
+	<bean id="generator" class="gr.ekt.r2rml.beans.Generator">
+		<property name="db" ref="db" />
+		<property name="util" ref="util" />
+	</bean>
+	
 </beans>

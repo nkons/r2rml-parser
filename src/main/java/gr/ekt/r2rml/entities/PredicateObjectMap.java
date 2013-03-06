@@ -3,6 +3,8 @@
  */
 package gr.ekt.r2rml.entities;
 
+import com.hp.hpl.jena.datatypes.BaseDatatype;
+
 /**
  * The mapping of predicates and respective objects for a specific subject. Objects come either from a column or from a template.
  * @author nkons
@@ -25,7 +27,15 @@ public class PredicateObjectMap {
 	 */
 	private String objectColumn;
 	
+	/**
+	 * The language of the literals to be created.
+	 */
 	private String language;
+	
+	/**
+	 * One of the XSD datatypes.
+	 */
+	private BaseDatatype dataType;
 	
 	/**
 	 * 
@@ -76,6 +86,14 @@ public class PredicateObjectMap {
 	
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+	
+	public BaseDatatype getDataType() {
+		return dataType;
+	}
+	
+	public void setDataType(BaseDatatype dataType) {
+		this.dataType = dataType;
 	}
 	
 }
