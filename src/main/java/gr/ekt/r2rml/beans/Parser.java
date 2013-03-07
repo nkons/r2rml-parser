@@ -186,6 +186,14 @@ public class Parser {
 		    }
 	    }
 	    
+	    NodeIterator iterSubject = mapModel.listObjectsOfProperty(r, mapModel.getProperty(rrNs + "subject"));
+	    while (iterSubject.hasNext()) { //should be only 1
+	    	RDFNode rnSubject = iterSubject.next();
+	    	log.info("Found subject: " + rnSubject.toString());
+	    	Template template = new Template(rnSubject.toString(), TermType.IRI, baseNs, resultModel);
+	    	subjectMap.setTemplate(template);
+	    }
+	    
 	    return subjectMap;
 	}
 	
@@ -207,15 +215,15 @@ public class Parser {
 	    	
 	    	NodeIterator iterObject1 = mapModel.listObjectsOfProperty(rnPredicateObject.asResource(), mapModel.getProperty(rrNs + "object"));
 	    	while (iterObject1.hasNext()) {
-	    		log.info("Found object: " + iterObject1.toString());
-	    		RDFNode rnTemplate = iterObject1.next();
-	    		if (rnTemplate.isLiteral()) {
-			    	log.info("Adding object map constant: " + rnTemplate.asLiteral().toString() + ". Treating it as a template with no fields.");
-			    	Template template = new Template(rnTemplate.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
+	    		RDFNode rnObject = iterObject1.next();
+	    		log.info("Found object: " + rnObject.toString());
+	    		if (rnObject.isLiteral()) {
+			    	log.info("Adding object map constant: " + rnObject.asLiteral().toString() + ". Treating it as a template with no fields.");
+			    	Template template = new Template(rnObject.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
 			    	predicateObjectMap.setObjectTemplate(template);
 	    		} else {
-	    			log.info("Adding object map constant: " + rnTemplate.asNode().toString() + ". Treating it as a template with no fields.");
-			    	Template template = new Template(rnTemplate.asNode().toString(), TermType.IRI, baseNs, resultModel);
+	    			log.info("Adding object map constant: " + rnObject.asNode().toString() + ". Treating it as a template with no fields.");
+			    	Template template = new Template(rnObject.asNode().toString(), TermType.IRI, baseNs, resultModel);
 			    	predicateObjectMap.setObjectTemplate(template);
 	    		}
 	    	}
@@ -316,21 +324,38 @@ public class Parser {
 				    	if (!contains(results, logicalTableMapping.getUri()))
 			    			results.add(logicalTableMapping);
 			    	} else {
+			    		//Then we can either have a rr:sqlQuery with the query or a rr:tableName with the table name
 			    		LocalResultSet sparqlResults = util.sparql(mapModel, "SELECT ?z2 WHERE { <" + r.getURI() + "> rr:logicalTable ?z1 . ?z1 rr:sqlQuery ?z2 . } ");
-			    		String sqlQuery = sparqlResults.getRows().get(0).getResources().get(0).getLocalName();
-				    	if (sqlQuery != null) {
-				    		sqlQuery = sqlQuery.replaceAll("[\r\n]+", " ");
-					    	if (sqlQuery.indexOf(';') != -1) sqlQuery = sqlQuery.replace(';', ' ');
-					    	
-				    		SelectQuery test = new SelectQuery(sqlQuery, p);
-				    		LogicalTableView ltv = mappingDocument.findLogicalTableViewByQuery(test.getQuery());
-				    		logicalTableMapping.setView(ltv);
-				    		
-					    	if (!contains(results, logicalTableMapping.getUri()))
-				    			results.add(logicalTableMapping);
-				    	} else {
-				    		log.error("Could not find rr:sqlQuery.");
-				    	}
+			    		if (sparqlResults.getRows().size() > 0) {
+				    		String sqlQuery = sparqlResults.getRows().get(0).getResources().get(0).getLocalName();
+					    	if (sqlQuery != null) {
+					    		sqlQuery = sqlQuery.replaceAll("[\r\n]+", " ");
+						    	if (sqlQuery.indexOf(';') != -1) sqlQuery = sqlQuery.replace(';', ' ');
+						    	
+					    		SelectQuery test = new SelectQuery(sqlQuery, p);
+					    		LogicalTableView logicalTableView = mappingDocument.findLogicalTableViewByQuery(test.getQuery());
+					    		logicalTableMapping.setView(logicalTableView);
+					    		
+						    	if (!contains(results, logicalTableMapping.getUri()))
+					    			results.add(logicalTableMapping);
+					    	} else {
+					    		log.error("Could not find rr:sqlQuery.");
+					    	}
+			    		} else {
+			    			sparqlResults = util.sparql(mapModel, "SELECT ?z2 WHERE { <" + r.getURI() + "> rr:logicalTable ?z1 . ?z1 rr:tableName ?z2 . } ");
+			    			if (sparqlResults.getRows().size() > 0) {
+			    				String tableName = sparqlResults.getRows().get(0).getResources().get(0).getLocalName();
+			    				tableName = tableName.replaceAll("\"", "");
+			    				log.info("Found tableName " + tableName);
+			    				LogicalTableView logicalTableView = new LogicalTableView();
+			    				SelectQuery sq = new SelectQuery(createQueryForTable(tableName), p);
+			    				logicalTableView.setSelectQuery(sq);
+			    				logicalTableMapping.setView(logicalTableView);
+			    				
+			    				if (!contains(results, logicalTableMapping.getUri()))
+					    			results.add(logicalTableMapping);
+			    			}
+			    		}
 			    	}
 			    	
 			    	log.info("Added logical table mapping from uri <" + r.getURI() + ">");
