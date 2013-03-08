@@ -10,7 +10,7 @@ This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 Unp
 
 http://creativecommons.org/licenses/by-nc/3.0/
 
-You can use the work as long as you attribute the work by providing a link to the project page and/or publication [1] above.
+You can use the work as long as you attribute the work by providing a link to the project page and/or to publication [1] above.
 
 ## Implementation
 

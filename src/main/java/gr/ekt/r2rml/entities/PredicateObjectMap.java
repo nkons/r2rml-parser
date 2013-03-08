@@ -30,7 +30,7 @@ public class PredicateObjectMap {
 	/**
 	 * The language of the literals to be created.
 	 */
-	private String language;
+	private Template language;
 	
 	/**
 	 * One of the XSD datatypes.
@@ -80,11 +80,11 @@ public class PredicateObjectMap {
 		this.objectColumn = objectColumn;
 	}
 	
-	public String getLanguage() {
+	public Template getLanguage() {
 		return language;
 	}
 	
-	public void setLanguage(String language) {
+	public void setLanguage(Template language) {
 		this.language = language;
 	}
 	

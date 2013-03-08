@@ -47,7 +47,14 @@ public class UtilImpl implements Util {
 	}
 	
 	public String fillTemplate(Template template, ResultSet rs) {
-		String result = template.getText();
+		
+		String result = new String();
+		if (template!= null && template.getText() != null) {
+			result = template.getText();
+		} else {
+			result = "";
+		}
+		
 		try {
 			for (String field : template.getFields()) {
 				if (field.startsWith("\"") && field.endsWith("\"")) {
@@ -64,8 +71,20 @@ public class UtilImpl implements Util {
 			}
 			
 			if (template.getTermType() == TermType.IRI && !template.isUri()) {
+				log.info("Processing URI template with namespace " + template.getText());
 				try {
 					result = template.getNamespace() + "/" + URLEncoder.encode(result, "UTF-8");;
+				} catch (UnsupportedEncodingException e) {
+					log.error("An error occurred: " + e.getMessage());
+					System.exit(0);
+				}
+			}
+			
+			if (template.isUri()) {
+				log.info("Processing URI template " + template.getText());
+				try {
+					int r = Math.max(result.lastIndexOf('#'), result.lastIndexOf('/')) + 1;
+					if (r > -1) result = result.substring(0, r) + URLEncoder.encode(result.substring(r), "UTF-8");;
 				} catch (UnsupportedEncodingException e) {
 					log.error("An error occurred: " + e.getMessage());
 					System.exit(0);

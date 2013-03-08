@@ -88,7 +88,8 @@ public class Generator {
 								//if (!util.isUriTemplate(resultModel, predicateObjectMap.getObjectTemplate())) {
 								if (!predicateObjectMap.getObjectTemplate().isUri()) {
 									Literal o = null;
-									if (StringUtils.isBlank(predicateObjectMap.getLanguage())) {
+									
+									if (predicateObjectMap.getLanguage() == null) {
 										String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
 										if (value != null)  {
 											if (predicateObjectMap.getDataType() != null) {
@@ -100,9 +101,11 @@ public class Generator {
 											}
 										}
 									} else {
+										String language = util.fillTemplate(predicateObjectMap.getLanguage(), rs);
 										String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
 										if (value != null) {
-											o = resultModel.createLiteral(value, predicateObjectMap.getLanguage());
+											
+											o = resultModel.createLiteral(value, language);
 											if (verbose) log.info("Adding literal triple with language: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + o.getLanguage());
 										}
 									}
@@ -113,6 +116,7 @@ public class Generator {
 										triples.add(st);
 									}
 								} else {
+									log.info("filling in template " + predicateObjectMap.getObjectTemplate().getText());
 									String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
 									if (value != null) {
 										RDFNode o = resultModel.createResource(value);
@@ -131,7 +135,7 @@ public class Generator {
 								String test = rs.getString(field);
 								if (test != null) {
 									Literal o;
-									if (StringUtils.isBlank(predicateObjectMap.getLanguage())) {
+									if (predicateObjectMap.getLanguage() == null) {
 										
 										if (predicateObjectMap.getDataType() != null) {
 											o = resultModel.createTypedLiteral(test, predicateObjectMap.getDataType());
@@ -142,7 +146,8 @@ public class Generator {
 										}
 										
 									} else {
-										o = resultModel.createLiteral(test, predicateObjectMap.getLanguage());
+										String language = util.fillTemplate(predicateObjectMap.getLanguage(), rs);
+										o = resultModel.createLiteral(test, language);
 										if (verbose) log.info("Adding triple with language: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + predicateObjectMap.getLanguage());
 									}
 									
@@ -213,7 +218,7 @@ public class Generator {
 			Model logModel = ModelFactory.createDefaultModel();
 			
 			String logFile = p.getProperty("default.log");
-			log.info("Writing results to " + new File(logFile).getAbsolutePath());
+			log.info("Logging results to " + new File(logFile).getAbsolutePath());
 
 			//run on the table mappings
 			for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
