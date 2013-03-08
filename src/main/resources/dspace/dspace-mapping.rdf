@@ -25,7 +25,7 @@ map:persons
 	
 	rr:predicateObjectMap [
       rr:predicate rdf:value;
-      rr:objectMap [ rr:template '{"firstname"}%20{"lastname"}' ]
+      rr:objectMap [ rr:template '{"firstname"} {"lastname"}' ]
     ].
 
 	
@@ -60,7 +60,7 @@ map:dc-contributor-author
     ];
     rr:predicateObjectMap [
         rr:predicate dc:creator;
-        rr:objectMap [ rr:template 'http://purl.org/dc/terms/Agent/agent_{"text_value"}' ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
     
 map:dc-coverage-spatial
@@ -91,7 +91,7 @@ map:dc-creator
     ];
     rr:predicateObjectMap [
         rr:predicate dc:creator;
-        rr:objectMap [ rr:column '"text_value"' ];
+        rr:objectMap [ rr:column '"text_value"'; rr:language '{"text_lang"}' ];
     ].
     
 map:dc-date-available
@@ -151,7 +151,7 @@ map:dc-title
     ];
     rr:predicateObjectMap [
         rr:predicate dc:title;
-        rr:objectMap [ rr:column '"text_value"' ];
+        rr:objectMap [ rr:column '"text_value"'; rr:language '{"text_lang"}' ];
     ].
 
 map:dc-type
@@ -294,7 +294,7 @@ map:dc-type
 	
 <#dc-creator-view>
 	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
+	SELECT i.item_id AS item_id, mv.text_value AS text_value, mv.text_lang AS text_lang
 	FROM item AS i
 	INNER JOIN metadatavalue AS mv
 	ON i.item_id=mv.item_id 
@@ -1070,7 +1070,7 @@ map:dc-type
 	
 <#dc-title-view>
 	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
+	SELECT i.item_id AS item_id, mv.text_value AS text_value, mv.text_lang AS text_lang
 	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
 	i.in_archive=TRUE AND
 	msr.metadata_schema_id=mfr.metadata_schema_id AND

@@ -418,7 +418,13 @@ public class Parser {
 	    		if (r.getURI() == null) {
 			    	//figure out to which TriplesMap this rr:tableName belongs
 			    	log.info("Found rr:tableName without parent.");
-			    	LocalResultSet sparqlResults = util.sparql(mapModel, "SELECT ?x WHERE { ?x rr:logicalTable ?z . ?z rr:tableName \"\\\"" + newTable + "\\\"\" . } ");
+			    	//LocalResultSet sparqlResults = util.sparql(mapModel, "SELECT ?x WHERE { ?x rr:logicalTable ?z . ?z rr:tableName " + newTable + " . } ");
+			    	if (util.findDatabaseType(p.getProperty("db.driver")).equals("postgresql")) {
+			    		newTable = "\"\\\"" + newTable + "\\\"\"";
+			    	} else {
+			    		newTable = "\"" + newTable + "\"";
+			    	}
+			    	LocalResultSet sparqlResults = util.sparql(mapModel, "SELECT ?x WHERE { ?x rr:logicalTable ?z . ?z rr:tableName " + newTable + " . } ");
 			    	
 			    	String triplesMapUri = sparqlResults.getRows().get(0).getResources().get(0).getUri();
 			    	if (triplesMapUri != null) {
@@ -496,7 +502,11 @@ public class Parser {
 			rs.beforeFirst();
 			while (rs.next()) {
 				//mysql: fields.add(rs.getString("Field"));
-				fields.add("\"" + rs.getString(1) + "\"");
+				if (util.findDatabaseType(p.getProperty("db.driver")).equals("postgresql")) {
+					fields.add("\"" + rs.getString(1) + "\"");
+				} else {
+					fields.add(rs.getString("Field"));
+				}
 			}
 			for (String f : fields) {
 				result += f + ", ";
@@ -508,7 +518,11 @@ public class Parser {
 			e.printStackTrace();
 		}
 		
-		result += " FROM " + "\"" + tableName + "\"";
+		if (util.findDatabaseType(p.getProperty("db.driver")).equals("postgresql")) {
+			result += " FROM " + "\"" + tableName + "\"";
+		} else {
+			result += " FROM " + tableName;
+		}
 		log.info("result is: " + result);
 		return result;
 	}
