@@ -12,6 +12,8 @@ http://creativecommons.org/licenses/by-nc/3.0/
 
 You can use the work as long as you attribute the work by providing a link to the project page and/or to publication [1] above.
 
+More up-to-date results in the [wiki](https://github.com/nkons/r2rml-parser/wiki).
+
 ## Implementation
 
 Written fully in Java, using Apache Jena, Spring, and Maven. Tested against MySQL and PostgreSQL.
