@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -443,9 +444,11 @@ public class Parser {
 		    
 		}
 
-		for (LogicalTableMapping l : results) {
-			if (l.getView() == null ) {
-				results.remove(l);
+		//prevent java.util.ConcurrentModificationException
+		for (Iterator<LogicalTableMapping> it = results.iterator(); it.hasNext(); ) {
+			LogicalTableMapping logicalTableMapping = it.next();
+			if (logicalTableMapping.getView() == null ) {
+				it.remove();
 			}
 		}
     	
