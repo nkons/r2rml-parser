@@ -1,3 +1,7 @@
+#
+# Downloaded from https://github.com/nkons/r2rml-parser/
+#
+
 @prefix map: <#>.
 @prefix rr: <http://www.w3.org/ns/r2rml#>.
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
@@ -8,18 +12,22 @@
 @prefix dctype: <http://purl.org/dc/dcmitype/>.
 @prefix dcam: <http://purl.org/dc/dcam/>.
 @prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix mads: <http://www.loc.gov/mads/rdf/v1#>.
+@prefix ekt: <http://data.dev.ekt.gr/>.
+
+### DSpace general mappings
 
 map:items
     rr:logicalTable <#item-view>;
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
         rr:class dcterms:BibliographicResource;
     ].
     
 map:persons
     rr:logicalTable [ rr:tableName '"eperson"'; ];
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/Agent/agent_{"eperson_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/person_{"eperson_id"}';
 		rr:class dcterms:Agent;
     ];
 	
@@ -27,12 +35,11 @@ map:persons
       rr:predicate rdf:value;
       rr:objectMap [ rr:template '{"firstname"} {"lastname"}' ]
     ].
-
 	
 map:collections
     rr:logicalTable [ rr:tableName '"collection"'; ];
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/collection_{"collection_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/collection_{"collection_id"}';
 		rr:class dcterms:BibliographicResource;
     ];
 	rr:predicateObjectMap [
@@ -43,128 +50,464 @@ map:collections
 map:communities
     rr:logicalTable [ rr:tableName '"community"'; ];
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/Agent/community_{"community_id"}';
-		rr:class dcterms:Agent;
+        rr:template 'http://data.dev.ekt.gr/helios/community_{"community_id"}';
+		rr:class dcterms:BibliographicResource;
     ];
 	rr:predicateObjectMap [
       rr:predicate rdf:value;
       rr:objectMap [ rr:column '"name"' ];
     ].
 
-# DSpace general mappings end here, beginning DC descriptions
+### Dublin Core descriptions
+
+map:dc-contributor
+    rr:logicalTable <#dc-contributor-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dc:contributor;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-contributor-advisor
+    rr:logicalTable <#dc-contributor-advisor-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dc:contributor;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
 
 map:dc-contributor-author
     rr:logicalTable <#dc-contributor-author-view>;
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:creator;
-        rr:objectMap [ rr:column '"text_value"' ];
-    ].
-    
-map:dc-coverage-spatial
-    rr:logicalTable <#dc-coverage-spatial-view>;
-    rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
-    ];
-    rr:predicateObjectMap [
-        rr:predicate dc:coverage;
-        rr:objectMap [ rr:template 'http://purl.org/dc/terms/Location/location_{"item_id"}' ];
-    ].
-    
-map:dc-location
-    rr:logicalTable <#dc-coverage-spatial-view>;
-    rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/Location/location_{"item_id"}';
-    ];
-    rr:predicateObjectMap [
-        rr:predicate rdf:value;
+        rr:predicate dc:contributor;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
-	
+map:dc-contributor-editor
+    rr:logicalTable <#dc-contributor-editor-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dc:contributor;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-contributor-illustrator
+    rr:logicalTable <#dc-contributor-illustrator-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dc:contributor;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-contributor-other
+    rr:logicalTable <#dc-contributor-other-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dc:contributor;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-coverage-spatial
+    rr:logicalTable <#dc-coverage-spatial-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:spatial;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-coverage-temporal
+    rr:logicalTable <#dc-coverage-temporal-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:temporal;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
 map:dc-creator
     rr:logicalTable <#dc-creator-view>;
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:creator;
-        rr:objectMap [ rr:column '"text_value"'; rr:language '{"text_lang"}' ];
+        rr:predicate dcterms:creator;
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
-    
-map:dc-date-available
+
+map:dc-date
     rr:logicalTable <#dc-date-view>;
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:date;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+#map:dc-date-accessioned
+
+map:dc-date-available
+    rr:logicalTable <#dc-date-available-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:available;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
+map:dc-date-copyright
+    rr:logicalTable <#dc-date-copyright-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:dateCopyrighted;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-date-created
+    rr:logicalTable <#dc-date-created-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:created;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-date-issued
+    rr:logicalTable <#dc-date-issued-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:issued;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-date-submitted
+    rr:logicalTable <#dc-date-submitted-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:dateSubmitted;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+#map:dc-date-updated
+
+map:dc-description
+    rr:logicalTable <#dc-description-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:description;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-description-abstract
+    rr:logicalTable <#dc-description-abstract-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:abstract;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-description-provenance
+    rr:logicalTable <#dc-description-provenance-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:provenance;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+#map:dc-description-sponsorship
+#map:dc-description-statementofresponsibility
+
+map:dc-description-tableofcontents
+    rr:logicalTable <#dc-description-tableofcontents-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:tableOfContents;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+#map:dc-description-uri
+
+map:dc-format
+    rr:logicalTable <#dc-format-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:format;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
 map:dc-format-extent
     rr:logicalTable <#dc-format-extent-view>;
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:extent;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
+map:dc-format-medium
+    rr:logicalTable <#dc-format-medium-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:medium;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+#map:dc-format-mimetype
+
 map:dc-identifier
     rr:logicalTable <#dc-identifier-uri-view>;
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:identifier;
+        rr:predicate dcterms:identifier;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
+
+#map:dc-identifier-citation
+#map:dc-identifier-govdoc
+#map:dc-identifier-isbn
+#map:dc-identifier-issn
+#map:dc-identifier-sici
+#map:dc-identifier-ismn
+#map:dc-identifier-other
+#map:dc-identifier-uri
 
 map:dc-language
     rr:logicalTable <#dc-language-view>;
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:language;
+        rr:predicate dcterms:language;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
-    
+
+#map:dc-language-iso
+
 map:dc-publisher
     rr:logicalTable <#dc-publisher-view>;
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:publisher;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
+#map:dc-relation
+#map:dc-relation-isformatof
+#map:dc-relation-ispartof
+#map:dc-relation-ispartofseries
+
+map:dc-relation-haspart
+    rr:logicalTable <#dc-relation-haspart-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:hasPart;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+#map:dc-relation-isversionof
+
+map:dc-relation-hasversion
+    rr:logicalTable <#dc-relation-hasversion-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:hasVersion;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+#map:dc-relation-isbasedon
+
+map:dc-relation-isreferencedby
+    rr:logicalTable <#dc-relation-isreferencedby-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:isReferencedBy;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-relation-requires
+    rr:logicalTable <#dc-relation-requires-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:requires;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-relation-replaces
+    rr:logicalTable <#dc-relation-replaces-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:replaces;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-relation-isreplacedby
+    rr:logicalTable <#dc-relation-isreplacedby-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:isReplacedBy;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+#map:dc-relation-uri
+
+map:dc-rights
+    rr:logicalTable <#dc-rights-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:license;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+#map:dc-rights-uri
+
+map:dc-source
+    rr:logicalTable <#dc-source-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:source;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+#map:dc-source-uri
+
+map:dc-subject
+    rr:logicalTable <#dc-subject-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:subject;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+#map:dc-subject-classification
+#map:dc-subject-ddc
+#map:dc-subject-lcc
+#map:dc-subject-lcsh
+#map:dc-subject-mesh
+#map:dc-subject-other
+
 map:dc-title
     rr:logicalTable <#dc-title-view>;
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:title;
-        rr:objectMap [ rr:column '"text_value"'; rr:language '{"text_lang"}' ];
+        rr:predicate dcterms:title;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:dc-title-alternative
+    rr:logicalTable <#dc-title-alternative-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:alternative;
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 map:dc-type
     rr:logicalTable <#dc-type-view>;
     rr:subjectMap [
-        rr:template 'http://purl.org/dc/terms/BibliographicResource/item_{"item_id"}';
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:type;
+        rr:predicate dcterms:type;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
+### MADS descriptions
 
+map:mods-accessCondition
+    rr:logicalTable <#mods-accessCondition-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:rights;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:mods-note
+    rr:logicalTable <#mods-note-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:description;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+### LOM descriptions
+
+map:lom-classification-keyword
+    rr:logicalTable <#lom-classification-keyword-view>;
+    rr:subjectMap [
+        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:subject;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+    
 ################################################ views ################################################
 
 ## custom views ##
@@ -174,9 +517,9 @@ map:dc-type
 	SELECT item_id FROM item WHERE in_archive=TRUE
 	""".
 
-#	<#Bitsreams>
+#	<#Bitstreams>
 
-#	<#BitsreamFormats>
+#	<#BitstreamFormats>
 
 
 ###### schemas: dublin core, mods, lom ######
@@ -191,7 +534,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='contributor'
+	mfr.element='contributor' AND
+    mfr.qualifier IS NULL
 	""".
 
 <#dc-contributor-advisor-view>
@@ -294,18 +638,16 @@ map:dc-type
 	
 <#dc-creator-view>
 	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value, mv.text_lang AS text_lang
-	FROM item AS i
-	INNER JOIN metadatavalue AS mv
-	ON i.item_id=mv.item_id 
-	INNER JOIN metadatafieldregistry AS mfr
-	ON mfr.metadata_field_id=mv.metadata_field_id 
-	INNER JOIN metadataschemaregistry AS msr
-	ON msr.metadata_schema_id=mfr.metadata_schema_id
-	WHERE i.in_archive=TRUE AND
-	mv.text_value IS NOT NULL AND
+	SELECT i.item_id AS item_id, mv.text_value AS text_value
+	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+	i.in_archive=TRUE AND
+	msr.metadata_schema_id=mfr.metadata_schema_id AND
+	mfr.metadata_field_id=mv.metadata_field_id AND
+	mv.text_value is not null AND
+	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='creator'
+	mfr.element='creator' AND
+    mfr.qualifier IS NULL
 	""".
 
 <#dc-date-view>
@@ -318,7 +660,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='date'
+	mfr.element='date' AND
+    mfr.qualifier IS NULL
 	""".
 
 <#dc-date-accessioned-view>
@@ -429,7 +772,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='description'
+	mfr.element='description' AND
+    mfr.qualifier IS NULL
 	""".	
 
 <#dc-description-abstract-view>
@@ -473,7 +817,7 @@ map:dc-type
 	mfr.element='description' AND
 	mfr.qualifier='sponsorship'
 	""".
-	
+
 <#dc-description-statementofresponsibility-view>
 	rr:sqlQuery """
 	SELECT i.item_id AS item_id, mv.text_value AS text_value
@@ -526,7 +870,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='format'
+	mfr.element='format' AND
+    mfr.qualifier IS NULL
 	""".
 
 <#dc-format-extent-view>
@@ -581,7 +926,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='identifier'
+	mfr.element='identifier' AND
+    mfr.qualifier IS NULL
 	""".
 	
 <#dc-identifier-citation-view>
@@ -694,8 +1040,8 @@ map:dc-type
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
 	mfr.element='identifier' AND
 	mfr.qualifier='uri'
-	""".		
-	
+	""".
+
 <#dc-language-view>
 	rr:sqlQuery """
 	SELECT i.item_id AS item_id, mv.text_value AS text_value
@@ -706,7 +1052,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='language'
+	mfr.element='language' AND
+    mfr.qualifier IS NULL
 	""".
 
 <#dc-language-iso-view>
@@ -733,7 +1080,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='Publisher'
+	mfr.element='Publisher' AND
+    mfr.qualifier IS NULL
 	""".
 
 <#dc-relation-view>
@@ -746,7 +1094,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation'
+	mfr.element='relation' AND
+    mfr.qualifier IS NULL
 	""".
 
 <#dc-relation-isformatof-view>
@@ -927,7 +1276,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='rights'
+	mfr.element='rights' AND
+    mfr.qualifier IS NULL
 	""".
 
 <#dc-rights-uri-view>
@@ -954,7 +1304,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='source'
+	mfr.element='source' AND
+    mfr.qualifier IS NULL
 	""".
 
 <#dc-source-uri-view>
@@ -981,7 +1332,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='subject'
+	mfr.element='subject' AND
+    mfr.qualifier IS NULL
 	""".
 	
 <#dc-subject-classification-view>
@@ -1070,7 +1422,7 @@ map:dc-type
 	
 <#dc-title-view>
 	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value, mv.text_lang AS text_lang
+	SELECT i.item_id AS item_id, mv.text_value AS text_value
 	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
 	i.in_archive=TRUE AND
 	msr.metadata_schema_id=mfr.metadata_schema_id AND
@@ -1078,7 +1430,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='title'
+	mfr.element='title' AND
+    mfr.qualifier IS NULL
 	""".
 
 <#dc-title-alternative-view>
@@ -1105,7 +1458,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='type'
+	mfr.element='type' AND
+    mfr.qualifier IS NULL
 	""".
 
 <#mods-accessCondition-view>
@@ -1118,7 +1472,8 @@ map:dc-type
 	mv.text_value is not null AND
 	i.item_id=mv.item_id AND
 	msr.namespace='http://www.loc.gov/standards/mods/mods.xsd' AND
-	mfr.element='accessCondition'
+	mfr.element='accessCondition' AND
+    mfr.qualifier IS NULL
 	""".
 	
 <#mods-note-view>
@@ -1133,48 +1488,6 @@ map:dc-type
 	msr.namespace='http://www.loc.gov/standards/mods/mods.xsd' AND
 	mfr.element='note'
 	""".
-	
-<#mods-originInfo-edition-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://www.loc.gov/standards/mods/mods.xsd' AND
-	mfr.element='originInfo' AND
-	mfr.qualifier='edition'
-	""".	
-
-<#mods-originInfo-place-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://www.loc.gov/standards/mods/mods.xsd' AND
-	mfr.element='originInfo' AND
-	mfr.qualifier='place'
-	""".	
- 
-<#mods-recordInfo-recordOrigin-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://www.loc.gov/standards/mods/mods.xsd' AND
-	mfr.element='recordInfo' AND
-	mfr.qualifier='recordOrigin'
-	""".	
 
 <#lom-classification-keyword-view>
 	rr:sqlQuery """
