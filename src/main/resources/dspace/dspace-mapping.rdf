@@ -12,8 +12,6 @@
 @prefix dctype: <http://purl.org/dc/dcmitype/>.
 @prefix dcam: <http://purl.org/dc/dcam/>.
 @prefix skos: <http://www.w3.org/2004/02/skos/core#>.
-@prefix mads: <http://www.loc.gov/mads/rdf/v1#>.
-@prefix ekt: <http://data.dev.ekt.gr/>.
 
 ### DSpace general mappings
 
@@ -28,21 +26,21 @@ map:persons
     rr:logicalTable [ rr:tableName '"eperson"'; ];
     rr:subjectMap [
         rr:template 'http://data.dev.ekt.gr/helios/person_{"eperson_id"}';
-		rr:class dcterms:Agent;
+        rr:class dcterms:Agent;
     ];
-	
-	rr:predicateObjectMap [
+    
+    rr:predicateObjectMap [
       rr:predicate rdf:value;
       rr:objectMap [ rr:template '{"firstname"} {"lastname"}' ]
     ].
-	
+    
 map:collections
     rr:logicalTable [ rr:tableName '"collection"'; ];
     rr:subjectMap [
         rr:template 'http://data.dev.ekt.gr/helios/collection_{"collection_id"}';
-		rr:class dcterms:BibliographicResource;
+        rr:class dcterms:BibliographicResource;
     ];
-	rr:predicateObjectMap [
+    rr:predicateObjectMap [
       rr:predicate rdf:value;
       rr:objectMap [ rr:column '"name"' ];
     ].
@@ -51,9 +49,9 @@ map:communities
     rr:logicalTable [ rr:tableName '"community"'; ];
     rr:subjectMap [
         rr:template 'http://data.dev.ekt.gr/helios/community_{"community_id"}';
-		rr:class dcterms:BibliographicResource;
+        rr:class dcterms:BibliographicResource;
     ];
-	rr:predicateObjectMap [
+    rr:predicateObjectMap [
       rr:predicate rdf:value;
       rr:objectMap [ rr:column '"name"' ];
     ].
@@ -513,993 +511,993 @@ map:lom-classification-keyword
 ## custom views ##
 
 <#item-view>
-	rr:sqlQuery """
-	SELECT item_id FROM item WHERE in_archive=TRUE
-	""".
+    rr:sqlQuery """
+    SELECT item_id FROM item WHERE in_archive=TRUE
+    """.
 
-#	<#Bitstreams>
+#   <#Bitstreams>
 
-#	<#BitstreamFormats>
+#   <#BitstreamFormats>
 
 
 ###### schemas: dublin core, mods, lom ######
 
 <#dc-contributor-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='contributor' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='contributor' AND
     mfr.qualifier IS NULL
-	""".
+    """.
 
 <#dc-contributor-advisor-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='contributor' AND
-	mfr.qualifier='advisor'
-	""".
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='contributor' AND
+    mfr.qualifier='advisor'
+    """.
+    
 <#dc-contributor-author-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='contributor' AND
-	mfr.qualifier='author'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='contributor' AND
+    mfr.qualifier='author'
+    """.
 
 <#dc-contributor-editor-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='contributor' AND
-	mfr.qualifier='editor'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='contributor' AND
+    mfr.qualifier='editor'
+    """.
 
 <#dc-contributor-illustrator-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='contributor' AND
-	mfr.qualifier='illustrator'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='contributor' AND
+    mfr.qualifier='illustrator'
+    """.
 
 <#dc-contributor-other-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='contributor' AND
-	mfr.qualifier='other'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='contributor' AND
+    mfr.qualifier='other'
+    """.
 
 <#dc-coverage-spatial-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='coverage' AND
-	mfr.qualifier='spatial'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='coverage' AND
+    mfr.qualifier='spatial'
+    """.
 
 <#dc-coverage-temporal-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='coverage' AND
-	mfr.qualifier='temporal'
-	""".
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='coverage' AND
+    mfr.qualifier='temporal'
+    """.
+    
 <#dc-creator-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='creator' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='creator' AND
     mfr.qualifier IS NULL
-	""".
+    """.
 
 <#dc-date-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='date' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
     mfr.qualifier IS NULL
-	""".
+    """.
 
 <#dc-date-accessioned-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='date' AND
-	mfr.qualifier='accessioned'
-	""".
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
+    mfr.qualifier='accessioned'
+    """.
+    
 <#dc-date-available-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='date' AND
-	mfr.qualifier='available'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
+    mfr.qualifier='available'
+    """.
 
 <#dc-date-copyright-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='date' AND
-	mfr.qualifier='copyright'
-	""".
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
+    mfr.qualifier='copyright'
+    """.
+    
 <#dc-date-created-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='date' AND
-	mfr.qualifier='created'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
+    mfr.qualifier='created'
+    """.    
+    
 <#dc-date-issued-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='date' AND
-	mfr.qualifier='issued'
-	""".
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
+    mfr.qualifier='issued'
+    """.
+    
 <#dc-date-submitted-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='date' AND
-	mfr.qualifier='submitted'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
+    mfr.qualifier='submitted'
+    """.    
+    
 <#dc-date-updated-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='date' AND
-	mfr.qualifier='updated'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
+    mfr.qualifier='updated'
+    """.    
+    
 <#dc-description-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='description' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='description' AND
     mfr.qualifier IS NULL
-	""".	
+    """.    
 
 <#dc-description-abstract-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='description' AND
-	mfr.qualifier='abstract'
-	""".		
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='description' AND
+    mfr.qualifier='abstract'
+    """.        
+    
 <#dc-description-provenance-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='description' AND
-	mfr.qualifier='provenance'
-	""".		
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='description' AND
+    mfr.qualifier='provenance'
+    """.        
+    
 <#dc-description-sponsorship-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='description' AND
-	mfr.qualifier='sponsorship'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='description' AND
+    mfr.qualifier='sponsorship'
+    """.
 
 <#dc-description-statementofresponsibility-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='description' AND
-	mfr.qualifier='statementofresponsibility'
-	""".
-		
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='description' AND
+    mfr.qualifier='statementofresponsibility'
+    """.
+        
 <#dc-description-tableofcontents-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='description' AND
-	mfr.qualifier='tableofcontents'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='description' AND
+    mfr.qualifier='tableofcontents'
+    """.
 
 <#dc-description-uri-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='description' AND
-	mfr.qualifier='uri'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='description' AND
+    mfr.qualifier='uri'
+    """.
 
 <#dc-format-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='format' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='format' AND
     mfr.qualifier IS NULL
-	""".
+    """.
 
 <#dc-format-extent-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='format' AND
-	mfr.qualifier='extent'
-	""".
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='format' AND
+    mfr.qualifier='extent'
+    """.
+    
 <#dc-format-medium>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='format' AND
-	mfr.qualifier='medium'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='format' AND
+    mfr.qualifier='medium'
+    """.
 
 <#dc-format-mimetype>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='format' AND
-	mfr.qualifier='mimetype'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='format' AND
+    mfr.qualifier='mimetype'
+    """.
 
 <#dc-identifier-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='identifier' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
     mfr.qualifier IS NULL
-	""".
-	
+    """.
+    
 <#dc-identifier-citation-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='identifier' AND
-	mfr.qualifier='citation'
-	""".	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='citation'
+    """.    
 
 <#dc-identifier-govdoc-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='identifier' AND
-	mfr.qualifier='govdoc'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='govdoc'
+    """.    
+    
 <#dc-identifier-isbn-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='identifier' AND
-	mfr.qualifier='isbn'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='isbn'
+    """.    
+    
 <#dc-identifier-issn-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='identifier' AND
-	mfr.qualifier='issn'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='issn'
+    """.    
+    
 <#dc-identifier-sici-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='identifier' AND
-	mfr.qualifier='sici'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='sici'
+    """.    
+    
 <#dc-identifier-ismn-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='identifier' AND
-	mfr.qualifier='ismn'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='ismn'
+    """.    
+    
 <#dc-identifier-other-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='identifier' AND
-	mfr.qualifier='other'
-	""".		
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='other'
+    """.        
+    
 <#dc-identifier-uri-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='identifier' AND
-	mfr.qualifier='uri'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='uri'
+    """.
 
 <#dc-language-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='language' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='language' AND
     mfr.qualifier IS NULL
-	""".
+    """.
 
 <#dc-language-iso-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='language' AND
-	mfr.qualifier='iso'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='language' AND
+    mfr.qualifier='iso'
+    """.
 
 <#dc-publisher-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='Publisher' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='Publisher' AND
     mfr.qualifier IS NULL
-	""".
+    """.
 
 <#dc-relation-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
     mfr.qualifier IS NULL
-	""".
+    """.
 
 <#dc-relation-isformatof-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='isformatof'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='isformatof'
+    """.
 
 <#dc-relation-ispartof-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='ispartof'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='ispartof'
+    """.
 
 <#dc-relation-ispartofseries-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='ispartofseries'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='ispartofseries'
+    """.
 
 <#dc-relation-haspart-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='haspart'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='haspart'
+    """.
 
 <#dc-relation-isversionof-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='isversionof'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='isversionof'
+    """.
 
 <#dc-relation-hasversion-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='hasversion'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='hasversion'
+    """.
 
 <#dc-relation-isbasedon-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='isbasedon'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='isbasedon'
+    """.
 
 <#dc-relation-isreferencedby-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='isreferencedby'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='isreferencedby'
+    """.
 
 <#dc-relation-requires-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='requires'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='requires'
+    """.
 
 <#dc-relation-replaces-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='replaces'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='replaces'
+    """.
 
 <#dc-relation-isreplacedby-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='isreplacedby'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='isreplacedby'
+    """.
 
 <#dc-relation-uri-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='relation' AND
-	mfr.qualifier='uri'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='relation' AND
+    mfr.qualifier='uri'
+    """.
 
 <#dc-rights-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='rights' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='rights' AND
     mfr.qualifier IS NULL
-	""".
+    """.
 
 <#dc-rights-uri-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='rights' AND
-	mfr.qualifier='uri'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='rights' AND
+    mfr.qualifier='uri'
+    """.
 
 <#dc-source-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='source' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='source' AND
     mfr.qualifier IS NULL
-	""".
+    """.
 
 <#dc-source-uri-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='source' AND
-	mfr.qualifier='uri'
-	""".
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='source' AND
+    mfr.qualifier='uri'
+    """.
+    
 <#dc-subject-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='subject' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
     mfr.qualifier IS NULL
-	""".
-	
+    """.
+    
 <#dc-subject-classification-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='subject' AND
-	mfr.qualifier='classification'
-	""".
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='classification'
+    """.
+    
 <#dc-subject-ddc-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='subject' AND
-	mfr.qualifier='ddc'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='ddc'
+    """.
 
 <#dc-subject-lcc-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='subject' AND
-	mfr.qualifier='lcc'
-	""".
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='lcc'
+    """.
+    
 <#dc-subject-lcsh-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='subject' AND
-	mfr.qualifier='lcsh'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='lcsh'
+    """.    
+    
 <#dc-subject-mesh-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='subject' AND
-	mfr.qualifier='mesh'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='mesh'
+    """.    
+    
 <#dc-subject-other-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='subject' AND
-	mfr.qualifier='other'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='other'
+    """.    
+    
 <#dc-title-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='title' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='title' AND
     mfr.qualifier IS NULL
-	""".
+    """.
 
 <#dc-title-alternative-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='title' AND
-	mfr.qualifier='alternative'
-	""".	
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='title' AND
+    mfr.qualifier='alternative'
+    """.    
+    
 <#dc-type-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='type' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='type' AND
     mfr.qualifier IS NULL
-	""".
+    """.
 
 <#mods-accessCondition-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://www.loc.gov/standards/mods/mods.xsd' AND
-	mfr.element='accessCondition' AND
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://www.loc.gov/standards/mods/mods.xsd' AND
+    mfr.element='accessCondition' AND
     mfr.qualifier IS NULL
-	""".
-	
+    """.
+    
 <#mods-note-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://www.loc.gov/standards/mods/mods.xsd' AND
-	mfr.element='note'
-	""".
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://www.loc.gov/standards/mods/mods.xsd' AND
+    mfr.element='note'
+    """.
 
 <#lom-classification-keyword-view>
-	rr:sqlQuery """
-	SELECT i.item_id AS item_id, mv.text_value AS text_value
-	FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-	i.in_archive=TRUE AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://ltsc.ieee.org/xsd/LOM' AND
-	mfr.element='classification' AND
-	mfr.qualifier='keyword'
-	""".
-	
+    rr:sqlQuery """
+    SELECT i.item_id AS item_id, mv.text_value AS text_value
+    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.item_id AND
+    msr.namespace='http://ltsc.ieee.org/xsd/LOM' AND
+    mfr.element='classification' AND
+    mfr.qualifier='keyword'
+    """.
+    
