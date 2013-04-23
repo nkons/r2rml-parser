@@ -10,8 +10,6 @@
 @prefix dc: <http://purl.org/dc/elements/1.1/>.
 @prefix dcterms: <http://purl.org/dc/terms/>.
 @prefix dctype: <http://purl.org/dc/dcmitype/>.
-@prefix dcam: <http://purl.org/dc/dcam/>.
-@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
 
 ### DSpace general mappings
 
