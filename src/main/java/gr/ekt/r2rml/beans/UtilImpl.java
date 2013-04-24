@@ -71,7 +71,7 @@ public class UtilImpl implements Util {
 			}
 			
 			if (template.getTermType() == TermType.IRI && !template.isUri()) {
-				log.info("Processing URI template with namespace " + template.getText());
+				//log.info("Processing URI template with namespace " + template.getText());
 				try {
 					result = template.getNamespace() + "/" + URLEncoder.encode(result, "UTF-8");;
 				} catch (UnsupportedEncodingException e) {

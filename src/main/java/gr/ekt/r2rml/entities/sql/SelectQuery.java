@@ -64,7 +64,18 @@ public class SelectQuery {
 		int end = q.toUpperCase().indexOf("FROM");
 
 		ArrayList<String> fields = new ArrayList<String>(Arrays.asList(q.substring(start, end).split(",")));
-
+		ArrayList<String> processedFields = new ArrayList<String>(); 
+		
+		for (int i = 0; i < fields.size(); i++) {
+			if (createSelectFieldTable(fields.get(i).trim()) == null) {
+				String newField = fields.get(i);
+				newField = fields.get(i + 1);
+				processedFields.add(newField);
+			} else {
+				processedFields.add(fields.get(i));
+			}
+		}
+		
 		for (String field : fields) {
 			SelectField f = new SelectField();
 			f.setName(field.trim());
