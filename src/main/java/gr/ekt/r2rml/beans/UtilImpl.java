@@ -81,7 +81,7 @@ public class UtilImpl implements Util {
 			}
 			
 			if (template.isUri()) {
-				log.info("Processing URI template " + template.getText());
+				//log.info("Processing URI template " + template.getText());
 				try {
 					int r = Math.max(result.lastIndexOf('#'), result.lastIndexOf('/')) + 1;
 					if (r > -1) result = result.substring(0, r) + URLEncoder.encode(result.substring(r), "UTF-8");;

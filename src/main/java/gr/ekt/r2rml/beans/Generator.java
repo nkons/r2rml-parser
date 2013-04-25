@@ -116,7 +116,7 @@ public class Generator {
 										triples.add(st);
 									}
 								} else {
-									log.info("filling in template " + predicateObjectMap.getObjectTemplate().getText());
+									if (verbose) log.info("filling in template " + predicateObjectMap.getObjectTemplate().getText());
 									String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
 									if (value != null) {
 										RDFNode o = resultModel.createResource(value);

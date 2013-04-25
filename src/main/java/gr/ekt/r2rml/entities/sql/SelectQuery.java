@@ -67,16 +67,12 @@ public class SelectQuery {
 		ArrayList<String> processedFields = new ArrayList<String>(); 
 		
 		for (int i = 0; i < fields.size(); i++) {
-			if (createSelectFieldTable(fields.get(i).trim()) == null) {
-				String newField = fields.get(i);
-				newField = fields.get(i + 1);
-				processedFields.add(newField);
-			} else {
+			if (createSelectFieldTable(fields.get(i).trim()) != null) {
 				processedFields.add(fields.get(i));
 			}
 		}
 		
-		for (String field : fields) {
+		for (String field : processedFields) {
 			SelectField f = new SelectField();
 			f.setName(field.trim());
 			f.setTable(createSelectFieldTable(field.trim()));
