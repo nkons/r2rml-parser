@@ -10,47 +10,48 @@
 @prefix dc: <http://purl.org/dc/elements/1.1/>.
 @prefix dcterms: <http://purl.org/dc/terms/>.
 @prefix dctype: <http://purl.org/dc/dcmitype/>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 ### DSpace general mappings
 
 map:items
     rr:logicalTable <#item-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
         rr:class dcterms:BibliographicResource;
     ].
     
-map:persons
-    rr:logicalTable [ rr:tableName '"eperson"'; ];
-    rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/person_{"eperson_id"}';
-        rr:class dcterms:Agent;
-    ];
-    
-    rr:predicateObjectMap [
-      rr:predicate rdf:value;
-      rr:objectMap [ rr:template '{"firstname"} {"lastname"}' ]
-    ].
+#map:persons
+#    rr:logicalTable [ rr:tableName '"eperson"'; ];
+#    rr:subjectMap [
+#        rr:template 'http://data.example.org/repository/person/{"eperson_id"}';
+#        rr:class foaf:Person;
+#    ];
+#    
+#    rr:predicateObjectMap [
+#      rr:predicate foaf:name;
+#      rr:objectMap [ rr:template '{"firstname"} {"lastname"}' ]
+#    ].
     
 map:collections
-    rr:logicalTable [ rr:tableName '"collection"'; ];
+    rr:logicalTable <#collection-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/collection_{"collection_id"}';
+        rr:template 'http://data.example.org/repository/collection/{"handle"}';
         rr:class dcterms:BibliographicResource;
     ];
     rr:predicateObjectMap [
-      rr:predicate rdf:value;
+      rr:predicate rdfs:label;
       rr:objectMap [ rr:column '"name"' ];
     ].
 
 map:communities
-    rr:logicalTable [ rr:tableName '"community"'; ];
+    rr:logicalTable <#community-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/community_{"community_id"}';
+        rr:template 'http://data.example.org/repository/community/{"handle"}';
         rr:class dcterms:BibliographicResource;
     ];
     rr:predicateObjectMap [
-      rr:predicate rdf:value;
+      rr:predicate rdfs:label;
       rr:objectMap [ rr:column '"name"' ];
     ].
 
@@ -59,7 +60,7 @@ map:communities
 map:dc-contributor
     rr:logicalTable <#dc-contributor-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:contributor;
@@ -69,7 +70,7 @@ map:dc-contributor
 map:dc-contributor-advisor
     rr:logicalTable <#dc-contributor-advisor-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:contributor;
@@ -79,7 +80,7 @@ map:dc-contributor-advisor
 map:dc-contributor-author
     rr:logicalTable <#dc-contributor-author-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:contributor;
@@ -89,7 +90,7 @@ map:dc-contributor-author
 map:dc-contributor-editor
     rr:logicalTable <#dc-contributor-editor-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:contributor;
@@ -99,7 +100,7 @@ map:dc-contributor-editor
 map:dc-contributor-illustrator
     rr:logicalTable <#dc-contributor-illustrator-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:contributor;
@@ -109,7 +110,7 @@ map:dc-contributor-illustrator
 map:dc-contributor-other
     rr:logicalTable <#dc-contributor-other-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:contributor;
@@ -119,7 +120,7 @@ map:dc-contributor-other
 map:dc-coverage-spatial
     rr:logicalTable <#dc-coverage-spatial-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:spatial;
@@ -129,7 +130,7 @@ map:dc-coverage-spatial
 map:dc-coverage-temporal
     rr:logicalTable <#dc-coverage-temporal-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:temporal;
@@ -139,7 +140,7 @@ map:dc-coverage-temporal
 map:dc-creator
     rr:logicalTable <#dc-creator-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:creator;
@@ -149,7 +150,7 @@ map:dc-creator
 map:dc-date
     rr:logicalTable <#dc-date-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:date;
@@ -158,20 +159,20 @@ map:dc-date
 
 #map:dc-date-accessioned
 
-map:dc-date-available
-    rr:logicalTable <#dc-date-available-view>;
-    rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
-    ];
-    rr:predicateObjectMap [
-        rr:predicate dcterms:available;
-        rr:objectMap [ rr:column '"text_value"' ];
-    ].
+#map:dc-date-available
+#    rr:logicalTable <#dc-date-available-view>;
+#    rr:subjectMap [
+#        rr:template 'http://data.example.org/repository/item/{"handle"}';
+#    ];
+#    rr:predicateObjectMap [
+#        rr:predicate dcterms:available;
+#        rr:objectMap [ rr:column '"text_value"' ];
+#    ].
 
 map:dc-date-copyright
     rr:logicalTable <#dc-date-copyright-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:dateCopyrighted;
@@ -181,64 +182,64 @@ map:dc-date-copyright
 map:dc-date-created
     rr:logicalTable <#dc-date-created-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:created;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
-map:dc-date-issued
-    rr:logicalTable <#dc-date-issued-view>;
-    rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
-    ];
-    rr:predicateObjectMap [
-        rr:predicate dcterms:issued;
-        rr:objectMap [ rr:column '"text_value"' ];
-    ].
+#map:dc-date-issued
+#    rr:logicalTable <#dc-date-issued-view>;
+#    rr:subjectMap [
+#        rr:template 'http://data.example.org/repository/item/{"handle"}';
+#    ];
+#    rr:predicateObjectMap [
+#        rr:predicate dcterms:issued;
+#        rr:objectMap [ rr:column '"text_value"' ];
+#    ].
 
-map:dc-date-submitted
-    rr:logicalTable <#dc-date-submitted-view>;
-    rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
-    ];
-    rr:predicateObjectMap [
-        rr:predicate dcterms:dateSubmitted;
-        rr:objectMap [ rr:column '"text_value"' ];
-    ].
+#map:dc-date-submitted
+#    rr:logicalTable <#dc-date-submitted-view>;
+#    rr:subjectMap [
+#        rr:template 'http://data.example.org/repository/item/{"handle"}';
+#    ];
+#    rr:predicateObjectMap [
+#        rr:predicate dcterms:dateSubmitted;
+#        rr:objectMap [ rr:column '"text_value"' ];
+#    ].
 
 #map:dc-date-updated
 
-map:dc-description
-    rr:logicalTable <#dc-description-view>;
-    rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
-    ];
-    rr:predicateObjectMap [
-        rr:predicate dcterms:description;
-        rr:objectMap [ rr:column '"text_value"' ];
-    ].
+#map:dc-description
+#    rr:logicalTable <#dc-description-view>;
+#    rr:subjectMap [
+#        rr:template 'http://data.example.org/repository/item/{"handle"}';
+#    ];
+#    rr:predicateObjectMap [
+#        rr:predicate dcterms:description;
+#        rr:objectMap [ rr:column '"text_value"' ];
+#    ].
 
 map:dc-description-abstract
     rr:logicalTable <#dc-description-abstract-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:abstract;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
-map:dc-description-provenance
-    rr:logicalTable <#dc-description-provenance-view>;
-    rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
-    ];
-    rr:predicateObjectMap [
-        rr:predicate dcterms:provenance;
-        rr:objectMap [ rr:column '"text_value"' ];
-    ].
+#map:dc-description-provenance
+#    rr:logicalTable <#dc-description-provenance-view>;
+#    rr:subjectMap [
+#        rr:template 'http://data.example.org/repository/item/{"handle"}';
+#    ];
+#    rr:predicateObjectMap [
+#        rr:predicate dcterms:provenance;
+#        rr:objectMap [ rr:column '"text_value"' ];
+#    ].
 
 #map:dc-description-sponsorship
 #map:dc-description-statementofresponsibility
@@ -246,7 +247,7 @@ map:dc-description-provenance
 map:dc-description-tableofcontents
     rr:logicalTable <#dc-description-tableofcontents-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:tableOfContents;
@@ -258,7 +259,7 @@ map:dc-description-tableofcontents
 map:dc-format
     rr:logicalTable <#dc-format-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:format;
@@ -268,7 +269,7 @@ map:dc-format
 map:dc-format-extent
     rr:logicalTable <#dc-format-extent-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:extent;
@@ -278,7 +279,7 @@ map:dc-format-extent
 map:dc-format-medium
     rr:logicalTable <#dc-format-medium-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:medium;
@@ -290,7 +291,7 @@ map:dc-format-medium
 map:dc-identifier
     rr:logicalTable <#dc-identifier-uri-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:identifier;
@@ -309,19 +310,19 @@ map:dc-identifier
 map:dc-language
     rr:logicalTable <#dc-language-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:language;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
-
+    
 #map:dc-language-iso
 
 map:dc-publisher
     rr:logicalTable <#dc-publisher-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:publisher;
@@ -336,7 +337,7 @@ map:dc-publisher
 map:dc-relation-haspart
     rr:logicalTable <#dc-relation-haspart-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:hasPart;
@@ -348,7 +349,7 @@ map:dc-relation-haspart
 map:dc-relation-hasversion
     rr:logicalTable <#dc-relation-hasversion-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:hasVersion;
@@ -360,7 +361,7 @@ map:dc-relation-hasversion
 map:dc-relation-isreferencedby
     rr:logicalTable <#dc-relation-isreferencedby-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:isReferencedBy;
@@ -370,7 +371,7 @@ map:dc-relation-isreferencedby
 map:dc-relation-requires
     rr:logicalTable <#dc-relation-requires-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:requires;
@@ -380,7 +381,7 @@ map:dc-relation-requires
 map:dc-relation-replaces
     rr:logicalTable <#dc-relation-replaces-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:replaces;
@@ -390,7 +391,7 @@ map:dc-relation-replaces
 map:dc-relation-isreplacedby
     rr:logicalTable <#dc-relation-isreplacedby-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:isReplacedBy;
@@ -402,7 +403,7 @@ map:dc-relation-isreplacedby
 map:dc-rights
     rr:logicalTable <#dc-rights-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:license;
@@ -414,7 +415,7 @@ map:dc-rights
 map:dc-source
     rr:logicalTable <#dc-source-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:source;
@@ -426,11 +427,11 @@ map:dc-source
 map:dc-subject
     rr:logicalTable <#dc-subject-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:subject;
-        rr:objectMap [ rr:column '"text_value"' ];
+        rr:objectMap [ rr:template 'http://id.loc.gov/authorities/classification/{"text_value"}';];
     ].
 
 #map:dc-subject-classification
@@ -443,7 +444,7 @@ map:dc-subject
 map:dc-title
     rr:logicalTable <#dc-title-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:title;
@@ -453,7 +454,7 @@ map:dc-title
 map:dc-title-alternative
     rr:logicalTable <#dc-title-alternative-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:alternative;
@@ -463,7 +464,7 @@ map:dc-title-alternative
 map:dc-type
     rr:logicalTable <#dc-type-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:type;
@@ -475,7 +476,7 @@ map:dc-type
 map:mods-accessCondition
     rr:logicalTable <#mods-accessCondition-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:rights;
@@ -485,7 +486,7 @@ map:mods-accessCondition
 map:mods-note
     rr:logicalTable <#mods-note-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:description;
@@ -497,7 +498,7 @@ map:mods-note
 map:lom-classification-keyword
     rr:logicalTable <#lom-classification-keyword-view>;
     rr:subjectMap [
-        rr:template 'http://data.dev.ekt.gr/helios/item_{"item_id"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:subject;
@@ -510,7 +511,27 @@ map:lom-classification-keyword
 
 <#item-view>
     rr:sqlQuery """
-    SELECT item_id FROM item WHERE in_archive=TRUE
+    SELECT h.handle AS handle, i.item_id
+    FROM handle AS h, item AS i WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2
+    """.
+
+<#collection-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, c.collection_id AS id, c.name AS name
+    FROM handle AS h, collection AS c WHERE
+    h.resource_id=c.collection_id AND
+    h.resource_type_id=3
+    """.
+
+<#community-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, c.community_id AS id, c.name AS name
+    FROM handle AS h, community AS c WHERE
+    h.resource_id=c.community_id AND
+    h.resource_type_id=4
     """.
 
 #   <#Bitstreams>
@@ -522,9 +543,11 @@ map:lom-classification-keyword
 
 <#dc-contributor-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -536,9 +559,11 @@ map:lom-classification-keyword
 
 <#dc-contributor-advisor-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -550,9 +575,11 @@ map:lom-classification-keyword
     
 <#dc-contributor-author-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -564,9 +591,11 @@ map:lom-classification-keyword
 
 <#dc-contributor-editor-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -578,9 +607,11 @@ map:lom-classification-keyword
 
 <#dc-contributor-illustrator-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -592,9 +623,11 @@ map:lom-classification-keyword
 
 <#dc-contributor-other-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -606,9 +639,11 @@ map:lom-classification-keyword
 
 <#dc-coverage-spatial-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -620,9 +655,11 @@ map:lom-classification-keyword
 
 <#dc-coverage-temporal-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -634,9 +671,11 @@ map:lom-classification-keyword
     
 <#dc-creator-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -648,9 +687,11 @@ map:lom-classification-keyword
 
 <#dc-date-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -662,9 +703,11 @@ map:lom-classification-keyword
 
 <#dc-date-accessioned-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -676,9 +719,11 @@ map:lom-classification-keyword
     
 <#dc-date-available-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -690,9 +735,11 @@ map:lom-classification-keyword
 
 <#dc-date-copyright-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -704,9 +751,11 @@ map:lom-classification-keyword
     
 <#dc-date-created-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -718,9 +767,11 @@ map:lom-classification-keyword
     
 <#dc-date-issued-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -732,9 +783,11 @@ map:lom-classification-keyword
     
 <#dc-date-submitted-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -746,9 +799,11 @@ map:lom-classification-keyword
     
 <#dc-date-updated-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -760,9 +815,11 @@ map:lom-classification-keyword
     
 <#dc-description-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -774,9 +831,11 @@ map:lom-classification-keyword
 
 <#dc-description-abstract-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -788,9 +847,11 @@ map:lom-classification-keyword
     
 <#dc-description-provenance-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -802,9 +863,11 @@ map:lom-classification-keyword
     
 <#dc-description-sponsorship-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -816,9 +879,11 @@ map:lom-classification-keyword
 
 <#dc-description-statementofresponsibility-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -830,9 +895,11 @@ map:lom-classification-keyword
         
 <#dc-description-tableofcontents-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -844,9 +911,11 @@ map:lom-classification-keyword
 
 <#dc-description-uri-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -858,9 +927,11 @@ map:lom-classification-keyword
 
 <#dc-format-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -872,9 +943,11 @@ map:lom-classification-keyword
 
 <#dc-format-extent-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -886,9 +959,11 @@ map:lom-classification-keyword
     
 <#dc-format-medium>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -900,9 +975,11 @@ map:lom-classification-keyword
 
 <#dc-format-mimetype>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -914,9 +991,11 @@ map:lom-classification-keyword
 
 <#dc-identifier-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -928,9 +1007,11 @@ map:lom-classification-keyword
     
 <#dc-identifier-citation-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -942,9 +1023,11 @@ map:lom-classification-keyword
 
 <#dc-identifier-govdoc-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -956,9 +1039,11 @@ map:lom-classification-keyword
     
 <#dc-identifier-isbn-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -970,9 +1055,11 @@ map:lom-classification-keyword
     
 <#dc-identifier-issn-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -984,9 +1071,11 @@ map:lom-classification-keyword
     
 <#dc-identifier-sici-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -998,9 +1087,11 @@ map:lom-classification-keyword
     
 <#dc-identifier-ismn-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1012,9 +1103,11 @@ map:lom-classification-keyword
     
 <#dc-identifier-other-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1026,9 +1119,11 @@ map:lom-classification-keyword
     
 <#dc-identifier-uri-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1040,9 +1135,11 @@ map:lom-classification-keyword
 
 <#dc-language-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1051,12 +1148,16 @@ map:lom-classification-keyword
     mfr.element='language' AND
     mfr.qualifier IS NULL
     """.
+    
+
 
 <#dc-language-iso-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1068,9 +1169,11 @@ map:lom-classification-keyword
 
 <#dc-publisher-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1082,9 +1185,11 @@ map:lom-classification-keyword
 
 <#dc-relation-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1096,9 +1201,11 @@ map:lom-classification-keyword
 
 <#dc-relation-isformatof-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1110,9 +1217,11 @@ map:lom-classification-keyword
 
 <#dc-relation-ispartof-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1124,9 +1233,11 @@ map:lom-classification-keyword
 
 <#dc-relation-ispartofseries-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1138,9 +1249,11 @@ map:lom-classification-keyword
 
 <#dc-relation-haspart-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1152,9 +1265,11 @@ map:lom-classification-keyword
 
 <#dc-relation-isversionof-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1166,9 +1281,11 @@ map:lom-classification-keyword
 
 <#dc-relation-hasversion-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1180,9 +1297,11 @@ map:lom-classification-keyword
 
 <#dc-relation-isbasedon-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1194,9 +1313,11 @@ map:lom-classification-keyword
 
 <#dc-relation-isreferencedby-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1208,9 +1329,11 @@ map:lom-classification-keyword
 
 <#dc-relation-requires-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1222,9 +1345,11 @@ map:lom-classification-keyword
 
 <#dc-relation-replaces-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1236,9 +1361,11 @@ map:lom-classification-keyword
 
 <#dc-relation-isreplacedby-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1250,9 +1377,11 @@ map:lom-classification-keyword
 
 <#dc-relation-uri-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1264,9 +1393,11 @@ map:lom-classification-keyword
 
 <#dc-rights-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1278,9 +1409,11 @@ map:lom-classification-keyword
 
 <#dc-rights-uri-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1292,9 +1425,11 @@ map:lom-classification-keyword
 
 <#dc-source-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1306,9 +1441,11 @@ map:lom-classification-keyword
 
 <#dc-source-uri-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1320,9 +1457,11 @@ map:lom-classification-keyword
     
 <#dc-subject-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1332,11 +1471,14 @@ map:lom-classification-keyword
     mfr.qualifier IS NULL
     """.
     
+    
 <#dc-subject-classification-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1348,9 +1490,11 @@ map:lom-classification-keyword
     
 <#dc-subject-ddc-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1362,9 +1506,11 @@ map:lom-classification-keyword
 
 <#dc-subject-lcc-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1376,9 +1522,11 @@ map:lom-classification-keyword
     
 <#dc-subject-lcsh-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1390,9 +1538,11 @@ map:lom-classification-keyword
     
 <#dc-subject-mesh-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1404,9 +1554,11 @@ map:lom-classification-keyword
     
 <#dc-subject-other-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1418,9 +1570,11 @@ map:lom-classification-keyword
     
 <#dc-title-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1432,9 +1586,11 @@ map:lom-classification-keyword
 
 <#dc-title-alternative-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1446,9 +1602,11 @@ map:lom-classification-keyword
     
 <#dc-type-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1460,9 +1618,11 @@ map:lom-classification-keyword
 
 <#mods-accessCondition-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1474,9 +1634,11 @@ map:lom-classification-keyword
     
 <#mods-note-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
@@ -1487,9 +1649,11 @@ map:lom-classification-keyword
 
 <#lom-classification-keyword-view>
     rr:sqlQuery """
-    SELECT i.item_id AS item_id, mv.text_value AS text_value
-    FROM item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
