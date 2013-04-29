@@ -46,7 +46,7 @@ public class Generator {
 	/**
 	 * The properties, as read from the properties file.
 	 */
-	private Properties p;
+	private Properties properties;
 	
 	private boolean verbose;
 	
@@ -54,7 +54,7 @@ public class Generator {
 	}
 	
 	public void createTriples(MappingDocument mappingDocument) {
-		verbose = p.containsKey("default.verbose") && (p.getProperty("default.verbose").contains("true") || p.getProperty("default.verbose").contains("yes"));
+		verbose = properties.containsKey("default.verbose") && (properties.getProperty("default.verbose").contains("true") || properties.getProperty("default.verbose").contains("yes"));
 		
 		for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
 			ArrayList<Statement> triples = new ArrayList<Statement>();
@@ -171,10 +171,10 @@ public class Generator {
 		    log.info("Generated " + triples.size() + " statements from table mapping <" + logicalTableMapping.getUri() + ">");
 	    }
 		
-		if (p.getProperty("jena.storeOutputModelInDatabase").contains("false")) {
-			log.info("Writing model to " + p.getProperty("jena.destinationFileName") + ". Model has " + resultModel.listStatements().toList().size() + " statements.");
+		if (properties.getProperty("jena.storeOutputModelInDatabase").contains("false")) {
+			log.info("Writing model to " + properties.getProperty("jena.destinationFileName") + ". Model has " + resultModel.listStatements().toList().size() + " statements.");
 			try {
-				resultModel.write(new FileOutputStream(p.getProperty("jena.destinationFileName")), p.getProperty("jena.destinationFileSyntax"));
+				resultModel.write(new FileOutputStream(properties.getProperty("jena.destinationFileName")), properties.getProperty("jena.destinationFileSyntax"));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -217,7 +217,7 @@ public class Generator {
 		try {
 			Model logModel = ModelFactory.createDefaultModel();
 			
-			String logFile = p.getProperty("default.log");
+			String logFile = properties.getProperty("default.log");
 			log.info("Logging results to " + new File(logFile).getAbsolutePath());
 
 			//run on the table mappings
@@ -234,7 +234,7 @@ public class Generator {
 				
 			}
 			
-			logModel.write(new FileOutputStream(p.getProperty("default.log")), p.getProperty("jena.destinationFileSyntax"));
+			logModel.write(new FileOutputStream(properties.getProperty("default.log")), properties.getProperty("jena.destinationFileSyntax"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -264,12 +264,12 @@ public class Generator {
 		this.resultModel = resultModel;
 	}
 	
-	public Properties getP() {
-		return p;
+	public Properties getProperties() {
+		return properties;
 	}
 	
-	public void setP(Properties p) {
-		this.p = p;
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 	
 }

@@ -38,18 +38,22 @@ public class DatabaseImpl implements Database {
 
 	private Store store;
 	
-	private Properties p = new Properties();
+	private Properties properties = new Properties();
 	
 	private String propertiesFilename;
 	
 	private Util util;
+	
+	public DatabaseImpl() {
+		
+	}
 	
 	/**
 	 * 
 	 */
 	public DatabaseImpl(String propertiesFilename) {
 		try {
-			p.load(new FileInputStream(propertiesFilename));
+			properties.load(new FileInputStream(propertiesFilename));
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(0);
@@ -60,11 +64,11 @@ public class DatabaseImpl implements Database {
 		log.info("Establishing source (relational) connection.");
 		if (connection == null) {
 			try {
-				String driver = p.getProperty("db.driver");
+				String driver = properties.getProperty("db.driver");
 				Class.forName(driver);
 				String databaseType = util.findDatabaseType(driver);
-				String dbConnectionString = "jdbc:" + databaseType + "://" + p.getProperty("db.host") + ":" + p.getProperty("db.port") + "/" + p.getProperty("db.name");
-				connection = DriverManager.getConnection(dbConnectionString, p.getProperty("db.login"), p.getProperty("db.password"));
+				String dbConnectionString = "jdbc:" + databaseType + "://" + properties.getProperty("db.host") + ":" + properties.getProperty("db.port") + "/" + properties.getProperty("db.name");
+				connection = DriverManager.getConnection(dbConnectionString, properties.getProperty("db.login"), properties.getProperty("db.password"));
 			
 				log.info("Established source (relational) connection.");
 				return connection;
@@ -83,14 +87,14 @@ public class DatabaseImpl implements Database {
 		if (jenaConnection == null) {
 			try {
 				
-				String jenaDriver = p.getProperty("jena.db.driver");
+				String jenaDriver = properties.getProperty("jena.db.driver");
 				Class.forName(jenaDriver);
 				String jenaDatabaseType = util.findDatabaseType(jenaDriver);
-				String jenaConnectionString = "jdbc:" + jenaDatabaseType + "://" + p.getProperty("jena.db.host") + ":" + p.getProperty("jena.db.port") + "/" + p.getProperty("jena.db.name");
+				String jenaConnectionString = "jdbc:" + jenaDatabaseType + "://" + properties.getProperty("jena.db.host") + ":" + properties.getProperty("jena.db.port") + "/" + properties.getProperty("jena.db.name");
 				log.info("jena repository at " + jenaConnectionString);
 				
 				
-				jenaConnection = new SDBConnection(jenaConnectionString, p.getProperty("jena.db.login"), p.getProperty("jena.db.password")) ;
+				jenaConnection = new SDBConnection(jenaConnectionString, properties.getProperty("jena.db.login"), properties.getProperty("jena.db.password")) ;
 				
 				StoreDesc storeDesc = null;
 				if ("postgresql".equals(jenaDatabaseType)) {
@@ -100,7 +104,7 @@ public class DatabaseImpl implements Database {
 				}
 				store = SDBFactory.connectStore(jenaConnection, storeDesc);
 				
-				if ("true".equals(p.getProperty("jena.cleanDbOnStartup"))) {
+				if ("true".equals(properties.getProperty("jena.cleanDbOnStartup"))) {
 					log.info("Cleaning up database");
 					store.getTableFormatter().create();
 				}
@@ -134,8 +138,8 @@ public class DatabaseImpl implements Database {
 		try {
 			if (connection == null) openConnection();
 			
-			if (!StringUtils.containsIgnoreCase(query, "limit") && p.containsKey("db.limit")) {
-				query += " LIMIT " + p.getProperty("db.limit");
+			if (!StringUtils.containsIgnoreCase(query, "limit") && properties.containsKey("db.limit")) {
+				query += " LIMIT " + properties.getProperty("db.limit");
 			}
 			
 			//PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -163,6 +167,14 @@ public class DatabaseImpl implements Database {
 	
 	public void setUtil(Util util) {
 		this.util = util;
+	}
+	
+	public Properties getProperties() {
+		return properties;
+	}
+	
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 	
 }

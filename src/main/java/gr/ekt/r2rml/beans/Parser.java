@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +81,7 @@ public class Parser {
 	/**
 	 * The properties, as read from the properties file.
 	 */
-	private Properties p = new Properties();
+	private Properties properties = new Properties();
 	
 	private boolean verbose;
 	
@@ -88,13 +89,29 @@ public class Parser {
 	
 	private Util util;
 	
+	public Parser() {
+		
+	}
+	
 	public Parser(String propertiesFilename) {
 		this.propertiesFilename = propertiesFilename;
+		try {
+			if (StringUtils.isNotEmpty(propertiesFilename)) {
+				properties.load(new FileInputStream(propertiesFilename));
+				log.info("Loaded properties from " + propertiesFilename);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public MappingDocument parse() {
 
 		init();
+		
+		log.info("Initialized.");
 		
 		try {
 			//First find the logical table views
@@ -111,8 +128,6 @@ public class Parser {
 			    mappingDocument.getLogicalTableMappings().set(i, logicalTableMapping);
 			}
 						
-			
-			
 			//resultModel.write(System.out, "TURTLE");
 			
 			//sparql("SELECT ?s ?p ?o FROM <" + baseNs + "> WHERE { ?s ?p ?o }", resultModel);
@@ -361,7 +376,7 @@ public class Parser {
 					    		sqlQuery = sqlQuery.replaceAll("[\r\n]+", " ");
 						    	if (sqlQuery.indexOf(';') != -1) sqlQuery = sqlQuery.replace(';', ' ');
 						    	
-					    		SelectQuery test = new SelectQuery(sqlQuery, p);
+					    		SelectQuery test = new SelectQuery(sqlQuery, properties);
 					    		LogicalTableView logicalTableView = mappingDocument.findLogicalTableViewByQuery(test.getQuery());
 					    		logicalTableMapping.setView(logicalTableView);
 					    		
@@ -377,7 +392,7 @@ public class Parser {
 			    				tableName = tableName.replaceAll("\"", "");
 			    				log.info("Found tableName " + tableName);
 			    				LogicalTableView logicalTableView = new LogicalTableView();
-			    				SelectQuery sq = new SelectQuery(createQueryForTable(tableName), p);
+			    				SelectQuery sq = new SelectQuery(createQueryForTable(tableName), properties);
 			    				logicalTableView.setSelectQuery(sq);
 			    				logicalTableMapping.setView(logicalTableView);
 			    				
@@ -413,14 +428,14 @@ public class Parser {
 	    		String newTable = rn.asLiteral().toString();
 	    		newTable = util.stripQuotes(newTable);
 	    		log.info("Found table name: " + newTable);
-	    		SelectQuery sq = new SelectQuery(createQueryForTable(newTable), p);
+	    		SelectQuery sq = new SelectQuery(createQueryForTable(newTable), properties);
 	    		log.info("Setting SQL query for table " + newTable + ": " + sq.getQuery());
 	    		logicalTableView.setSelectQuery(sq);
 	    		if (r.getURI() == null) {
 			    	//figure out to which TriplesMap this rr:tableName belongs
 			    	log.info("Found rr:tableName without parent.");
 			    	//LocalResultSet sparqlResults = util.sparql(mapModel, "SELECT ?x WHERE { ?x rr:logicalTable ?z . ?z rr:tableName " + newTable + " . } ");
-			    	if (util.findDatabaseType(p.getProperty("db.driver")).equals("postgresql")) {
+			    	if (util.findDatabaseType(properties.getProperty("db.driver")).equals("postgresql")) {
 			    		newTable = "\"\\\"" + newTable + "\\\"\"";
 			    	} else {
 			    		newTable = "\"" + newTable + "\"";
@@ -481,7 +496,7 @@ public class Parser {
 					e.printStackTrace();
 				}
 		    	
-		    	SelectQuery selectQuery = new SelectQuery(query, p);
+		    	SelectQuery selectQuery = new SelectQuery(query, properties);
 		    	logicalTableView.setSelectQuery(selectQuery);
 		    	results.add(logicalTableView);
 		    }
@@ -495,7 +510,7 @@ public class Parser {
 			ArrayList<String> fields = new ArrayList<String>();
 			
 			java.sql.ResultSet rs;
-			if (p.getProperty("db.driver").contains("mysql")) {
+			if (properties.getProperty("db.driver").contains("mysql")) {
 				rs = db.query("DESCRIBE " + tableName);
 			} else {
 				//postgres
@@ -505,7 +520,7 @@ public class Parser {
 			rs.beforeFirst();
 			while (rs.next()) {
 				//mysql: fields.add(rs.getString("Field"));
-				if (util.findDatabaseType(p.getProperty("db.driver")).equals("postgresql")) {
+				if (util.findDatabaseType(properties.getProperty("db.driver")).equals("postgresql")) {
 					fields.add("\"" + rs.getString(1) + "\"");
 				} else {
 					fields.add(rs.getString("Field"));
@@ -521,7 +536,7 @@ public class Parser {
 			e.printStackTrace();
 		}
 		
-		if (util.findDatabaseType(p.getProperty("db.driver")).equals("postgresql")) {
+		if (util.findDatabaseType(properties.getProperty("db.driver")).equals("postgresql")) {
 			result += " FROM " + "\"" + tableName + "\"";
 		} else {
 			result += " FROM " + tableName;
@@ -531,54 +546,53 @@ public class Parser {
 	}
 
 	public void init() {
-		try {
-			p.load(new FileInputStream(propertiesFilename));
+		log.info("Initializing.");
+		
+		//test source database
+		db.openConnection();
+				
+		//test destination database
+		if (properties.containsKey("jena.storeOutputModelInDatabase") && properties.getProperty("jena.storeOutputModelInDatabase").contains("true")) {
+			db.openJenaConnection();
+		}
+		
+		this.baseNs = properties.getProperty("default.namespace");
+		String mappingFilename = properties.getProperty("mapping.file");
+		
+		InputStream isMap = FileManager.get().open(mappingFilename);
+		mapModel = ModelFactory.createDefaultModel();
+		mapModel.read(isMap, baseNs, properties.getProperty("mapping.file.type"));
+		//mapModel.write(System.out, properties.getProperty("mapping.file.type"));
+		
+		String inputModelFileName = properties.getProperty("input.model");
+		InputStream isRes = FileManager.get().open(inputModelFileName);
+		
+		Model resultBaseModel = ModelFactory.createDefaultModel();
+		resultBaseModel.read(isRes, baseNs, properties.getProperty("input.model.type"));
+		//resultBaseModel.write(System.out, properties.getProperty("input.model.type"));
+		
+		String storeInDatabase = properties.getProperty("jena.storeOutputModelInDatabase");
+		String cleanDbOnStartup = properties.getProperty("jena.cleanDbOnStartup");
+		
+		verbose =  properties.containsKey("default.verbose") && (properties.getProperty("default.verbose").contains("true") || properties.getProperty("default.verbose").contains("yes"));
 			
-			//test source database
-			db.openConnection();
-					
-			//test destination database
-			if (p.getProperty("jena.storeOutputModelInDatabase").contains("true")) {
-				db.openJenaConnection();
+		log.info("Initialising Parser");
+		
+		if (Boolean.valueOf(storeInDatabase)) {
+			if (Boolean.valueOf(cleanDbOnStartup)) {
+			    //Model model = SDBFactory.connectDefaultModel(db.jenaStore());
+			    
+			    //if (model.size() > 0) {
+			    //	model.removeAll();
+			    //}
+				//db.getStore() .getJenaConnection().cleanDB();
 			}
 			
-			this.baseNs = p.getProperty("default.namespace");
-			String mappingFilename = p.getProperty("mapping.file");
-			
-			InputStream isMap = FileManager.get().open(mappingFilename);
-			mapModel = ModelFactory.createDefaultModel();
-			mapModel.read(isMap, baseNs, p.getProperty("mapping.file.type"));
-			//mapModel.write(System.out, properties.getProperty("mapping.file.type"));
-			
-			String inputModelFileName = p.getProperty("input.model");
-			InputStream isRes = FileManager.get().open(inputModelFileName);
-			
-			Model resultBaseModel = ModelFactory.createDefaultModel();
-			resultBaseModel.read(isRes, baseNs, p.getProperty("input.model.type"));
-			//resultBaseModel.write(System.out, properties.getProperty("input.model.type"));
-			
-			String storeInDatabase = p.getProperty("jena.storeOutputModelInDatabase");
-			String cleanDbOnStartup = p.getProperty("jena.cleanDbOnStartup");
-			
-			verbose =  p.containsKey("default.verbose") && (p.getProperty("default.verbose").contains("true") || p.getProperty("default.verbose").contains("yes"));
-				
-			log.info("Initialising Parser");
-			
-			if (Boolean.valueOf(storeInDatabase)) {
-				if (Boolean.valueOf(cleanDbOnStartup)) {
-				    //Model model = SDBFactory.connectDefaultModel(db.jenaStore());
-				    
-				    //if (model.size() > 0) {
-				    //	model.removeAll();
-				    //}
-					//db.getStore() .getJenaConnection().cleanDB();
-				}
-				
-				Store store = db.jenaStore();
-			    Model resultDbModel = SDBFactory.connectDefaultModel(store);
-			    
-			    resultDbModel.read(isRes, baseNs, p.getProperty("input.model.type"));
-			    log.info("Store size is " + store.getSize());
+			Store store = db.jenaStore();
+		    Model resultDbModel = SDBFactory.connectDefaultModel(store);
+		    
+		    resultDbModel.read(isRes, baseNs, properties.getProperty("input.model.type"));
+		    log.info("Store size is " + store.getSize());
 //			    if (store.getSize() > 0) {
 //				    StmtIterator sIter = resultDbModel.listStatements();
 //				    for ( ; sIter.hasNext() ; ) {
@@ -587,30 +601,24 @@ public class Parser {
 //				    }
 //				    sIter.close() ;
 //			    }
-			    
-			    //Model resultDbModel = ModelFactory.createModelRDBMaker(db.getJenaConnection()).createModel("fresh");
-				resultDbModel.add(resultBaseModel);
-				
-				//resultModel = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), resultDbModel);
-				resultModel = ModelFactory.createDefaultModel();
+		    
+		    //Model resultDbModel = ModelFactory.createModelRDBMaker(db.getJenaConnection()).createModel("fresh");
+			resultDbModel.add(resultBaseModel);
+			
+			//resultModel = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), resultDbModel);
+			resultModel = ModelFactory.createDefaultModel();
 
-				Map<String, String> prefixes = mapModel.getNsPrefixMap();
-				log.info("Copy " + prefixes.size() + " prefixes from map model to persistent.");
-				for (String s : mapModel.getNsPrefixMap().keySet()) {
-					log.info(s + ": " + mapModel.getNsPrefixMap().get(s));
-				}
-				resultModel.setNsPrefixes(prefixes);
-				
-			} else {
-				//resultModel = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), resultBaseModel);
-				resultModel = ModelFactory.createDefaultModel();
-				resultModel.setNsPrefixes(mapModel.getNsPrefixMap());
+			Map<String, String> prefixes = mapModel.getNsPrefixMap();
+			log.info("Copy " + prefixes.size() + " prefixes from map model to persistent.");
+			for (String s : mapModel.getNsPrefixMap().keySet()) {
+				log.info(s + ": " + mapModel.getNsPrefixMap().get(s));
 			}
-						
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
+			resultModel.setNsPrefixes(prefixes);
+			
+		} else {
+			//resultModel = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), resultBaseModel);
+			resultModel = ModelFactory.createDefaultModel();
+			resultModel.setNsPrefixes(mapModel.getNsPrefixMap());
 		}
 	}
 	
@@ -649,12 +657,12 @@ public class Parser {
 		return resultModel;
 	}
 	
-	public Properties getP() {
-		return p;
+	public Properties getProperties() {
+		return properties;
 	}
-	
-	public void setP(Properties p) {
-		this.p = p;
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 	
 }

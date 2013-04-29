@@ -20,7 +20,7 @@ public class Main {
 		MappingDocument mappingDocument = parser.parse();
 		
 		Generator generator = (Generator) context.getBean("generator");
-		generator.setP(parser.getP());
+		generator.setProperties(parser.getProperties());
 		generator.setResultModel(parser.getResultModel());
 		
 		//Actually do the output
