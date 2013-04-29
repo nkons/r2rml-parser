@@ -132,7 +132,14 @@ public class Generator {
 									field = field.replaceAll("\"", "");
 									//log.info("Cleaning. Field is now " + field);
 								}
-								String test = rs.getString(field);
+								
+								String test = null;
+								try {
+									test = rs.getString(field);
+								} catch (Exception e) {
+									log.error(e.getMessage());
+								}
+								
 								if (test != null) {
 									Literal o;
 									if (predicateObjectMap.getLanguage() == null) {
