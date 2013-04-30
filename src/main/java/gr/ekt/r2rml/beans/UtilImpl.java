@@ -47,7 +47,7 @@ public class UtilImpl implements Util {
 	}
 	
 	public String fillTemplate(Template template, ResultSet rs) {
-		
+		log.info("filling in template " + template.getText());
 		String result = new String();
 		if (template!= null && template.getText() != null) {
 			result = template.getText();
@@ -62,8 +62,12 @@ public class UtilImpl implements Util {
 					//log.info("Cleaning. Field is now " + field);
 				}
 				if (rs.getString(field) != null) {
-					String before = result.substring(0, result.indexOf('{'));
-					String after = result.substring(result.indexOf('}') + 1);
+					String before = result.substring(0, result.indexOf(field));
+					before = before.substring(0, before.lastIndexOf('{'));
+
+					String after = result.substring(result.indexOf(field) + field.length());
+					after = after.substring(after.indexOf('}') + 1);
+					
 					result = before + rs.getString(field) + after;
 				} else {
 					result = null;

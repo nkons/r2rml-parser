@@ -3,6 +3,8 @@
  */
 package gr.ekt.r2rml.entities;
 
+import java.util.ArrayList;
+
 import com.hp.hpl.jena.datatypes.BaseDatatype;
 
 /**
@@ -13,9 +15,9 @@ import com.hp.hpl.jena.datatypes.BaseDatatype;
 public class PredicateObjectMap {
 
 	/**
-	 * The predicate value.
+	 * The predicate value(s).
 	 */
-	private String predicate;
+	private ArrayList<String> predicates;
 	
 	/**
 	 * Holds the template through which the objects will be generated.
@@ -44,16 +46,16 @@ public class PredicateObjectMap {
 	}
 	
 	/**
-	 * @return the predicate
+	 * @return the predicates
 	 */
-	public String getPredicate() {
-		return predicate;
+	public ArrayList<String> getPredicates() {
+		return predicates;
 	}
 	/**
-	 * @param predicate the predicate to set
+	 * @param predicates the predicates to set
 	 */
-	public void setPredicate(String predicate) {
-		this.predicate = predicate;
+	public void setPredicates(ArrayList<String> predicates) {
+		this.predicates = predicates;
 	}
 	/**
 	 * @return the objectTemplate

@@ -15,10 +15,9 @@ import java.util.ArrayList;
  */
 public class SubjectMap {
 
-	private ArrayList<String> fields;
 	private Template template;
 	private SelectQuery selectQuery;
-	private String classUri;
+	private ArrayList<String> classUris;
 	
 	/**
 	 * Default constructor.
@@ -26,18 +25,6 @@ public class SubjectMap {
 	public SubjectMap() {
 	}
 	
-	/**
-	 * @return the fields
-	 */
-	public ArrayList<String> getFields() {
-		return fields;
-	}
-	/**
-	 * @param fields the fields to set
-	 */
-	public void setFields(ArrayList<String> fields) {
-		this.fields = fields;
-	}
 	/**
 	 * @return the template
 	 */
@@ -63,15 +50,15 @@ public class SubjectMap {
 		this.selectQuery = selectQuery;
 	}
 	/**
-	 * @return the classUri
+	 * @return the classUris
 	 */
-	public String getClassUri() {
-		return classUri;
+	public ArrayList<String> getClassUris() {
+		return classUris;
 	}
 	/**
-	 * @param classUri the classUri to set
+	 * @param classUris the classUris to set
 	 */
-	public void setClassUri(String classUri) {
-		this.classUri = classUri;
+	public void setClassUris(ArrayList<String> classUris) {
+		this.classUris = classUris;
 	}
 }

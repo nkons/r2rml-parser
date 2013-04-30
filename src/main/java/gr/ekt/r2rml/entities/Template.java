@@ -67,6 +67,9 @@ public class Template {
 	public ArrayList<String> createTemplateFields() {
 		ArrayList<String> results = new ArrayList<String>();
 		String template = this.text;
+		log.info("\\{");
+		template = template.replaceAll("\\\\\\{", " "); //remove escaped braces \{ that could mix things
+		log.info("new template " + template);
 		while (template.indexOf('{') != -1) {
 			int from = template.indexOf('{') + 1;
 			int to = template.indexOf('}');

@@ -69,7 +69,7 @@ public class ComplianceTests {
 		
 		int counter = 0;
 		for (String key : tests.keySet()) {
-			if (counter == 9) { //(counter > 4 && counter < 6) {
+			if (counter == 19) { //(counter > 4 && counter < 6) {
 				String folder = "src/test/resources/" + key + "/";
 				initialiseSourceDatabase(folder + "create.sql");
 				
@@ -98,41 +98,19 @@ public class ComplianceTests {
 		}
 		context.close();
 	}
-	
-	@Test
-	public void test000() {
-		log.info("test 000");
-		initialiseSourceDatabase("src/test/resources/D000-1table1column0rows/create.sql");
-		
-		//Override property file
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml");
-		Parser parser = (Parser) context.getBean("parser");
-		Properties p = parser.getProperties();
-			p.setProperty("mapping.file", "src/test/resources/D000-1table1column0rows/r2rml.ttl");
-		parser.setProperties(p);
-		
-		MappingDocument mappingDocument = parser.parse();
-
-		Generator generator = (Generator) context.getBean("generator");
-		generator.setProperties(parser.getProperties());
-		generator.setResultModel(parser.getResultModel());
-		generator.createTriples(mappingDocument);
-		
-		context.close();
-	}
 		
 	@Test
 	public void testSingle() {
 		log.info("test single");
-		String folder = "src/test/resources/D003-1table3columns1row/";
+		String folder = "src/test/resources/D007-1table1primarykey2columns1row/";
 		initialiseSourceDatabase(folder + "create.sql");
 		
 		//Override property file
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml");
 		Parser parser = (Parser) context.getBean("parser");
 		Properties p = parser.getProperties();
-			p.setProperty("mapping.file", folder + "r2rmlj.ttl");
-			p.setProperty("jena.destinationFileName", "r2rmlj.nq");
+			p.setProperty("mapping.file", folder + "r2rmlc.ttl");
+			p.setProperty("jena.destinationFileName", folder + "r2rmlc.nq");
 		parser.setProperties(p);
 		MappingDocument mappingDocument = parser.parse();
 

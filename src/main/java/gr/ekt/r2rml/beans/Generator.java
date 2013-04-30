@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,102 +67,109 @@ public class Generator {
 					String resultSubject = util.fillTemplate(logicalTableMapping.getSubjectMap().getTemplate(), rs);
 					
 					if (resultSubject != null) {
-						if (StringUtils.isNotEmpty(logicalTableMapping.getSubjectMap().getClassUri())) {
-							Resource s = resultModel.createResource(resultSubject);
-							Property p = RDF.type;
-							Resource o = resultModel.createResource(logicalTableMapping.getSubjectMap().getClassUri());
-							Statement st = resultModel.createStatement(s, p, o);
-							if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.getURI() + ">");
-							resultModel.add(st);
-							triples.add(st);
+						//if (StringUtils.isNotEmpty(logicalTableMapping.getSubjectMap().getClassUri())) {
+						if (logicalTableMapping.getSubjectMap().getClassUris() != null && logicalTableMapping.getSubjectMap().getClassUris().size() > 0) {
+							for (String classUri : logicalTableMapping.getSubjectMap().getClassUris()) {
+								Resource s = resultModel.createResource(resultSubject);
+								Property p = RDF.type;
+								Resource o = resultModel.createResource(classUri);
+								Statement st = resultModel.createStatement(s, p, o);
+								if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.getURI() + ">");
+								resultModel.add(st);
+								triples.add(st);
+							}
 						}
 						
 						//for (int i = 0; i < logicalTableMapping.getPredicateObjectMaps()  resultPredicates.size(); i++) {
 						for (PredicateObjectMap predicateObjectMap : logicalTableMapping.getPredicateObjectMaps()) {
 							Resource s = resultModel.createResource(resultSubject);
-							Property p = resultModel.createProperty(predicateObjectMap.getPredicate());
 							
-							if (predicateObjectMap.getObjectTemplate() != null) {
-								//Literal o = resultModel.createLiteral(u.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
-								//if (!util.isUriTemplate(resultModel, predicateObjectMap.getObjectTemplate())) {
-								if (!predicateObjectMap.getObjectTemplate().isUri()) {
-									Literal o = null;
-									
-									if (predicateObjectMap.getLanguage() == null) {
-										String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
-										if (value != null)  {
-											if (predicateObjectMap.getDataType() != null) {
-												o = resultModel.createTypedLiteral(value, predicateObjectMap.getDataType());
-												if (verbose) log.info("Adding typed literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"^^" + predicateObjectMap.getDataType().getURI());
-											} else {
-												o = resultModel.createLiteral(value);
-												if (verbose) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
+							for (String predicate : predicateObjectMap.getPredicates()) {
+								
+								Property p = resultModel.createProperty(predicate);
+								
+								if (predicateObjectMap.getObjectTemplate() != null) {
+									//Literal o = resultModel.createLiteral(u.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
+									//if (!util.isUriTemplate(resultModel, predicateObjectMap.getObjectTemplate())) {
+									if (!predicateObjectMap.getObjectTemplate().isUri()) {
+										Literal o = null;
+										
+										if (predicateObjectMap.getLanguage() == null) {
+											String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
+											if (value != null)  {
+												if (predicateObjectMap.getDataType() != null) {
+													o = resultModel.createTypedLiteral(value, predicateObjectMap.getDataType());
+													if (verbose) log.info("Adding typed literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"^^" + predicateObjectMap.getDataType().getURI());
+												} else {
+													o = resultModel.createLiteral(value);
+													if (verbose) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
+												}
+											}
+										} else {
+											String language = util.fillTemplate(predicateObjectMap.getLanguage(), rs);
+											String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
+											if (value != null) {
+												
+												o = resultModel.createLiteral(value, language);
+												if (verbose) log.info("Adding literal triple with language: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + o.getLanguage());
 											}
 										}
+										
+										if (o != null) {
+											Statement st = resultModel.createStatement(s, p, o);
+											resultModel.add(st);
+											triples.add(st);
+										}
 									} else {
-										String language = util.fillTemplate(predicateObjectMap.getLanguage(), rs);
+										if (verbose) log.info("filling in template " + predicateObjectMap.getObjectTemplate().getText());
 										String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
 										if (value != null) {
+											RDFNode o = resultModel.createResource(value);
+											if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
+											Statement st = resultModel.createStatement(s, p, o);
+											resultModel.add(st);
+											triples.add(st);
+										}
+									}
+								} else if (predicateObjectMap.getObjectColumn() != null) {
+									String field = predicateObjectMap.getObjectColumn();
+									if (field.startsWith("\"") && field.endsWith("\"")) {
+										field = field.replaceAll("\"", "");
+										//log.info("Cleaning. Field is now " + field);
+									}
+									
+									String test = null;
+									try {
+										test = rs.getString(field);
+									} catch (Exception e) {
+										log.error(e.getMessage());
+									}
+									
+									if (test != null) {
+										Literal o;
+										if (predicateObjectMap.getLanguage() == null) {
 											
-											o = resultModel.createLiteral(value, language);
-											if (verbose) log.info("Adding literal triple with language: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + o.getLanguage());
-										}
-									}
-									
-									if (o != null) {
-										Statement st = resultModel.createStatement(s, p, o);
-										resultModel.add(st);
-										triples.add(st);
-									}
-								} else {
-									if (verbose) log.info("filling in template " + predicateObjectMap.getObjectTemplate().getText());
-									String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
-									if (value != null) {
-										RDFNode o = resultModel.createResource(value);
-										if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
-										Statement st = resultModel.createStatement(s, p, o);
-										resultModel.add(st);
-										triples.add(st);
-									}
-								}
-							} else if (predicateObjectMap.getObjectColumn() != null) {
-								String field = predicateObjectMap.getObjectColumn();
-								if (field.startsWith("\"") && field.endsWith("\"")) {
-									field = field.replaceAll("\"", "");
-									//log.info("Cleaning. Field is now " + field);
-								}
-								
-								String test = null;
-								try {
-									test = rs.getString(field);
-								} catch (Exception e) {
-									log.error(e.getMessage());
-								}
-								
-								if (test != null) {
-									Literal o;
-									if (predicateObjectMap.getLanguage() == null) {
-										
-										if (predicateObjectMap.getDataType() != null) {
-											o = resultModel.createTypedLiteral(test, predicateObjectMap.getDataType());
-											if (verbose) log.info("Adding typed literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"^^" + predicateObjectMap.getDataType().getURI());
+											if (predicateObjectMap.getDataType() != null) {
+												o = resultModel.createTypedLiteral(test, predicateObjectMap.getDataType());
+												if (verbose) log.info("Adding typed literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"^^" + predicateObjectMap.getDataType().getURI());
+											} else {
+												o = resultModel.createLiteral(test);
+												if (verbose) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
+											}
+											
 										} else {
-											o = resultModel.createLiteral(test);
-											if (verbose) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
+											String language = util.fillTemplate(predicateObjectMap.getLanguage(), rs);
+											o = resultModel.createLiteral(test, language);
+											if (verbose) log.info("Adding triple with language: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + predicateObjectMap.getLanguage());
 										}
 										
-									} else {
-										String language = util.fillTemplate(predicateObjectMap.getLanguage(), rs);
-										o = resultModel.createLiteral(test, language);
-										if (verbose) log.info("Adding triple with language: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + predicateObjectMap.getLanguage());
+										Statement st = resultModel.createStatement(s, p, o);
+										resultModel.add(st);
+										triples.add(st);
 									}
-									
-									Statement st = resultModel.createStatement(s, p, o);
-									resultModel.add(st);
-									triples.add(st);
+		
 								}
-	
-							} 
+							}
 						}
 					}
 
