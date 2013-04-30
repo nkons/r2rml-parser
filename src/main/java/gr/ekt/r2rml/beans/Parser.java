@@ -194,6 +194,41 @@ public class Parser {
 		    	subjectMap.setSelectQuery(sq);
 		    }
 		    
+		    NodeIterator iterColumn = mapModel.listObjectsOfProperty(rn.asResource(), mapModel.getProperty(rrNs + "column"));
+		    while (iterColumn.hasNext()) {
+		    	RDFNode rnColumn = iterColumn.next();
+		    	String tempColumn = rnColumn.asLiteral().toString();
+		    	String templateText = "{" + tempColumn + "}";
+		    	
+		    	NodeIterator iterTermType = mapModel.listObjectsOfProperty(rn.asResource(), mapModel.getProperty(rrNs + "termType"));
+		    	if (iterTermType.hasNext()) {
+			    	while (iterTermType.hasNext()) {
+			    		RDFNode rnTermType = iterTermType.next();
+			    		if (rnTermType.isResource() && rnTermType.asResource().getNameSpace().equals(rrNs)) {
+			    			String termType = rnTermType.asResource().getLocalName();
+			    			log.info("found rr:termType " + termType);
+			    			if ("IRI".equals(termType)) {
+			    				Template template = new Template(templateText, TermType.IRI, baseNs, resultModel);
+						    	subjectMap.setTemplate(template);
+			    			} else if ("BlankNode".equals(termType)) {
+			    				Template template = new Template(templateText, TermType.BLANKNODE, baseNs, resultModel);
+						    	subjectMap.setTemplate(template);
+			    			} else if ("Literal".equals(termType)) {
+			    				Template template = new Template(templateText, TermType.LITERAL, baseNs, resultModel);
+						    	subjectMap.setTemplate(template);
+			    			} else {
+			    				log.error("Unknown term type: " + termType + ". Terminating.");
+			    				System.exit(0);
+			    			}
+			    		}
+			    	}
+	    		} else {
+	    			Template template = new Template(templateText, TermType.LITERAL, baseNs, resultModel);
+			    	subjectMap.setTemplate(template);
+	    		}
+		    	log.info("Added subject template " + templateText + " from column " + tempColumn);
+		    }
+		    
 		    NodeIterator iterClass = mapModel.listObjectsOfProperty(rn.asResource(), mapModel.getProperty(rrNs + "class"));
 		    ArrayList<String> classUris = new ArrayList<String>();
 		    while (iterClass.hasNext()) { //can be more than 1

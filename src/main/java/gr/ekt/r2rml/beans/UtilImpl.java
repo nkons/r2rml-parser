@@ -182,6 +182,9 @@ public class UtilImpl implements Util {
 		return result;
 	}
 	
+	/**
+	 * returns an XSD datatype according to an XSD declaration
+	 */
 	public BaseDatatype findDataType(String dataType) {
 		if ("anyURI".equalsIgnoreCase(dataType)) {
     		return XSDDatatype.XSDanyURI;

@@ -3,6 +3,8 @@ package gr.ekt.r2rml.beans;
 import gr.ekt.r2rml.entities.LogicalTableMapping;
 import gr.ekt.r2rml.entities.MappingDocument;
 import gr.ekt.r2rml.entities.PredicateObjectMap;
+import gr.ekt.r2rml.entities.Template;
+import gr.ekt.r2rml.entities.TermType;
 import gr.ekt.r2rml.entities.sql.SelectQuery;
 
 import java.io.File;
@@ -17,6 +19,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -64,13 +67,26 @@ public class Generator {
 				rs.beforeFirst();
 				int tripleCount = 0;
 				while (rs.next()) {
-					String resultSubject = util.fillTemplate(logicalTableMapping.getSubjectMap().getTemplate(), rs);
+					Template subjectTemplate = logicalTableMapping.getSubjectMap().getTemplate();
+					String resultSubject = util.fillTemplate(subjectTemplate, rs);
 					
 					if (resultSubject != null) {
 						//if (StringUtils.isNotEmpty(logicalTableMapping.getSubjectMap().getClassUri())) {
 						if (logicalTableMapping.getSubjectMap().getClassUris() != null && logicalTableMapping.getSubjectMap().getClassUris().size() > 0) {
 							for (String classUri : logicalTableMapping.getSubjectMap().getClassUris()) {
-								Resource s = resultModel.createResource(resultSubject);
+								Resource s = null; //resultModel.createResource();
+								if (verbose) log.info("subject termType: " + subjectTemplate.getTermType().toString());
+								if (subjectTemplate.getTermType() == TermType.IRI) {
+									s = resultModel.createResource(resultSubject);
+								} else if (subjectTemplate.getTermType() == TermType.LITERAL) {
+									s = resultModel.createLiteral(resultSubject).asResource();
+								} else if (subjectTemplate.getTermType() == TermType.BLANKNODE) {
+									s = resultModel.createResource(AnonId.create(resultSubject));
+									if (verbose) log.info("created blank node subject with id " + s.getId());
+								} else {
+									s = resultModel.createResource(resultSubject);
+								}
+								
 								Property p = RDF.type;
 								Resource o = resultModel.createResource(classUri);
 								Statement st = resultModel.createStatement(s, p, o);
@@ -82,20 +98,38 @@ public class Generator {
 						
 						//for (int i = 0; i < logicalTableMapping.getPredicateObjectMaps()  resultPredicates.size(); i++) {
 						for (PredicateObjectMap predicateObjectMap : logicalTableMapping.getPredicateObjectMaps()) {
-							Resource s = resultModel.createResource(resultSubject);
+							Resource s = null; //resultModel.createResource();
+							if (verbose) log.info("subject termType: " + subjectTemplate.getTermType().toString());
+							if (subjectTemplate.getTermType() == TermType.IRI) {
+								s = resultModel.createResource(resultSubject);
+							} else if (subjectTemplate.getTermType() == TermType.LITERAL) {
+								s = resultModel.createLiteral(resultSubject).asResource();
+							} else if (subjectTemplate.getTermType() == TermType.BLANKNODE) {
+								s = resultModel.createResource(AnonId.create(resultSubject));
+								if (verbose) log.info("created blank node subject with id " + s.getId());
+							} else {
+								s = resultModel.createResource(resultSubject);
+							}
+							
+							Template objectTemplate = predicateObjectMap.getObjectTemplate();
+							if (objectTemplate != null && objectTemplate.getTermType() != null) {
+								log.info("object type is " + objectTemplate.getTermType().toString());
+							} else {
+								log.info("object type is null");
+							}
 							
 							for (String predicate : predicateObjectMap.getPredicates()) {
 								
 								Property p = resultModel.createProperty(predicate);
 								
-								if (predicateObjectMap.getObjectTemplate() != null) {
+								if (objectTemplate != null) {
 									//Literal o = resultModel.createLiteral(u.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
 									//if (!util.isUriTemplate(resultModel, predicateObjectMap.getObjectTemplate())) {
-									if (!predicateObjectMap.getObjectTemplate().isUri()) {
+									if (!objectTemplate.isUri()) {
 										Literal o = null;
 										
 										if (predicateObjectMap.getLanguage() == null) {
-											String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
+											String value = util.fillTemplate(objectTemplate, rs);
 											if (value != null)  {
 												if (predicateObjectMap.getDataType() != null) {
 													o = resultModel.createTypedLiteral(value, predicateObjectMap.getDataType());
@@ -107,9 +141,8 @@ public class Generator {
 											}
 										} else {
 											String language = util.fillTemplate(predicateObjectMap.getLanguage(), rs);
-											String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
+											String value = util.fillTemplate(objectTemplate, rs);
 											if (value != null) {
-												
 												o = resultModel.createLiteral(value, language);
 												if (verbose) log.info("Adding literal triple with language: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + o.getLanguage());
 											}
@@ -121,7 +154,7 @@ public class Generator {
 											triples.add(st);
 										}
 									} else {
-										if (verbose) log.info("filling in template " + predicateObjectMap.getObjectTemplate().getText());
+										if (verbose) log.info("filling in template " + objectTemplate.getText());
 										String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
 										if (value != null) {
 											RDFNode o = resultModel.createResource(value);
