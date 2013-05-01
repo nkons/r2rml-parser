@@ -1,3 +1,14 @@
+/**
+ * Licensed under the Creative Commons Attribution-NonCommercial 3.0 Unported 
+ * License (the "License"). You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at:
+ * 
+ *  http://creativecommons.org/licenses/by-nc/3.0/
+ *  
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied.
+ */
 package gr.ekt.r2rml.test;
 
 import gr.ekt.r2rml.beans.Generator;
@@ -101,16 +112,16 @@ public class ComplianceTests {
 		
 	@Test
 	public void testSingle() {
-		log.info("test single");
-		String folder = "src/test/resources/D007-1table1primarykey2columns1row/";
+		log.info("test single. Careful, database 'test' will be erased and re-created!");
+		String folder = "src/test/resources/D002-1table2columns1row/";
 		initialiseSourceDatabase(folder + "create.sql");
 		
 		//Override property file
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml");
 		Parser parser = (Parser) context.getBean("parser");
 		Properties p = parser.getProperties();
-			p.setProperty("mapping.file", folder + "r2rmlc.ttl");
-			p.setProperty("jena.destinationFileName", folder + "r2rmlc.nq");
+			p.setProperty("mapping.file", folder + "r2rmla.ttl");
+			p.setProperty("jena.destinationFileName", folder + "r2rmla.nq");
 		parser.setProperties(p);
 		MappingDocument mappingDocument = parser.parse();
 
