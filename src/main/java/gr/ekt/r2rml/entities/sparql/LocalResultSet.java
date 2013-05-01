@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Holds information about a SPARQL query results
+ * Holds information about a Sparql query results
+ * @see LocalResultRow
  * @author nkons
  *
  */

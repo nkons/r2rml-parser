@@ -11,6 +11,11 @@
  */
 package gr.ekt.r2rml.entities;
 
+/**
+ * RDF resource types
+ * @author nkons
+ *
+ */
 public enum TermType {
 
 	IRI,

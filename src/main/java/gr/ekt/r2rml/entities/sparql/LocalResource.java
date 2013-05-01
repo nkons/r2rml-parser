@@ -22,6 +22,8 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
+ * A local resource, and associated information. Is contained in rows of a Sparql query resultset
+ * @see LocalResultRow
  * @author nkons
  *
  */

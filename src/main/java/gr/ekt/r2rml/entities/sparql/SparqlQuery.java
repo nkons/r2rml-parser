@@ -15,6 +15,8 @@ package gr.ekt.r2rml.entities.sparql;
 import java.io.Serializable;
 
 /**
+ * Holds information about a Sparql query and the resultset it returns
+ * @see LocalResultSet
  * @author nkons
  *
  */
