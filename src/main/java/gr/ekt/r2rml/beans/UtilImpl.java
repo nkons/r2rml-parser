@@ -275,4 +275,61 @@ public class UtilImpl implements Util {
 		return null;
 	}
 	
+	/**
+	 * returns an XSD datatype according to the type of an SQL field
+	 */
+	public BaseDatatype findDataTypeFromSql(String sqlDataType) {
+		sqlDataType = sqlDataType.toLowerCase();
+		if (sqlDataType.equals("character")
+				|| sqlDataType.equals("text") 
+				|| sqlDataType.contains("varchar")
+				|| sqlDataType.contains("char")
+				|| sqlDataType.contains("varbit")
+				|| sqlDataType.contains("cidr")
+				|| sqlDataType.contains("inet")
+				|| sqlDataType.contains("macaddr")) {
+    		//return XSDDatatype.XSDstring;
+			//if the sql field type is a string, it is ok to omit the xsd datatype from the result
+			return null;
+    	} else if (sqlDataType.equals("binary")
+    			|| sqlDataType.equals("bytea")) {
+    		return XSDDatatype.XSDbase64Binary;
+    	} else if (sqlDataType.contains("numeric")
+    			|| sqlDataType.contains("decimal")) {
+    		return XSDDatatype.XSDdecimal;
+    	} else if (sqlDataType.equals("smallint") 
+    			|| sqlDataType.equals("integer") 
+    			|| sqlDataType.equals("bigint")
+    			|| sqlDataType.equals("int")
+    			|| sqlDataType.equals("int2")
+    			|| sqlDataType.equals("int4")
+    			|| sqlDataType.equals("int8")
+    			|| sqlDataType.equals("serial")
+    			|| sqlDataType.equals("serial4")
+    			|| sqlDataType.equals("bigserial")) {
+        	return XSDDatatype.XSDinteger;
+    	} else if (sqlDataType.equals("float")
+    			|| sqlDataType.equals("float4")
+    			|| sqlDataType.equals("float8")
+    			|| sqlDataType.equals("real")
+    			|| sqlDataType.equals("double precision")) {
+        	return XSDDatatype.XSDdouble;
+    	} else if (sqlDataType.equals("boolean")
+    			|| sqlDataType.equals("bool")) {
+        	return XSDDatatype.XSDboolean;
+    	} else if (sqlDataType.equals("date")) {
+        	return XSDDatatype.XSDdate;
+    	} else if (sqlDataType.equals("time")
+    			|| sqlDataType.equals("timetz")) {
+        	return XSDDatatype.XSDtime;
+    	} else if (sqlDataType.equals("timestamp")
+    			|| sqlDataType.equals("timestamptz")) {
+        	return XSDDatatype.XSDdateTime;
+        } else {
+    		log.info("Found unknown SQL sqlDataType " + sqlDataType);
+    		System.exit(0);
+    	}
+		return null;
+	}
+	
 }

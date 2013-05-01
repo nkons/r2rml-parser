@@ -10,6 +10,8 @@ import gr.ekt.r2rml.entities.sql.SelectQuery;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,6 +21,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hp.hpl.jena.datatypes.BaseDatatype;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -171,6 +174,8 @@ public class Generator {
 									String test = null;
 									try {
 										test = rs.getString(field);
+										BaseDatatype xsdDataType = findFieldDataType(field, rs);
+										predicateObjectMap.setDataType(xsdDataType);
 									} catch (Exception e) {
 										log.error(e.getMessage());
 									}
@@ -281,6 +286,27 @@ public class Generator {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	BaseDatatype findFieldDataType(String field, ResultSet rs) {
+		field = field.trim();
+		log.info("figuring out datatype of field: " + field);
+		try {
+			ResultSetMetaData rsMeta = rs.getMetaData();
+			log.info("table name " + rsMeta.getTableName(1));
+			for (int i = 1; i <= rsMeta.getColumnCount(); i++) {
+				log.info("column name is " + rsMeta.getColumnName(i));
+				if (rsMeta.getColumnName(i).equals(field)) {
+					String sqlType = rsMeta.getColumnTypeName(i);
+					log.info("column " + i + " with name " + rsMeta.getColumnName(i) + " is of type " + sqlType);
+					return util.findDataTypeFromSql(sqlType);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	public Database getDb() {

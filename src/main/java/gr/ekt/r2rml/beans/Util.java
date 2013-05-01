@@ -27,4 +27,6 @@ public interface Util {
 	
 	BaseDatatype findDataType(String dataType);
 	
+	BaseDatatype findDataTypeFromSql(String sqlDataType);
+	
 }
