@@ -76,10 +76,9 @@ public class Generator {
 							for (String classUri : logicalTableMapping.getSubjectMap().getClassUris()) {
 								Resource s = null; //resultModel.createResource();
 								if (verbose) log.info("subject termType: " + subjectTemplate.getTermType().toString());
-								if (subjectTemplate.getTermType() == TermType.IRI) {
+								//we cannot have a literal as a subject, it has to be an iri or a blank node
+								if (subjectTemplate.getTermType() == TermType.IRI || subjectTemplate.getTermType() == TermType.LITERAL) {
 									s = resultModel.createResource(resultSubject);
-								} else if (subjectTemplate.getTermType() == TermType.LITERAL) {
-									s = resultModel.createLiteral(resultSubject).asResource();
 								} else if (subjectTemplate.getTermType() == TermType.BLANKNODE) {
 									s = resultModel.createResource(AnonId.create(resultSubject));
 									if (verbose) log.info("created blank node subject with id " + s.getId());
@@ -100,10 +99,8 @@ public class Generator {
 						for (PredicateObjectMap predicateObjectMap : logicalTableMapping.getPredicateObjectMaps()) {
 							Resource s = null; //resultModel.createResource();
 							if (verbose) log.info("subject termType: " + subjectTemplate.getTermType().toString());
-							if (subjectTemplate.getTermType() == TermType.IRI) {
+							if (subjectTemplate.getTermType() == TermType.IRI || subjectTemplate.getTermType() == TermType.LITERAL) {
 								s = resultModel.createResource(resultSubject);
-							} else if (subjectTemplate.getTermType() == TermType.LITERAL) {
-								s = resultModel.createLiteral(resultSubject).asResource();
 							} else if (subjectTemplate.getTermType() == TermType.BLANKNODE) {
 								s = resultModel.createResource(AnonId.create(resultSubject));
 								if (verbose) log.info("created blank node subject with id " + s.getId());
