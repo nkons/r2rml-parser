@@ -1,6 +1,6 @@
 # R2RML Parser
 
-A parser that exposes relational database contents as RDF graphs, based on an R2RML mapping document. Contains a mapping file for the DSpace institutional repository solution. First results presented in [1].
+A parser that can export relational database contents as RDF graphs, based on an R2RML mapping document. Contains a mapping file for the DSpace institutional repository solution, available [here](https://github.com/nkons/r2rml-parser/blob/master/src/main/resources/dspace/dspace-mapping.rdf). First results presented in [1].
 
 [1] N. Konstantinou, D.E. Spanos, N. Houssos, N. Mitrou: Exposing Scholarly Information as Linked Open Data: RDFizing DSpace contents, In The Electronic Library, to appear (2013).
 
