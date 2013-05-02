@@ -142,7 +142,7 @@ public class Generator {
 								if (objectTemplate != null) {
 									//Literal o = resultModel.createLiteral(u.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
 									//if (!util.isUriTemplate(resultModel, predicateObjectMap.getObjectTemplate())) {
-									if (!objectTemplate.isUri()) {
+									if (objectTemplate.getTermType() == TermType.LITERAL) {
 										Literal o = null;
 										
 										if (predicateObjectMap.getLanguage() == null) {
@@ -170,11 +170,21 @@ public class Generator {
 											resultModel.add(st);
 											triples.add(st);
 										}
-									} else {
-										if (verbose) log.info("filling in template " + objectTemplate.getText());
-										String value = util.fillTemplate(predicateObjectMap.getObjectTemplate(), rs);
+									} else if (objectTemplate.getTermType() == TermType.IRI) {
+										if (verbose) log.info("filling in iri template " + objectTemplate.getText());
+										String value = util.fillTemplate(objectTemplate, rs);
 										if (value != null) {
 											RDFNode o = resultModel.createResource(value);
+											if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
+											Statement st = resultModel.createStatement(s, p, o);
+											resultModel.add(st);
+											triples.add(st);
+										}
+									} else if (objectTemplate.getTermType() == TermType.BLANKNODE) {
+										if (verbose) log.info("filling in blanknode template " + objectTemplate.getText());
+										String value = util.fillTemplate(objectTemplate, rs);
+										if (value != null) {
+											RDFNode o = resultModel.createResource(AnonId.create(value));
 											if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
 											Statement st = resultModel.createStatement(s, p, o);
 											resultModel.add(st);

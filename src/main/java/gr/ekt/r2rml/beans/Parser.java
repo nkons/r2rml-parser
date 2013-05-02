@@ -388,6 +388,30 @@ public class Parser {
 				    	predicateObjectMap.setObjectTemplate(template);
 		    		}
 			    }
+			    
+			    //If there is a type declared, add it the object template
+			    NodeIterator iterTermType = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "termType"));
+		    	if (iterTermType.hasNext()) {
+		    		Template template = predicateObjectMap.getObjectTemplate();
+			    	while (iterTermType.hasNext()) { //should only be 1
+			    		RDFNode rnTermType = iterTermType.next();
+			    		if (rnTermType.isResource() && rnTermType.asResource().getNameSpace().equals(rrNs)) {
+			    			String termType = rnTermType.asResource().getLocalName();
+			    			log.info("found rr:termType " + termType);
+			    			if ("IRI".equals(termType)) {
+			    				template.setTermType(TermType.IRI);
+			    			} else if ("BlankNode".equals(termType)) {
+			    				template.setTermType(TermType.BLANKNODE);
+			    			} else if ("Literal".equals(termType)) {
+			    				template.setTermType(TermType.LITERAL);
+			    			} else {
+			    				log.error("Unknown term type: " + termType + ". Terminating.");
+			    				System.exit(0);
+			    			}
+			    		}
+			    	}
+			    	predicateObjectMap.setObjectTemplate(template);
+	    		}
 		    }
 	    	predicateObjectMaps.add(predicateObjectMap);
 	    }
