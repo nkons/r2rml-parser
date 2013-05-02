@@ -1,10 +1,6 @@
 # R2RML Parser
 
-A parser that can export relational database contents as RDF graphs, based on an R2RML mapping document. Contains a mapping file for the DSpace institutional repository solution, available [here](https://github.com/nkons/r2rml-parser/blob/master/src/main/resources/dspace/dspace-mapping.rdf). First results presented in [1].
-
-[1] N. Konstantinou, D.E. Spanos, N. Houssos, N. Mitrou: Exposing Scholarly Information as Linked Open Data: RDFizing DSpace contents, In The Electronic Library, to appear (2013).
-
-More up-to-date results in the [wiki](https://github.com/nkons/r2rml-parser/wiki).
+A parser that can export relational database contents as RDF graphs, based on an R2RML mapping document. Contains a mapping file for the DSpace institutional repository solution, available [here](https://github.com/nkons/r2rml-parser/blob/master/src/main/resources/dspace/dspace-mapping.rdf). Early results presented in [1]. More up-to-date results in the [wiki](https://github.com/nkons/r2rml-parser/wiki).
 
 ## Licence
 
@@ -12,8 +8,12 @@ This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 Unp
 
 http://creativecommons.org/licenses/by-nc/3.0/
 
-You can use the work as long as you attribute the work by providing a link to the project page and/or to publication [1] above.
+You can use the work as long as you attribute the work by providing proper reference (e.g. a link to the project page or a reference to [1]).
 
 ## Implementation
 
 Written fully in Java, using Apache Jena, Spring, and Maven. Tested against MySQL and PostgreSQL.
+
+## Publications
+
+[1] N. Konstantinou, D.E. Spanos, N. Houssos, N. Mitrou: Exposing Scholarly Information as Linked Open Data: RDFizing DSpace contents, In The Electronic Library, to appear (2013).
