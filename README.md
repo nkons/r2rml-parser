@@ -1,6 +1,10 @@
 # R2RML Parser
 
-A parser that can export relational database contents as RDF graphs, based on an R2RML mapping document. Contains a mapping file for the DSpace institutional repository solution, available [here](https://github.com/nkons/r2rml-parser/blob/master/src/main/resources/dspace/dspace-mapping.rdf). Early results presented in [1]. More up-to-date results in the [wiki](https://github.com/nkons/r2rml-parser/wiki).
+A parser that can export relational database contents as RDF graphs, based on an [R2RML](http://www.w3.org/TR/r2rml/) mapping document. Contains an R2RML [mapping document](https://github.com/nkons/r2rml-parser/blob/master/src/main/resources/dspace/dspace-mapping.rdf) for the [DSpace](http://www.dspace.org/) institutional repository solution. Early results presented in [1]. More up-to-date results in the [wiki](https://github.com/nkons/r2rml-parser/wiki).
+
+## Implementation
+
+Written fully in Java, using Apache Jena, Spring, JUnit, and Maven. Tested against MySQL and PostgreSQL.
 
 ## Licence
 
@@ -8,11 +12,7 @@ This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 Unp
 
 http://creativecommons.org/licenses/by-nc/3.0/
 
-You can use the work as long as you provide proper reference, e.g. a link to the project page and/or a reference to [1].
-
-## Implementation
-
-Written fully in Java, using Apache Jena, Spring, and Maven. Tested against MySQL and PostgreSQL.
+You can use the work as long as you provide proper reference, e.g. a link to the project page and/or a reference to [1], and respect the license terms.
 
 ## Publications
 
