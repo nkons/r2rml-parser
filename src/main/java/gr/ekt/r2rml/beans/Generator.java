@@ -129,10 +129,12 @@ public class Generator {
 							}
 							
 							Template objectTemplate = predicateObjectMap.getObjectTemplate();
-							if (objectTemplate != null && objectTemplate.getTermType() != null) {
-								log.info("object type is " + objectTemplate.getTermType().toString());
-							} else {
-								log.info("object type is null");
+							if (verbose) {
+								if (objectTemplate != null && objectTemplate.getTermType() != null) {
+									log.info("object type is " + objectTemplate.getTermType().toString());
+								} else {
+									log.info("object type is null");
+								}
 							}
 							
 							for (String predicate : predicateObjectMap.getPredicates()) {
@@ -230,6 +232,19 @@ public class Generator {
 										triples.add(st);
 									}
 		
+								} else if (predicateObjectMap.getRefObjectMapUri() != null) {
+									log.info("Object uris will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMapUri());
+									LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(predicateObjectMap.getRefObjectMapUri());
+									log.info("The logical table mapping with the uri " + l.getUri() + " has already generated "+ l.getTriples().size() + " triples.");
+									
+									for (Statement existingStatement : l.getTriples()) {
+										String existingSubjectUri = existingStatement.asTriple().getSubject().getURI();
+										RDFNode o = resultModel.createResource(existingSubjectUri);
+										Statement newStatement = resultModel.createStatement(s, p, o);
+										resultModel.add(newStatement);
+										if (verbose) log.info("Adding triple referring to an existing statement subjetct: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
+										triples.add(newStatement);
+									}
 								}
 							}
 						}
@@ -317,15 +332,15 @@ public class Generator {
 	
 	BaseDatatype findFieldDataType(String field, ResultSet rs) {
 		field = field.trim();
-		log.info("figuring out datatype of field: " + field);
+		if (verbose) log.info("figuring out datatype of field: " + field);
 		try {
 			ResultSetMetaData rsMeta = rs.getMetaData();
-			log.info("table name " + rsMeta.getTableName(1));
+			if (verbose) log.info("table name " + rsMeta.getTableName(1));
 			for (int i = 1; i <= rsMeta.getColumnCount(); i++) {
-				log.info("column name is " + rsMeta.getColumnName(i));
+				if (verbose) log.info("column name is " + rsMeta.getColumnName(i));
 				if (rsMeta.getColumnName(i).equals(field)) {
 					String sqlType = rsMeta.getColumnTypeName(i);
-					log.info("column " + i + " with name " + rsMeta.getColumnName(i) + " is of type " + sqlType);
+					if (verbose) log.info("column " + i + " with name " + rsMeta.getColumnName(i) + " is of type " + sqlType);
 					return util.findDataTypeFromSql(sqlType);
 				}
 			}

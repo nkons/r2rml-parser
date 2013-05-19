@@ -46,6 +46,11 @@ public class PredicateObjectMap {
 	 * One of the XSD datatypes.
 	 */
 	private BaseDatatype dataType;
+
+	/**
+	 * If the predicateObjectMap is a rr:RefObjectMap, i.e. references a rr:parentTriplesMap, store the referenced uri.
+	 */
+	private String refObjectMapUri;
 	
 	/**
 	 * 
@@ -104,6 +109,14 @@ public class PredicateObjectMap {
 	
 	public void setDataType(BaseDatatype dataType) {
 		this.dataType = dataType;
+	}
+	
+	public String getRefObjectMapUri() {
+		return refObjectMapUri;
+	}
+	
+	public void setRefObjectMapUri(String refObjectMapUri) {
+		this.refObjectMapUri = refObjectMapUri;
 	}
 	
 }

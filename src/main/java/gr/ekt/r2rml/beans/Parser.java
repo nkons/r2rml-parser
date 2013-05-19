@@ -11,6 +11,7 @@
  */
 package gr.ekt.r2rml.beans;
 
+import gr.ekt.r2rml.beans.util.LogicalTableMappingComparator;
 import gr.ekt.r2rml.entities.LogicalTableMapping;
 import gr.ekt.r2rml.entities.LogicalTableView;
 import gr.ekt.r2rml.entities.MappingDocument;
@@ -27,7 +28,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 
@@ -124,11 +128,13 @@ public class Parser {
 		
 		try {
 			//First find the logical table views
-			ArrayList<LogicalTableView> logicalTableViews = findLogicalTableViews();
+			LinkedList<LogicalTableView> logicalTableViews = findLogicalTableViews();
 			mappingDocument.setLogicalTableViews(logicalTableViews);
+			log.info("Mapping document now has " + logicalTableViews.size() + " logical table views.");
 			
-			ArrayList<LogicalTableMapping> logicalTableMappings = findLogicalTableMappings();
+			LinkedList<LogicalTableMapping> logicalTableMappings = findLogicalTableMappings();
 			mappingDocument.setLogicalTableMappings(logicalTableMappings);
+			log.info("Mapping document now has " + logicalTableMappings.size() + " logical table mappings.");
 			
 			for (int i = 0; i < mappingDocument.getLogicalTableMappings().size(); i++) {
 				LogicalTableMapping logicalTableMapping = mappingDocument.getLogicalTableMappings().get(i);
@@ -136,7 +142,15 @@ public class Parser {
 			    logicalTableMapping.setPredicateObjectMaps(createPredicateObjectMapsForResource(mapModel.getResource(logicalTableMapping.getUri())));
 			    mappingDocument.getLogicalTableMappings().set(i, logicalTableMapping);
 			}
-						
+			
+			log.info("Sorting to evaluate first the logical table mappings that do not have a reference to a parent triples map");
+			
+			Comparator c =  new LogicalTableMappingComparator();
+			Collections.sort(mappingDocument.getLogicalTableMappings(), c);
+			log.info("Logical table mappings will be parsed in the following order:");
+			for (LogicalTableMapping ltm : mappingDocument.getLogicalTableMappings()) {
+				log.info(" table mapping uri: " + ltm.getUri());
+			}
 			//resultModel.write(System.out, "TURTLE");
 			
 			//sparql("SELECT ?s ?p ?o FROM <" + baseNs + "> WHERE { ?s ?p ?o }", resultModel);
@@ -324,7 +338,7 @@ public class Parser {
 	    	while (iterObjectMap2.hasNext()) {
 		    	RDFNode rnObjectMap = iterObjectMap2.next();
 		    	
-		    	//Must have here an rr:column, an rr:template, or an rr:constant
+		    	//Must have here an rr:column, an rr:template, an rr:constant, or an rr:parentTriplesMap
 		    	
 		    	NodeIterator iterTemplate = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "template"));
 			    while (iterTemplate.hasNext()) { //should return only 1
@@ -412,6 +426,13 @@ public class Parser {
 			    	}
 			    	predicateObjectMap.setObjectTemplate(template);
 	    		}
+
+		    	NodeIterator iterParentTriplesMap = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "parentTriplesMap"));
+			    while (iterParentTriplesMap.hasNext()) {
+			    	RDFNode rnParentTriplesMap = iterParentTriplesMap.next();
+			    	log.info("found rr:parentTriplesMap " + rnParentTriplesMap.asResource().getURI());
+			    	predicateObjectMap.setRefObjectMapUri(rnParentTriplesMap.asResource().getURI());
+			    }
 		    }
 	    	predicateObjectMaps.add(predicateObjectMap);
 	    }
@@ -419,8 +440,8 @@ public class Parser {
 	    return predicateObjectMaps;
 	}
 	
-	public ArrayList<LogicalTableMapping> findLogicalTableMappings() {
-		ArrayList<LogicalTableMapping> results = new ArrayList<LogicalTableMapping>();
+	public LinkedList<LogicalTableMapping> findLogicalTableMappings() {
+		LinkedList<LogicalTableMapping> results = new LinkedList<LogicalTableMapping>();
 		Property logicalTable = mapModel.getProperty(rrNs + "logicalTable");
 		ResIterator iter1 = mapModel.listSubjectsWithProperty(logicalTable);
 		while (iter1.hasNext()) {
@@ -525,10 +546,9 @@ public class Parser {
 			    }
 		    	logicalTableMapping.setView(logicalTableView);
 
-	    		results.add(logicalTableMapping);
-	    		
+		    	if (!contains(results, logicalTableMapping.getUri()))
+		    		results.add(logicalTableMapping);
 		    }
-		    
 		}
 
 		//prevent java.util.ConcurrentModificationException
@@ -542,8 +562,8 @@ public class Parser {
 		return results;
 	}
 	
-	public ArrayList<LogicalTableView> findLogicalTableViews() {
-		ArrayList<LogicalTableView> results = new ArrayList<LogicalTableView>();
+	public LinkedList<LogicalTableView> findLogicalTableViews() {
+		LinkedList<LogicalTableView> results = new LinkedList<LogicalTableView>();
 		Property sqlQuery = mapModel.getProperty(rrNs + "sqlQuery");
 		ResIterator iter = mapModel.listSubjectsWithProperty(sqlQuery);
 		while (iter.hasNext()) {
@@ -694,7 +714,7 @@ public class Parser {
 		}
 	}
 	
-	boolean contains(ArrayList<LogicalTableMapping> logicalTableMappings, String uri) {
+	boolean contains(LinkedList<LogicalTableMapping> logicalTableMappings, String uri) {
 		for (LogicalTableMapping logicalTableMapping : logicalTableMappings) {
 			if (logicalTableMapping.getUri().equals(uri)) return true;
 		}

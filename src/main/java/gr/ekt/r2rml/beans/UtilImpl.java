@@ -55,7 +55,7 @@ public class UtilImpl implements Util {
 	}
 	
 	public String fillTemplate(Template template, ResultSet rs) {
-		log.info("filling in template " + template.getText());
+		//log.info("filling in template " + template.getText());
 		String result = new String();
 		if (template!= null && template.getText() != null) {
 			result = template.getText();

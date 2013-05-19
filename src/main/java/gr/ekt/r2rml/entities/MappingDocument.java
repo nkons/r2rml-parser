@@ -11,7 +11,7 @@
  */
 package gr.ekt.r2rml.entities;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 public class MappingDocument {
 	private static final Logger log = LoggerFactory.getLogger(MappingDocument.class);
 
-	private ArrayList<LogicalTableView> logicalTableViews;
-	private ArrayList<LogicalTableMapping> logicalTableMappings;
+	private LinkedList<LogicalTableView> logicalTableViews;
+	private LinkedList<LogicalTableMapping> logicalTableMappings;
 	
 	/**
 	 * 
@@ -65,25 +65,25 @@ public class MappingDocument {
 	/**
 	 * @return the logicalTableViews
 	 */
-	public ArrayList<LogicalTableView> getLogicalTableViews() {
+	public LinkedList<LogicalTableView> getLogicalTableViews() {
 		return logicalTableViews;
 	}
 	/**
 	 * @param logicalTableViews the logicalTableViews to set
 	 */
-	public void setLogicalTableViews(ArrayList<LogicalTableView> logicalTableViews) {
+	public void setLogicalTableViews(LinkedList<LogicalTableView> logicalTableViews) {
 		this.logicalTableViews = logicalTableViews;
 	}
 	/**
 	 * @return the logicalTableMappings
 	 */
-	public ArrayList<LogicalTableMapping> getLogicalTableMappings() {
+	public LinkedList<LogicalTableMapping> getLogicalTableMappings() {
 		return logicalTableMappings;
 	}
 	/**
 	 * @param logicalTableMappings the logicalTableMappings to set
 	 */
-	public void setLogicalTableMappings(ArrayList<LogicalTableMapping> logicalTableMappings) {
+	public void setLogicalTableMappings(LinkedList<LogicalTableMapping> logicalTableMappings) {
 		this.logicalTableMappings = logicalTableMappings;
 	}
 }

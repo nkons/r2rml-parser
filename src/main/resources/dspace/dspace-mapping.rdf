@@ -957,7 +957,7 @@ map:lom-classification-keyword
     mfr.qualifier='extent'
     """.
     
-<#dc-format-medium>
+<#dc-format-medium-view>
     rr:sqlQuery """
     SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
