@@ -78,6 +78,7 @@ public class Generator {
 	public void createTriples(MappingDocument mappingDocument) {
 		verbose = properties.containsKey("default.verbose") && (properties.getProperty("default.verbose").contains("true") || properties.getProperty("default.verbose").contains("yes"));
 		
+		int tripleCount = 0;
 		for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
 			ArrayList<Statement> triples = new ArrayList<Statement>();
 		    try {
@@ -85,7 +86,6 @@ public class Generator {
 				//log.info("About to execute " + selectQuery.getQuery());
 				java.sql.ResultSet rs = db.query(selectQuery.getQuery());
 				rs.beforeFirst();
-				int tripleCount = 0;
 				while (rs.next()) {
 					Template subjectTemplate = logicalTableMapping.getSubjectMap().getTemplate();
 					String resultSubject = util.fillTemplate(subjectTemplate, rs);
@@ -249,16 +249,16 @@ public class Generator {
 							}
 						}
 					}
-
 					tripleCount++;
 					if (tripleCount % 1000 == 0) log.info("at " + tripleCount + " triples");
 				}
+				
 				rs.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		    logicalTableMapping.setTriples(triples);
-		    log.info("Generated " + triples.size() + " statements from table mapping <" + logicalTableMapping.getUri() + ">");
+		    if (verbose) log.info("Generated " + triples.size() + " statements from table mapping <" + logicalTableMapping.getUri() + ">");
 	    }
 		
 		if (properties.getProperty("jena.storeOutputModelInDatabase").contains("false")) {

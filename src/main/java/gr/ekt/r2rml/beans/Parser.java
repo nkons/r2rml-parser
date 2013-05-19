@@ -120,6 +120,7 @@ public class Parser {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public MappingDocument parse() {
 
 		init();
@@ -143,13 +144,16 @@ public class Parser {
 			    mappingDocument.getLogicalTableMappings().set(i, logicalTableMapping);
 			}
 			
-			log.info("Sorting to evaluate first the logical table mappings that do not have a reference to a parent triples map");
-			
+			//Sorting: evaluate first the logical table mappings without reference to a parent triples map
+			@SuppressWarnings("rawtypes")
 			Comparator c =  new LogicalTableMappingComparator();
 			Collections.sort(mappingDocument.getLogicalTableMappings(), c);
-			log.info("Logical table mappings will be parsed in the following order:");
-			for (LogicalTableMapping ltm : mappingDocument.getLogicalTableMappings()) {
-				log.info(" table mapping uri: " + ltm.getUri());
+			
+			if (verbose) {
+				log.info("Logical table mappings will be parsed in the following order:");
+				for (LogicalTableMapping ltm : mappingDocument.getLogicalTableMappings()) {
+					log.info(" table mapping uri: " + ltm.getUri());
+				}
 			}
 			//resultModel.write(System.out, "TURTLE");
 			
