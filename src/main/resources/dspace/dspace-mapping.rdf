@@ -973,7 +973,7 @@ map:lom-classification-keyword
     mfr.qualifier='medium'
     """.
 
-<#dc-format-mimetype>
+<#dc-format-mimetype-view>
     rr:sqlQuery """
     SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
@@ -1148,8 +1148,6 @@ map:lom-classification-keyword
     mfr.element='language' AND
     mfr.qualifier IS NULL
     """.
-    
-
 
 <#dc-language-iso-view>
     rr:sqlQuery """
@@ -1179,7 +1177,7 @@ map:lom-classification-keyword
     mv.text_value is not null AND
     i.item_id=mv.item_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-    mfr.element='Publisher' AND
+    mfr.element='publisher' AND
     mfr.qualifier IS NULL
     """.
 
@@ -1470,7 +1468,6 @@ map:lom-classification-keyword
     mfr.element='subject' AND
     mfr.qualifier IS NULL
     """.
-    
     
 <#dc-subject-classification-view>
     rr:sqlQuery """
