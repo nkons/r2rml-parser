@@ -17,3 +17,5 @@ You can use the work as long as you provide proper reference, e.g. a link to the
 ## Publications
 
 [1] N. Konstantinou, D.E. Spanos, N. Houssos, N. Mitrou: Exposing Scholarly Information as Linked Open Data: RDFizing DSpace contents, In The Electronic Library, to appear (2013).
+
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/e4cf60f85b533bc770726ca7ebed0891 "githalytics.com")](http://githalytics.com/nkons/r2rml-parser)
