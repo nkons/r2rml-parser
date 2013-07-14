@@ -1,0 +1,48 @@
+@prefix map: <#>.
+@prefix rr: <http://www.w3.org/ns/r2rml#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix dc: <http://purl.org/dc/elements/1.1/>.
+@prefix dcterms: <http://purl.org/dc/terms/>.
+@prefix dctype: <http://purl.org/dc/dcmitype/>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+map:groups
+    rr:logicalTable [ rr:tableName '"epersongroup"'; ];
+    rr:subjectMap [
+        rr:template 'http://data.example.org/repository/group/{"eperson_group_id"}';
+        rr:class foaf:Group;
+    ];
+    
+    rr:predicateObjectMap [
+      rr:predicate foaf:name;
+      rr:objectMap [ rr:template '{"name"}' ;
+                      rr:termType rr:Literal; ]
+    ].
+
+map:persons
+    rr:logicalTable [ rr:tableName '"eperson"'; ];
+    rr:subjectMap [
+        rr:template 'http://data.example.org/repository/person/{"eperson_id"}';
+        rr:class foaf:Person;
+    ];
+    
+    rr:predicateObjectMap [
+      rr:predicate foaf:name;
+      rr:objectMap [ rr:template '{"firstname"} {"lastname"}' ;
+                      rr:termType rr:Literal; ]
+    ].
+
+map:persons-groups
+    rr:logicalTable [ rr:tableName '"epersongroup2eperson"'; ];
+    rr:subjectMap [
+        rr:template 'http://data.example.org/repository/group/{"eperson_group_id"}';
+    ];
+    
+    rr:predicateObjectMap [
+      rr:predicate foaf:member;
+      rr:objectMap [ rr:template 'http://data.example.org/repository/person/{"eperson_id"}' ;
+      rr:termType rr:IRI;  ]
+    ].
+

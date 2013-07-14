@@ -657,7 +657,11 @@ public class Parser {
 		
 		InputStream isMap = FileManager.get().open(mappingFilename);
 		mapModel = ModelFactory.createDefaultModel();
-		mapModel.read(isMap, baseNs, properties.getProperty("mapping.file.type"));
+		try {
+			mapModel.read(isMap, baseNs, properties.getProperty("mapping.file.type"));
+		} catch (Exception e) {
+			log.info("Error reading input model");
+		}
 		//mapModel.write(System.out, properties.getProperty("mapping.file.type"));
 		
 		String inputModelFileName = properties.getProperty("input.model");

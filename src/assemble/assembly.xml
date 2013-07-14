@@ -1,0 +1,52 @@
+<assembly xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.1.0-SNAPSHOT.xsd">
+	<id>build</id>
+	
+	<formats>
+		<format>dir</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<fileSets>
+		<fileSet>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>dspace/**</include>
+				<include>r2rml-parser.bat</include>
+				<include>r2rml-parser.sh</include>
+			</includes>
+			<excludes>
+				<exclude>src/**</exclude>
+			</excludes>
+		</fileSet>
+	</fileSets>
+
+	<files>
+		<file>
+			<source>src/main/resources/app-context.xml</source>
+			<outputDirectory>.</outputDirectory>
+			<destName>app-context.xml</destName>
+			<filtered>false</filtered>
+		</file>
+		<file>
+			<source>src/main/resources/log4j.xml</source>
+			<outputDirectory>.</outputDirectory>
+			<destName>log4j.xml</destName>
+			<filtered>false</filtered>
+		</file>
+		<file>
+			<source>r2rml.properties</source>
+			<outputDirectory>.</outputDirectory>
+			<destName>r2rml.properties</destName>
+			<filtered>false</filtered>
+		</file>
+	</files>
+		
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>lib</outputDirectory>
+		</dependencySet>
+	</dependencySets>
+
+</assembly>

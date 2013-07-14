@@ -233,9 +233,9 @@ public class Generator {
 									}
 		
 								} else if (predicateObjectMap.getRefObjectMapUri() != null) {
-									log.info("Object uris will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMapUri());
+									if (verbose) log.info("Object uris will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMapUri());
 									LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(predicateObjectMap.getRefObjectMapUri());
-									log.info("The logical table mapping with the uri " + l.getUri() + " has already generated "+ l.getTriples().size() + " triples.");
+									if (verbose) log.info("The logical table mapping with the uri " + l.getUri() + " has already generated "+ l.getTriples().size() + " triples.");
 									
 									for (Statement existingStatement : l.getTriples()) {
 										String existingSubjectUri = existingStatement.asTriple().getSubject().getURI();
