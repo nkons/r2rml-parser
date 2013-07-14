@@ -1,6 +1,6 @@
 # R2RML Parser
 
-A parser that can export relational database contents as RDF graphs, based on an [R2RML](http://www.w3.org/TR/r2rml/) mapping document. Contains an R2RML [mapping document](https://github.com/nkons/r2rml-parser/blob/master/src/main/resources/dspace/dspace-mapping.rdf) for the [DSpace](http://www.dspace.org/) institutional repository solution. Early results presented in [1]. More up-to-date results in the [wiki](https://github.com/nkons/r2rml-parser/wiki).
+A parser that can export relational database contents as RDF graphs, based on an [R2RML](http://www.w3.org/TR/r2rml/) mapping document. Contains an R2RML [mapping document](https://github.com/nkons/r2rml-parser/blob/master/dspace/dspace-mapping.rdf) for the [DSpace](http://www.dspace.org/) institutional repository solution. Early results presented in [1]. More up-to-date results in the [wiki](https://github.com/nkons/r2rml-parser/wiki).
 
 ## Implementation
 
