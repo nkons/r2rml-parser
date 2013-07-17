@@ -12,11 +12,15 @@ public class LogicalTableMappingComparator implements Comparator<LogicalTableMap
 	public int compare(LogicalTableMapping logicalTableMapping0, LogicalTableMapping logicalTableMapping1) {
 		
 		for (PredicateObjectMap p : logicalTableMapping0.getPredicateObjectMaps()) {
-			if (StringUtils.isNotBlank(p.getRefObjectMapUri())) return 1;
+			try {
+				if (StringUtils.isNotBlank(p.getRefObjectMap().getParentTriplesMapUri())) return 1;
+			} catch (Exception e) { }
 		}
 		
 		for (PredicateObjectMap p : logicalTableMapping1.getPredicateObjectMaps()) {
-			if (StringUtils.isNotBlank(p.getRefObjectMapUri())) return -1;
+			try {
+				if (StringUtils.isNotBlank(p.getRefObjectMap().getParentTriplesMapUri())) return -1;
+			} catch (Exception e) {	}
 		}
 
 		return 0;

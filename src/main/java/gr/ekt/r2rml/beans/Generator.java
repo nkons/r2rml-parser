@@ -83,8 +83,8 @@ public class Generator {
 			ArrayList<Statement> triples = new ArrayList<Statement>();
 		    try {
 				SelectQuery selectQuery = logicalTableMapping.getView().getSelectQuery();
-				//log.info("About to execute " + selectQuery.getQuery());
 				java.sql.ResultSet rs = db.query(selectQuery.getQuery());
+				if (verbose) log.info("Iterating over " + selectQuery.getQuery());
 				rs.beforeFirst();
 				while (rs.next()) {
 					Template subjectTemplate = logicalTableMapping.getSubjectMap().getTemplate();
@@ -231,19 +231,45 @@ public class Generator {
 										resultModel.add(st);
 										triples.add(st);
 									}
-		
-								} else if (predicateObjectMap.getRefObjectMapUri() != null) {
-									if (verbose) log.info("Object uris will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMapUri());
-									LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(predicateObjectMap.getRefObjectMapUri());
-									if (verbose) log.info("The logical table mapping with the uri " + l.getUri() + " has already generated "+ l.getTriples().size() + " triples.");
-									
-									for (Statement existingStatement : l.getTriples()) {
-										String existingSubjectUri = existingStatement.asTriple().getSubject().getURI();
-										RDFNode o = resultModel.createResource(existingSubjectUri);
-										Statement newStatement = resultModel.createStatement(s, p, o);
-										resultModel.add(newStatement);
-										if (verbose) log.info("Adding triple referring to an existing statement subjetct: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
-										triples.add(newStatement);
+								} else if (predicateObjectMap.getRefObjectMap() != null && predicateObjectMap.getRefObjectMap().getParentTriplesMapUri() != null) {
+									if (predicateObjectMap.getRefObjectMap().getParent() != null && predicateObjectMap.getRefObjectMap().getChild() != null) {
+										
+										if (verbose) log.info("Object uris will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMap().getParentTriplesMapUri() 
+												+ " with a rr:joinCondition containing rr:child " + predicateObjectMap.getRefObjectMap().getChild() + " and rr:parent " + predicateObjectMap.getRefObjectMap().getParent());
+										LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
+										
+										String childValue = rs.getString(predicateObjectMap.getRefObjectMap().getChild().replaceAll("\"", "")); //table names need to be e.g. Sport instead of "Sport", and this is why we remove the quotes
+										if (verbose) log.info("child value is " + childValue); 
+										
+										String parentQuery = l.getSubjectMap().getSelectQuery().getQuery();
+										String addition = " WHERE " + predicateObjectMap.getRefObjectMap().getParent() + " = " + childValue;
+										parentQuery += addition;
+										if (verbose) log.info("modified parent sql query to " + parentQuery);
+										java.sql.ResultSet rsParent = db.query(parentQuery);
+										rsParent.beforeFirst();
+										while (rsParent.next()) {
+											Template parentTemplate = l.getSubjectMap().getTemplate();
+											String parentSubject = util.fillTemplate(parentTemplate, rsParent);
+											RDFNode o = resultModel.createResource(parentSubject);
+											Statement newStatement = resultModel.createStatement(s, p, o);
+											resultModel.add(newStatement);
+											if (verbose) log.info("Adding triple referring to a parent statement subjetct: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
+											triples.add(newStatement);
+										}
+										rsParent.close();
+									} else {
+										if (verbose) log.info("Object uris will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
+										LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
+										if (verbose) log.info("The logical table mapping with the uri " + l.getUri() + " has already generated "+ l.getTriples().size() + " triples.");
+										
+										for (Statement existingStatement : l.getTriples()) {
+											String existingSubjectUri = existingStatement.asTriple().getSubject().getURI();
+											RDFNode o = resultModel.createResource(existingSubjectUri);
+											Statement newStatement = resultModel.createStatement(s, p, o);
+											resultModel.add(newStatement);
+											if (verbose) log.info("Adding triple referring to an existing statement subjetct: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
+											triples.add(newStatement);
+										}
 									}
 								}
 							}

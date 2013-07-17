@@ -48,9 +48,9 @@ public class PredicateObjectMap {
 	private BaseDatatype dataType;
 
 	/**
-	 * If the predicateObjectMap is a rr:RefObjectMap, i.e. references a rr:parentTriplesMap, store the referenced uri.
+	 * If the predicateObjectMap is a rr:RefObjectMap, i.e. references a rr:parentTriplesMap, store the referenced uri, child and parent fields in an object.
 	 */
-	private String refObjectMapUri;
+	private RefObjectMap refObjectMap;
 	
 	/**
 	 * 
@@ -111,12 +111,12 @@ public class PredicateObjectMap {
 		this.dataType = dataType;
 	}
 	
-	public String getRefObjectMapUri() {
-		return refObjectMapUri;
+	public RefObjectMap getRefObjectMap() {
+		return refObjectMap;
 	}
 	
-	public void setRefObjectMapUri(String refObjectMapUri) {
-		this.refObjectMapUri = refObjectMapUri;
+	public void setRefObjectMap(RefObjectMap refObjectMap) {
+		this.refObjectMap = refObjectMap;
 	}
 	
 }

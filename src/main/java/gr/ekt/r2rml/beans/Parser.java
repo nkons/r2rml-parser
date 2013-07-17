@@ -16,6 +16,7 @@ import gr.ekt.r2rml.entities.LogicalTableMapping;
 import gr.ekt.r2rml.entities.LogicalTableView;
 import gr.ekt.r2rml.entities.MappingDocument;
 import gr.ekt.r2rml.entities.PredicateObjectMap;
+import gr.ekt.r2rml.entities.RefObjectMap;
 import gr.ekt.r2rml.entities.SubjectMap;
 import gr.ekt.r2rml.entities.Template;
 import gr.ekt.r2rml.entities.TermType;
@@ -143,6 +144,34 @@ public class Parser {
 			    logicalTableMapping.setPredicateObjectMaps(createPredicateObjectMapsForResource(mapModel.getResource(logicalTableMapping.getUri())));
 			    mappingDocument.getLogicalTableMappings().set(i, logicalTableMapping);
 			}
+			
+//			for (LogicalTableMapping ltm : mappingDocument.getLogicalTableMappings()) {
+//				for (PredicateObjectMap pom : ltm.getPredicateObjectMaps()) {
+//					if (pom.getRefObjectMap() != null && pom.getRefObjectMap().getParentTriplesMapUri() != null && pom.getRefObjectMap().getChild() != null && pom.getRefObjectMap().getParent() != null) {
+//						log.info("should add condition");
+//						LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(pom.getRefObjectMap().getParentTriplesMapUri());
+//						
+//						if (l.getSubjectMap().getSelectQuery().getTables().size() == 1) {
+//							String parentTable = l.getSubjectMap().getSelectQuery().getTables().get(0).getName();
+//							String condition = ltm.getSubjectMap().getSelectQuery().getTables().get(0).getName() + "." + pom.getRefObjectMap().getChild()
+//									+ " = " + parentTable + "." + pom.getRefObjectMap().getParent();
+//							log.info("condition is " + condition);
+//							//initial query
+//							String q = ltm.getSubjectMap().getSelectQuery().getQuery();
+//							if (q.toLowerCase().indexOf("where") > -1) {
+//								q += " AND " + condition;
+//							} else {
+//								q += ", " + parentTable + " WHERE " + condition;
+//							}
+//							log.info("initial select query is " + q);
+//							ltm.getSubjectMap().getSelectQuery().setQuery(q);
+//							log.info("select query is now " + ltm.getSubjectMap().getSelectQuery().getQuery());
+//						} else {
+//							log.error("A join condition was defined, referencing a subject map with more than 1 tables or none.");
+//						}
+//					}
+//				}
+//			}
 			
 			//Sorting: evaluate first the logical table mappings without reference to a parent triples map
 			@SuppressWarnings("rawtypes")
@@ -435,7 +464,28 @@ public class Parser {
 			    while (iterParentTriplesMap.hasNext()) {
 			    	RDFNode rnParentTriplesMap = iterParentTriplesMap.next();
 			    	log.info("found rr:parentTriplesMap " + rnParentTriplesMap.asResource().getURI());
-			    	predicateObjectMap.setRefObjectMapUri(rnParentTriplesMap.asResource().getURI());
+			    	RefObjectMap refObjectMap = new RefObjectMap();
+			    	refObjectMap.setParentTriplesMapUri(rnParentTriplesMap.asResource().getURI());
+			    	
+			    	NodeIterator iterJoinCondition = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "joinCondition"));
+			    	while (iterJoinCondition.hasNext()) {
+			    		RDFNode rnJoinCondition = iterJoinCondition.next();
+			    		log.info("found rr:joinCondition " + rnJoinCondition.asResource().getURI());
+			    		NodeIterator iterChild = mapModel.listObjectsOfProperty(rnJoinCondition.asResource(), mapModel.getProperty(rrNs + "child"));
+			    		while (iterChild.hasNext()) {
+			    			RDFNode rnChild = iterChild.next();
+			    			log.info("found rr:child " + rnChild.asLiteral().toString());
+			    			refObjectMap.setChild(rnChild.asLiteral().toString());
+			    		}
+			    		
+			    		NodeIterator iterParent = mapModel.listObjectsOfProperty(rnJoinCondition.asResource(), mapModel.getProperty(rrNs + "parent"));
+			    		while (iterParent.hasNext()) {
+			    			RDFNode rnParent = iterParent.next();
+			    			log.info("found rr:parent " + rnParent.asLiteral().toString());
+			    			refObjectMap.setParent(rnParent.asLiteral().toString());
+			    		}
+			    	}
+			    	predicateObjectMap.setRefObjectMap(refObjectMap);
 			    }
 		    }
 	    	predicateObjectMaps.add(predicateObjectMap);
@@ -601,29 +651,35 @@ public class Parser {
 	}
 	
 	public String createQueryForTable(String tableName) {
+		//If true, we are in postgres, otherwise in mysql
+		boolean postgres = util.findDatabaseType(properties.getProperty("db.driver")).equals("postgresql");
+		
 		String result = "SELECT ";
 		try {
 			ArrayList<String> fields = new ArrayList<String>();
 			
 			java.sql.ResultSet rs;
-			if (properties.getProperty("db.driver").contains("mysql")) {
-				rs = db.query("DESCRIBE " + tableName);
+			if (postgres) {
+				rs = db.query("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'");
 			} else {
-				//postgres
-				rs = db.query("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'"); 
+				rs = db.query("DESCRIBE " + tableName); 
 			}
 			
 			rs.beforeFirst();
 			while (rs.next()) {
 				//mysql: fields.add(rs.getString("Field"));
-				if (util.findDatabaseType(properties.getProperty("db.driver")).equals("postgresql")) {
+				if (postgres) {
 					fields.add("\"" + rs.getString(1) + "\"");
 				} else {
 					fields.add(rs.getString("Field"));
 				}
 			}
 			for (String f : fields) {
-				result += f + ", ";
+				if (postgres) {
+					result += "\"" + tableName + "\"" + "." + f + ", ";
+				} else {
+					result += tableName + "." + f + ", ";
+				}
 			}
 			result = result.substring(0, result.lastIndexOf(','));
 			rs.close();
@@ -632,7 +688,7 @@ public class Parser {
 			e.printStackTrace();
 		}
 		
-		if (util.findDatabaseType(properties.getProperty("db.driver")).equals("postgresql")) {
+		if (postgres) {
 			result += " FROM " + "\"" + tableName + "\"";
 		} else {
 			result += " FROM " + tableName;
@@ -665,10 +721,12 @@ public class Parser {
 		//mapModel.write(System.out, properties.getProperty("mapping.file.type"));
 		
 		String inputModelFileName = properties.getProperty("input.model");
-		InputStream isRes = FileManager.get().open(inputModelFileName);
 		
 		Model resultBaseModel = ModelFactory.createDefaultModel();
-		resultBaseModel.read(isRes, baseNs, properties.getProperty("input.model.type"));
+		if (StringUtils.isNotBlank(inputModelFileName)) {
+			InputStream isRes = FileManager.get().open(inputModelFileName);
+			resultBaseModel.read(isRes, baseNs, properties.getProperty("input.model.type"));
+		}
 		//resultBaseModel.write(System.out, properties.getProperty("input.model.type"));
 		
 		String storeInDatabase = properties.getProperty("jena.storeOutputModelInDatabase");
@@ -691,7 +749,10 @@ public class Parser {
 			Store store = db.jenaStore();
 		    Model resultDbModel = SDBFactory.connectDefaultModel(store);
 		    
-		    resultDbModel.read(isRes, baseNs, properties.getProperty("input.model.type"));
+		    if (StringUtils.isNotBlank(inputModelFileName)) {
+				InputStream isRes = FileManager.get().open(inputModelFileName);
+				resultDbModel.read(isRes, baseNs, properties.getProperty("input.model.type"));
+		    }
 		    log.info("Store size is " + store.getSize());
 //			    if (store.getSize() > 0) {
 //				    StmtIterator sIter = resultDbModel.listStatements();
