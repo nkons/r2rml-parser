@@ -242,8 +242,15 @@ public class Generator {
 										if (verbose) log.info("child value is " + childValue); 
 										
 										String parentQuery = l.getSubjectMap().getSelectQuery().getQuery();
-										String addition = " WHERE " + predicateObjectMap.getRefObjectMap().getParent() + " = " + childValue;
-										parentQuery += addition;
+										if (l.getSubjectMap().getSelectQuery().getTables().size() == 1) {
+											String addition = " WHERE " + predicateObjectMap.getRefObjectMap().getParent() + " = " + childValue;
+											parentQuery += addition;											
+										} else {
+											log.error("In the logical table mapping <" + logicalTableMapping.getUri() + ">, the SQL query that generates the parent triples in the parent logical table mapping <" + l.getUri() + "> contains results from more than one tables. " +
+												" Consider using rr:tableName instead of rr:sqlQuery in the parent logical table mapping. Terminating.");
+											System.exit(0);
+										}
+										
 										if (verbose) log.info("modified parent sql query to " + parentQuery);
 										java.sql.ResultSet rsParent = db.query(parentQuery);
 										rsParent.beforeFirst();

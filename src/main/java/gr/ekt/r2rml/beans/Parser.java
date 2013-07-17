@@ -49,7 +49,6 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sdb.SDBFactory;
-import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.util.FileManager;
 
 /**
@@ -144,34 +143,6 @@ public class Parser {
 			    logicalTableMapping.setPredicateObjectMaps(createPredicateObjectMapsForResource(mapModel.getResource(logicalTableMapping.getUri())));
 			    mappingDocument.getLogicalTableMappings().set(i, logicalTableMapping);
 			}
-			
-//			for (LogicalTableMapping ltm : mappingDocument.getLogicalTableMappings()) {
-//				for (PredicateObjectMap pom : ltm.getPredicateObjectMaps()) {
-//					if (pom.getRefObjectMap() != null && pom.getRefObjectMap().getParentTriplesMapUri() != null && pom.getRefObjectMap().getChild() != null && pom.getRefObjectMap().getParent() != null) {
-//						log.info("should add condition");
-//						LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(pom.getRefObjectMap().getParentTriplesMapUri());
-//						
-//						if (l.getSubjectMap().getSelectQuery().getTables().size() == 1) {
-//							String parentTable = l.getSubjectMap().getSelectQuery().getTables().get(0).getName();
-//							String condition = ltm.getSubjectMap().getSelectQuery().getTables().get(0).getName() + "." + pom.getRefObjectMap().getChild()
-//									+ " = " + parentTable + "." + pom.getRefObjectMap().getParent();
-//							log.info("condition is " + condition);
-//							//initial query
-//							String q = ltm.getSubjectMap().getSelectQuery().getQuery();
-//							if (q.toLowerCase().indexOf("where") > -1) {
-//								q += " AND " + condition;
-//							} else {
-//								q += ", " + parentTable + " WHERE " + condition;
-//							}
-//							log.info("initial select query is " + q);
-//							ltm.getSubjectMap().getSelectQuery().setQuery(q);
-//							log.info("select query is now " + ltm.getSubjectMap().getSelectQuery().getQuery());
-//						} else {
-//							log.error("A join condition was defined, referencing a subject map with more than 1 tables or none.");
-//						}
-//					}
-//				}
-//			}
 			
 			//Sorting: evaluate first the logical table mappings without reference to a parent triples map
 			@SuppressWarnings("rawtypes")
@@ -738,22 +709,16 @@ public class Parser {
 		
 		if (Boolean.valueOf(storeInDatabase)) {
 			if (Boolean.valueOf(cleanDbOnStartup)) {
-			    //Model model = SDBFactory.connectDefaultModel(db.jenaStore());
-			    
-			    //if (model.size() > 0) {
-			    //	model.removeAll();
-			    //}
-				//db.getStore() .getJenaConnection().cleanDB();
+				db.jenaStore().getTableFormatter().create();
 			}
-			
-			Store store = db.jenaStore();
-		    Model resultDbModel = SDBFactory.connectDefaultModel(store);
+
+			Model resultDbModel = SDBFactory.connectDefaultModel(db.jenaStore());
 		    
 		    if (StringUtils.isNotBlank(inputModelFileName)) {
 				InputStream isRes = FileManager.get().open(inputModelFileName);
 				resultDbModel.read(isRes, baseNs, properties.getProperty("input.model.type"));
 		    }
-		    log.info("Store size is " + store.getSize());
+		    log.info("Store size is " + db.jenaStore().getSize());
 //			    if (store.getSize() > 0) {
 //				    StmtIterator sIter = resultDbModel.listStatements();
 //				    for ( ; sIter.hasNext() ; ) {

@@ -101,7 +101,6 @@ public class DatabaseImpl implements Database {
 				String jenaConnectionString = "jdbc:" + jenaDatabaseType + "://" + properties.getProperty("jena.db.host") + ":" + properties.getProperty("jena.db.port") + "/" + properties.getProperty("jena.db.name");
 				log.info("jena repository at " + jenaConnectionString);
 				
-				
 				jenaConnection = new SDBConnection(jenaConnectionString, properties.getProperty("jena.db.login"), properties.getProperty("jena.db.password")) ;
 				
 				StoreDesc storeDesc = null;
@@ -130,14 +129,14 @@ public class DatabaseImpl implements Database {
 	}
 	
 	public Store jenaStore() {
-		if (store == null) {
-			StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL) ;
-			store = SDBFactory.connectStore(jenaConnection, storeDesc) ;
-			return store;
-		} else {
-			log.info("Store is not null. Returning store");
-			return store;
+		try {
+			@SuppressWarnings("unused")
+			long storeSize = store.getSize();
+		} catch (Exception e) {
+			log.info("Initializing Jena store.");
+			store.getTableFormatter().create();
 		}
+		return store;
 	}
 	
 	public ResultSet query(String query) {
