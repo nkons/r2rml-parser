@@ -81,7 +81,7 @@ public class ComplianceTests {
 		int counter = 0;
 		for (String key : tests.keySet()) {
 			if (counter == 19) { //(counter > 4 && counter < 6) {
-				String folder = "src/test/resources/" + key + "/";
+				String folder = "src/test/resources/postgres/" + key + "/";
 				initialiseSourceDatabase(folder + "create.sql");
 				
 				for (String mappingFile : tests.get(key)) {
@@ -113,7 +113,7 @@ public class ComplianceTests {
 	@Test
 	public void testSingle() {
 		log.info("test single. Careful, database 'test' will be erased and re-created!");
-		String folder = "src/test/resources/D002-1table2columns1row/";
+		String folder = "src/test/resources/postgres/D002-1table2columns1row/";
 		initialiseSourceDatabase(folder + "create.sql");
 		
 		//Override property file
@@ -211,5 +211,4 @@ public class ComplianceTests {
 			e.printStackTrace();
 		}
 	}
-
 }

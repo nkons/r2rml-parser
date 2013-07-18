@@ -36,6 +36,6 @@
     rr:predicateObjectMap
     [ 
       rr:predicate	ex:city ; 
-      rr:objectMap	[ rr:column "\"city\""; ]
+      rr:objectMap	[ rr:constant "At"; ]
     ];
 	.
