@@ -77,6 +77,7 @@ public class Generator {
 	
 	public void createTriples(MappingDocument mappingDocument) {
 		verbose = properties.containsKey("default.verbose") && (properties.getProperty("default.verbose").contains("true") || properties.getProperty("default.verbose").contains("yes"));
+		String databaseType = util.findDatabaseType(properties.getProperty("db.driver"));
 		
 		int tripleCount = 0;
 		for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
@@ -88,7 +89,7 @@ public class Generator {
 				rs.beforeFirst();
 				while (rs.next()) {
 					Template subjectTemplate = logicalTableMapping.getSubjectMap().getTemplate();
-					String resultSubject = util.fillTemplate(subjectTemplate, rs);
+					String resultSubject = (subjectTemplate != null) ? util.fillTemplate(subjectTemplate, rs) : null;
 					
 					if (resultSubject != null) {
 						//if (StringUtils.isNotEmpty(logicalTableMapping.getSubjectMap().getClassUri())) {
@@ -243,8 +244,10 @@ public class Generator {
 										
 										String parentQuery = l.getSubjectMap().getSelectQuery().getQuery();
 										if (l.getSubjectMap().getSelectQuery().getTables().size() == 1) {
-											String addition = " WHERE " + predicateObjectMap.getRefObjectMap().getParent() + " = " + childValue;
-											parentQuery += addition;											
+											String parentFieldName = predicateObjectMap.getRefObjectMap().getParent();
+											if (!databaseType.equals("postgresql")) parentFieldName = parentFieldName.replaceAll("\"", ""); //in mysql, table names must not be enclosed in quotes
+											String addition = " WHERE " + parentFieldName + " = " + childValue;
+											parentQuery += addition;
 										} else {
 											log.error("In the logical table mapping <" + logicalTableMapping.getUri() + ">, the SQL query that generates the parent triples in the parent logical table mapping <" + l.getUri() + "> contains results from more than one tables. " +
 												" Consider using rr:tableName instead of rr:sqlQuery in the parent logical table mapping. Terminating.");

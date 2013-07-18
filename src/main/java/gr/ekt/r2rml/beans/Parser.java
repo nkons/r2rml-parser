@@ -560,8 +560,8 @@ public class Parser {
 			    	}
 			    	LocalResultSet sparqlResults = util.sparql(mapModel, "SELECT ?x WHERE { ?x rr:logicalTable ?z . ?z rr:tableName " + newTable + " . } ");
 			    	
-			    	String triplesMapUri = sparqlResults.getRows().get(0).getResources().get(0).getUri();
-			    	if (triplesMapUri != null) {
+			    	if (sparqlResults.getRows().size() > 0) {
+			    		String triplesMapUri = sparqlResults.getRows().get(0).getResources().get(0).getUri();
 			    		logicalTableMapping.setUri(triplesMapUri);
 			    	} else {
 			    		log.error("Could not find triples map.");
@@ -750,7 +750,7 @@ public class Parser {
 	
 	boolean contains(LinkedList<LogicalTableMapping> logicalTableMappings, String uri) {
 		for (LogicalTableMapping logicalTableMapping : logicalTableMappings) {
-			if (logicalTableMapping.getUri().equals(uri)) return true;
+			if (StringUtils.equals(logicalTableMapping.getUri(), uri)) return true;
 		}
 		return false;
 	}

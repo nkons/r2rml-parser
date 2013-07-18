@@ -148,10 +148,9 @@ public class DatabaseImpl implements Database {
 			if (!StringUtils.containsIgnoreCase(query, "limit") && properties.containsKey("db.limit")) {
 				query += " LIMIT " + properties.getProperty("db.limit");
 			}
-			
+			//log.info(query);
 			//PreparedStatement preparedStatement = connection.prepareStatement(query);
 			Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-			//log.info("sql query: " + query);
 			result = statement.executeQuery(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
