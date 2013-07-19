@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gr.ekt</groupId>
 	<artifactId>r2rml</artifactId>
-	<version>0.1</version>
+	<version>0.2</version>
 	<packaging>jar</packaging>
 	<name>R2RML Parser</name>
 	<properties>
@@ -103,4 +103,31 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<licenses>
+		<license>
+			<name>R2RML Parser Creative Commons License</name>
+			<url>http://creativecommons.org/licenses/by-nc/3.0/</url>
+		</license>
+	</licenses>
+
+	<issueManagement>
+		<url>https://github.com/nkons/r2rml-parser/issues</url>
+		<system>GitHub Issues</system>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<name>Nikolaos Konstantinou</name>
+			<email>nkons at cn.ntua.gr</email>
+			<url>http://www.cn.ntua.gr/~nkons/</url>
+			<organization>National Technical University of Athens</organization>
+			<organizationUrl>http://www.ntua.gr</organizationUrl>
+			<roles>
+				<role>committer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+	</developers>
+	
 </project>
