@@ -12,8 +12,10 @@ This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 Unp
 
 http://creativecommons.org/licenses/by-nc/3.0/
 
-You can use the work as long as you provide proper reference, e.g. a link to the project page and/or a reference to [1], and respect the license terms.
+You can use the work as long as you provide proper reference, e.g. a link to the project page and/or a reference to publications below, and respect the license terms.
 
 ## Publications
 
-[1] N. Konstantinou, D.E. Spanos, N. Houssos, N. Mitrou: Exposing Scholarly Information as Linked Open Data: RDFizing DSpace contents, In The Electronic Library, to appear (2013).
+[1] N. Konstantinou, D.E. Spanos, N. Houssos, N. Mitrou: "Exposing Scholarly Information as Linked Open Data: RDFizing DSpace contents". In The Electronic Library, to appear (2013)
+
+[2] N. Konstantinou, N. Houssos, A. Manta: "Exposing Bibliographic Information as Linked Open Data using Standards-based Mappings: Methodology and Results". In 3rd International Conference on Integrated Information (IC-ININFO’13), Prague, Czech Republic, September 2013
