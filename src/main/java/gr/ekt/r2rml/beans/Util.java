@@ -11,6 +11,7 @@
  */
 package gr.ekt.r2rml.beans;
 
+import gr.ekt.r2rml.entities.LogicalTableMapping;
 import gr.ekt.r2rml.entities.Template;
 import gr.ekt.r2rml.entities.sparql.LocalResultSet;
 
@@ -33,6 +34,9 @@ public interface Util {
 	
 	BaseDatatype findDataTypeFromSql(String sqlDataType);
 	
-	public String md5(ResultSet rs);
+	String md5(ResultSet rs);
 	
+	String md5(String s);
+	
+	String md5(LogicalTableMapping logicalTableMapping);
 }

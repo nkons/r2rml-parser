@@ -633,7 +633,7 @@ public class Parser {
 			if (postgres) {
 				rs = db.query("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'");
 			} else {
-				rs = db.query("DESCRIBE " + tableName); 
+				rs = db.query("DESCRIBE " + tableName);
 			}
 			
 			rs.beforeFirst();
@@ -687,7 +687,8 @@ public class Parser {
 		try {
 			mapModel.read(isMap, baseNs, properties.getProperty("mapping.file.type"));
 		} catch (Exception e) {
-			log.info("Error reading input model");
+			log.error("Error reading input model");
+			System.exit(0);
 		}
 		//mapModel.write(System.out, properties.getProperty("mapping.file.type"));
 		

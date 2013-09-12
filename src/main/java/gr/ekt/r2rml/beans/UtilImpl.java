@@ -11,6 +11,8 @@
  */
 package gr.ekt.r2rml.beans;
 
+import gr.ekt.r2rml.entities.LogicalTableMapping;
+import gr.ekt.r2rml.entities.PredicateObjectMap;
 import gr.ekt.r2rml.entities.Template;
 import gr.ekt.r2rml.entities.TermType;
 import gr.ekt.r2rml.entities.sparql.LocalResource;
@@ -353,8 +355,10 @@ public class UtilImpl implements Util {
 				for (int i = 1; i <= columns; i++) {
 					s += rs.getString(i);					
 				}
+				s = md5(s);
 			}
 			rs.close();
+			
 			byte[] hash = md.digest(s.getBytes("UTF-8"));
 			StringBuilder sb = new StringBuilder(2 * hash.length);
 			for (byte b : hash) {
@@ -362,11 +366,70 @@ public class UtilImpl implements Util {
 			}
 			digest = sb.toString();
 		} catch (UnsupportedEncodingException ex) {
-			log.info(ex.getMessage());
+			log.error(ex.getMessage());
 		} catch (NoSuchAlgorithmException ex) {
-			log.info(ex.getMessage());
+			log.error(ex.getMessage());
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+		return digest;
+	}
+	
+	public String md5(LogicalTableMapping logicalTableMapping) {
+		String digest = null;
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			String s = new String();
+			s += logicalTableMapping.getSubjectMap().getSelectQuery().getQuery();
+			s += logicalTableMapping.getSubjectMap().getTemplate().getText();
+			for (String classUri : logicalTableMapping.getSubjectMap().getClassUris()) {
+				s += classUri;
+			}
+			
+			for (PredicateObjectMap predicateObjectMap : logicalTableMapping.getPredicateObjectMaps()) {
+				s += predicateObjectMap.getObjectColumn();
+				s += predicateObjectMap.getDataType() != null ?  predicateObjectMap.getDataType().toString() : "null";
+				s += predicateObjectMap.getLanguage();
+				s += predicateObjectMap.getObjectTemplate().getText();
+				
+				for (String predicate : predicateObjectMap.getPredicates()) {
+					s += predicate;
+				}
+				
+				s += predicateObjectMap.getRefObjectMap() != null? predicateObjectMap.getRefObjectMap().getParentTriplesMapUri() : "null";
+			}
+
+			log.info("about to hash logicalTableMapping " + s);
+			byte[] hash = md.digest(s.getBytes("UTF-8"));
+			StringBuilder sb = new StringBuilder(2 * hash.length);
+			for (byte b : hash) {
+				sb.append(String.format("%02x", b & 0xff));
+			}
+			digest = sb.toString();
+		} catch (UnsupportedEncodingException ex) {
+			log.error(ex.getMessage());
+		} catch (NoSuchAlgorithmException ex) {
+			log.error(ex.getMessage());
+		}
+		
+		return digest;
+	}
+	
+	public String md5(String s) {
+		String digest = null;
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] hash = md.digest(s.getBytes("UTF-8"));
+			
+			StringBuilder sb = new StringBuilder(2 * hash.length);
+			for (byte b : hash) {
+				sb.append(String.format("%02x", b & 0xff));
+			}
+			digest = sb.toString();
+		} catch (UnsupportedEncodingException ex) {
+			log.error(ex.getMessage());
+		} catch (NoSuchAlgorithmException ex) {
+			log.error(ex.getMessage());
 		}
 		return digest;
 	}

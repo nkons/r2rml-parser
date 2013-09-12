@@ -1,6 +1,8 @@
 # R2RML Parser
 
-An R2RML implementation that can export relational database contents as RDF graphs, based on an [R2RML](http://www.w3.org/TR/r2rml/) mapping document. Contains an R2RML [mapping document](https://github.com/nkons/r2rml-parser/blob/master/dspace/dspace-mapping.rdf) for the [DSpace](http://www.dspace.org/) institutional repository solution. Early results presented in [1]. More up-to-date results in the [wiki](https://github.com/nkons/r2rml-parser/wiki).
+An R2RML implementation that can export relational database contents as RDF graphs, based on an [R2RML](http://www.w3.org/TR/r2rml/) mapping document. Contains an R2RML [mapping document](https://github.com/nkons/r2rml-parser/blob/master/dspace/dspace-mapping.rdf) for the [DSpace](http://www.dspace.org/) institutional repository solution.
+
+For more information, please [visit the wiki](https://github.com/nkons/r2rml-parser/wiki).
 
 ## Implementation details
 
@@ -16,8 +18,8 @@ You are free to use and distribute this work as long as you provide proper refer
 
 ## Publications
 
-[1] N. Konstantinou, D.E. Spanos, N. Houssos, N. Mitrou: "Exposing Scholarly Information as Linked Open Data: RDFizing DSpace contents". In The Electronic Library, 2013 (to appear)
+1. N. Konstantinou, D.E. Spanos, N. Houssos, N. Mitrou: "Exposing Scholarly Information as Linked Open Data: RDFizing DSpace contents". In The Electronic Library, 2013 (to appear)
 
-[2] N. Konstantinou, D.E. Spanos, N. Mitrou: "Transient and persistent RDF views over relational databases in the context of digital repositories". In 7th Metadata and Semantics Research Conference (MTSR'13), Thessaloniki, Greece, November 2013 (to appear)
+1. N. Konstantinou, D.E. Spanos, N. Mitrou: "Transient and persistent RDF views over relational databases in the context of digital repositories". In 7th Metadata and Semantics Research Conference (MTSR'13), Thessaloniki, Greece, November 2013 (to appear)
 
-[3] N. Konstantinou, N. Houssos, A. Manta: "Exposing Bibliographic Information as Linked Open Data using Standards-based Mappings: Methodology and Results". In 3rd International Conference on Integrated Information (IC-ININFO'13), Prague, Czech Republic, September 2013
+1. N. Konstantinou, N. Houssos, A. Manta: "Exposing Bibliographic Information as Linked Open Data using Standards-based Mappings: Methodology and Results". In 3rd International Conference on Integrated Information (IC-ININFO'13), Prague, Czech Republic, September 2013
