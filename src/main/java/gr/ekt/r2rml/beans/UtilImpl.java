@@ -19,6 +19,8 @@ import gr.ekt.r2rml.entities.sparql.LocalResultSet;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -340,4 +342,32 @@ public class UtilImpl implements Util {
 		return null;
 	}
 	
+	public String md5(ResultSet rs) {
+		String digest = null;
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			String s = new String();
+			rs.beforeFirst();
+			int columns = rs.getMetaData().getColumnCount();
+			while (rs.next()) {
+				for (int i = 1; i <= columns; i++) {
+					s += rs.getString(i);					
+				}
+			}
+			rs.close();
+			byte[] hash = md.digest(s.getBytes("UTF-8"));
+			StringBuilder sb = new StringBuilder(2 * hash.length);
+			for (byte b : hash) {
+				sb.append(String.format("%02x", b & 0xff));
+			}
+			digest = sb.toString();
+		} catch (UnsupportedEncodingException ex) {
+			log.info(ex.getMessage());
+		} catch (NoSuchAlgorithmException ex) {
+			log.info(ex.getMessage());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return digest;
+	}
 }

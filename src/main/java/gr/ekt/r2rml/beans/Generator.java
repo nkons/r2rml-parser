@@ -358,6 +358,12 @@ public class Generator {
 				Literal o2 = logModel.createLiteral(String.valueOf(new Date()));
 				logModel.add(s, p2, o2);
 				
+				Property p3 = logModel.createProperty("queryHash");
+				ResultSet rs = db.query(logicalTableMapping.getView().getSelectQuery().getQuery());
+				Literal o3 = logModel.createLiteral(String.valueOf(util.md5(rs)));
+				logModel.add(s, p3, o3);
+				
+				//TODO include a mappingHash
 			}
 			
 			logModel.write(new FileOutputStream(properties.getProperty("default.log")), properties.getProperty("jena.destinationFileSyntax"));

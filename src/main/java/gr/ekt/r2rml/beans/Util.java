@@ -33,4 +33,6 @@ public interface Util {
 	
 	BaseDatatype findDataTypeFromSql(String sqlDataType);
 	
+	public String md5(ResultSet rs);
+	
 }
