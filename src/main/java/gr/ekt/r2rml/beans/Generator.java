@@ -42,12 +42,15 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.RSIterator;
+import com.hp.hpl.jena.rdf.model.ReifiedStatement;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.util.FileManager;
+import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
@@ -78,27 +81,66 @@ public class Generator {
 	
 	private boolean incremental;
 	
-	private Model lastRunLogModel;
-	
+	private Model logModel;
+		
 	public Generator() {
 	}
 	
 	public void createTriples(MappingDocument mappingDocument) {
 		incremental = properties.containsKey("default.incremental") && (properties.getProperty("default.incremental").contains("true") || properties.getProperty("default.incremental").contains("yes"));
+		logModel = ModelFactory.createDefaultModel();
+		String logNs = properties.getProperty("default.namespace");
+		logModel.setNsPrefix("log", logNs);
 		if (incremental) {
-			String logFilename = properties.getProperty("default.log");
-			InputStream isMap = FileManager.get().open(logFilename);
-			lastRunLogModel = ModelFactory.createDefaultModel();
+			String modelFilename = properties.getProperty("jena.destinationFileName");
+			InputStream isMap = FileManager.get().open(modelFilename);
+			resultModel = ModelFactory.createDefaultModel();
 			try {
-				lastRunLogModel.read(isMap, null, properties.getProperty("mapping.file.type"));
+				resultModel.read(isMap, null, properties.getProperty("jena.destinationFileSyntax"));
 			} catch (Exception e) {
-				log.error("Error reading log ");
+				log.error("Error reading last run model. Please change property default.incremental in file r2rml.properties to false.");
+				System.exit(0);
+			}
+			
+			String logFilename = properties.getProperty("default.log");
+			InputStream isMapLog = FileManager.get().open(logFilename);
+			try {
+				logModel.read(isMapLog, properties.getProperty("default.namespace"), properties.getProperty("mapping.file.type"));
+			} catch (Exception e) {
+				log.error("Error reading log. Please change property default.incremental in file r2rml.properties to false.");
 				System.exit(0);
 			}
 			log.info("Going to dump incrementally, based on log file " + properties.getProperty("default.log"));
+			
+			//remove any old statements
+			ArrayList<Statement> statementsToRemove = new ArrayList<Statement>();
+			StmtIterator stmtIter = resultModel.listStatements();
+			while (stmtIter.hasNext()) {
+				Statement stmt = stmtIter.next();
+				Resource type = stmt.getSubject().getPropertyResourceValue(RDF.type);
+				if (type == null || !type.equals(RDF.Statement)) {
+					statementsToRemove.add(stmt);
+					//TODO remove []    dc:source map:persons .
+					//statementsToRemove.add(resultModel.createStatement(stmt.getSubject(), DC.source, RDF.object));
+				}
+			}
+			stmtIter.close();
+			log.info("removing " + statementsToRemove.size() + " old statements.");
+			resultModel.remove(statementsToRemove);
 		}
 		verbose = properties.containsKey("default.verbose") && (properties.getProperty("default.verbose").contains("true") || properties.getProperty("default.verbose").contains("yes"));
 		String databaseType = util.findDatabaseType(properties.getProperty("db.driver"));
+		
+		//if there are statements in the result model, this means that last time incremental was set to false
+		//so we need to re-create the model until there are no simple statements, only reified statements
+		boolean executeAllMappings = false;
+		if (incremental) {
+			RSIterator rsIter = resultModel.listReifiedStatements();
+			if (!rsIter.hasNext()) {
+				executeAllMappings = true;
+			}
+			rsIter.close();
+		}
 		
 		int tripleCount = 0;
 		for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
@@ -106,16 +148,17 @@ public class Generator {
 			
 			if (incremental) {
 				HashMap<String, String> lastRunStatistics = new HashMap<String, String>(); 
-				Resource lastRunLogicalTableMapping = lastRunLogModel.getResource(logicalTableMapping.getUri());
+				Resource lastRunLogicalTableMapping = logModel.getResource(logicalTableMapping.getUri());
 				StmtIterator iter = lastRunLogicalTableMapping.listProperties();
 				while (iter.hasNext()) {
 					Statement stmt = iter.next();
 					Property prop = stmt.getPredicate();
 					
 					RDFNode node = stmt.getObject();
-					log.info("found " + prop.getLocalName() + " " + node.toString());
+					if (verbose) log.info("found in last time log " + prop.getLocalName() + " " + node.toString());
 			        lastRunStatistics.put(prop.getLocalName(), node.toString());
 				}
+				iter.close();
 				
 				//selectQueryHash logicalTableMappingHash selectQueryResultsHash tripleCount timestamp
 				String selectQueryHash = util.md5(logicalTableMapping.getView().getSelectQuery().getQuery());
@@ -128,13 +171,40 @@ public class Generator {
 				if (selectQueryHash.equals(lastRunStatistics.get("selectQueryHash"))
 						&& logicalTableMappingHash.equals(lastRunStatistics.get("logicalTableMappingHash"))
 						&& selectQueryResultsHash.equals(lastRunStatistics.get("selectQueryResultsHash"))) {
-					log.info("Skipping " + logicalTableMapping.getUri() + ". found the same (a) select query (b) logical table mapping and (c) select query results.");
-					executeMapping = false;
+					executeMapping = false || executeAllMappings;
+					if (verbose) {
+						if (!executeMapping) {
+							log.info("Will skip triple generation from " + logicalTableMapping.getUri() + ". Found the same (a) select query (b) logical table mapping and (c) select query results.");	
+						}
+					}
 				}
 			}
 			
 			ArrayList<Statement> triples = new ArrayList<Statement>();
 			if (executeMapping) {
+				
+				ArrayList<ReifiedStatement> reificationsToRemove = new ArrayList<ReifiedStatement>();
+				resultModel.listReifiedStatements();
+				RSIterator rsExistingIter = resultModel.listReifiedStatements();
+				while (rsExistingIter.hasNext()) {
+					ReifiedStatement rstmt = rsExistingIter.next();
+					Statement st = rstmt.getProperty(DC.source);
+					String source = st.getObject().toString();
+					if (mappingDocument.findLogicalTableMappingByUri(source) != null) {
+						if (logicalTableMapping.getUri().equals(source)) {
+							reificationsToRemove.add(rstmt);
+						}
+					} else {
+						reificationsToRemove.add(rstmt);
+					}
+				}
+				rsExistingIter.close();
+				log.info("removing " + reificationsToRemove.size() + " old reified statements from source " + logicalTableMapping.getUri() + ".");
+				for (ReifiedStatement rstmt : reificationsToRemove) {
+					resultModel.removeReification(rstmt);
+				}
+				
+				//Then insert the newly generated ones
 			    try {
 					SelectQuery selectQuery = logicalTableMapping.getView().getSelectQuery();
 					java.sql.ResultSet rs = db.query(selectQuery.getQuery());
@@ -164,8 +234,13 @@ public class Generator {
 									Resource o = resultModel.createResource(classUri);
 									Statement st = resultModel.createStatement(s, p, o);
 									if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.getURI() + ">");
-									resultModel.add(st);
 									triples.add(st);
+									if (incremental) {
+										ReifiedStatement rst = resultModel.createReifiedStatement(st);
+										rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
+									} else {
+										resultModel.add(st);
+									}
 								}
 							}
 							
@@ -223,8 +298,13 @@ public class Generator {
 											
 											if (o != null) {
 												Statement st = resultModel.createStatement(s, p, o);
-												resultModel.add(st);
 												triples.add(st);
+												if (incremental) {
+													ReifiedStatement rst = resultModel.createReifiedStatement(st);
+													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
+												} else {
+													resultModel.add(st);
+												}
 											}
 										} else if (objectTemplate.getTermType() == TermType.IRI) {
 											if (verbose) log.info("filling in iri template " + objectTemplate.getText());
@@ -233,8 +313,13 @@ public class Generator {
 												RDFNode o = resultModel.createResource(value);
 												if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
 												Statement st = resultModel.createStatement(s, p, o);
-												resultModel.add(st);
 												triples.add(st);
+												if (incremental) {
+													ReifiedStatement rst = resultModel.createReifiedStatement(st);
+													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
+												} else {
+													resultModel.add(st);
+												}
 											}
 										} else if (objectTemplate.getTermType() == TermType.BLANKNODE) {
 											if (verbose) log.info("filling in blanknode template " + objectTemplate.getText());
@@ -243,8 +328,13 @@ public class Generator {
 												RDFNode o = resultModel.createResource(AnonId.create(value));
 												if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
 												Statement st = resultModel.createStatement(s, p, o);
-												resultModel.add(st);
 												triples.add(st);
+												if (incremental) {
+													ReifiedStatement rst = resultModel.createReifiedStatement(st);
+													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
+												} else {
+													resultModel.add(st);
+												}
 											}
 										}
 									} else if (predicateObjectMap.getObjectColumn() != null) {
@@ -274,7 +364,6 @@ public class Generator {
 													o = resultModel.createLiteral(test);
 													if (verbose) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
 												}
-												
 											} else {
 												String language = util.fillTemplate(predicateObjectMap.getLanguage(), rs);
 												o = resultModel.createLiteral(test, language);
@@ -282,8 +371,13 @@ public class Generator {
 											}
 											
 											Statement st = resultModel.createStatement(s, p, o);
-											resultModel.add(st);
 											triples.add(st);
+											if (incremental) {
+												ReifiedStatement rst = resultModel.createReifiedStatement(st);
+												rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
+											} else {
+												resultModel.add(st);
+											}
 										}
 									} else if (predicateObjectMap.getRefObjectMap() != null && predicateObjectMap.getRefObjectMap().getParentTriplesMapUri() != null) {
 										if (predicateObjectMap.getRefObjectMap().getParent() != null && predicateObjectMap.getRefObjectMap().getChild() != null) {
@@ -315,9 +409,14 @@ public class Generator {
 												String parentSubject = util.fillTemplate(parentTemplate, rsParent);
 												RDFNode o = resultModel.createResource(parentSubject);
 												Statement newStatement = resultModel.createStatement(s, p, o);
-												resultModel.add(newStatement);
 												if (verbose) log.info("Adding triple referring to a parent statement subjetct: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
 												triples.add(newStatement);
+												if (incremental) {
+													ReifiedStatement rst = resultModel.createReifiedStatement(newStatement);
+													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
+												} else {
+													resultModel.add(newStatement);
+												}
 											}
 											rsParent.close();
 										} else {
@@ -329,9 +428,14 @@ public class Generator {
 												String existingSubjectUri = existingStatement.asTriple().getSubject().getURI();
 												RDFNode o = resultModel.createResource(existingSubjectUri);
 												Statement newStatement = resultModel.createStatement(s, p, o);
-												resultModel.add(newStatement);
 												if (verbose) log.info("Adding triple referring to an existing statement subjetct: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
 												triples.add(newStatement);
+												if (incremental) {
+													ReifiedStatement rst = resultModel.createReifiedStatement(newStatement);
+													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
+												} else {
+													resultModel.add(newStatement);
+												}
 											}
 										}
 									}
@@ -346,7 +450,10 @@ public class Generator {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
+			} else {
+				log.info("Skipping triple generation from " + logicalTableMapping.getUri() + ". Nothing changed here.");
 			}
+			
 		    logicalTableMapping.setTriples(triples);
 		    if (verbose) log.info("Generated " + triples.size() + " statements from table mapping <" + logicalTableMapping.getUri() + ">");
 	    }
@@ -397,40 +504,42 @@ public class Generator {
 		Calendar c0 = Calendar.getInstance();
         long t0 = c0.getTimeInMillis();
 		try {
-			Model logModel = ModelFactory.createDefaultModel();
-			
 			String logFile = properties.getProperty("default.log");
 			log.info("Logging results to " + new File(logFile).getAbsolutePath());
+			
+			//overwrite old values
+			logModel = ModelFactory.createDefaultModel();
+			logModel.setNsPrefix("log", logNs);
 
 			//run on the table mappings
 			for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
 				Resource s = logModel.createResource(logicalTableMapping.getUri());
 				
-				log.info("Logging selectQueryHash");
-				Property pSelectQueryHash = logModel.createProperty("selectQueryHash");
+				if (verbose) log.info("Logging selectQueryHash");
+				Property pSelectQueryHash = logModel.createProperty(logNs + "selectQueryHash");
 				String selectQuery = logicalTableMapping.getView().getSelectQuery().getQuery();
 				Literal oSelectQueryHash = logModel.createLiteral(String.valueOf(util.md5(selectQuery)));
 				logModel.add(s, pSelectQueryHash, oSelectQueryHash);
 				
-				log.info("Logging logicalTableMappingHash");
-				Property pLogicalTableMappingHash = logModel.createProperty("logicalTableMappingHash");
+				if (verbose) log.info("Logging logicalTableMappingHash");
+				Property pLogicalTableMappingHash = logModel.createProperty(logNs + "logicalTableMappingHash");
 				String logicalTableMappingHash = util.md5(logicalTableMapping);
 				Literal oLogicalTableMappingHash = logModel.createLiteral(String.valueOf(logicalTableMappingHash));
 				logModel.add(s, pLogicalTableMappingHash, oLogicalTableMappingHash);
 				
-				log.info("Logging selectQueryResultsHash");
-				Property pSelectQueryResultsHash = logModel.createProperty("selectQueryResultsHash");
+				if (verbose) log.info("Logging selectQueryResultsHash");
+				Property pSelectQueryResultsHash = logModel.createProperty(logNs + "selectQueryResultsHash");
 				ResultSet rsSelectQueryResultsHash = db.query(logicalTableMapping.getView().getSelectQuery().getQuery());
 				Literal oSelectQueryResultsHash = logModel.createLiteral(String.valueOf(util.md5(rsSelectQueryResultsHash)));
 				logModel.add(s, pSelectQueryResultsHash, oSelectQueryResultsHash);
 				
-				log.info("Logging tripleCount");
-				Property pTripleCount = logModel.createProperty("tripleCount");
-				Literal oTripleCount = logModel.createLiteral(String.valueOf(logicalTableMapping.getTriples().size()));
-				logModel.add(s, pTripleCount, oTripleCount);
+//				if (verbose) log.info("Logging tripleCount");
+//				Property pTripleCount = logModel.createProperty(logNs + "tripleCount");
+//				Literal oTripleCount = logModel.createLiteral(String.valueOf(logicalTableMapping.getTriples().size()));
+//				logModel.add(s, pTripleCount, oTripleCount);
 				
-				log.info("Logging timestamp");
-				Property pTimestamp = logModel.createProperty("timestamp");
+				if (verbose) log.info("Logging timestamp");
+				Property pTimestamp = logModel.createProperty(logNs + "timestamp");
 				Literal oTimestamp = logModel.createLiteral(String.valueOf(new Date()));
 				logModel.add(s, pTimestamp, oTimestamp);
 			}

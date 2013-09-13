@@ -193,7 +193,7 @@ public class UtilImpl implements Util {
 		
 		return result;
 	}
-	
+
 	/**
 	 * returns an XSD datatype according to an XSD declaration
 	 */
@@ -399,7 +399,7 @@ public class UtilImpl implements Util {
 				s += predicateObjectMap.getRefObjectMap() != null? predicateObjectMap.getRefObjectMap().getParentTriplesMapUri() : "null";
 			}
 
-			log.info("about to hash logicalTableMapping " + s);
+			//log.info("about to hash logicalTableMapping " + s);
 			byte[] hash = md.digest(s.getBytes("UTF-8"));
 			StringBuilder sb = new StringBuilder(2 * hash.length);
 			for (byte b : hash) {
