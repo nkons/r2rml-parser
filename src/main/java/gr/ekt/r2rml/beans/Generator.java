@@ -29,8 +29,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,21 +114,19 @@ public class Generator {
 			}
 			log.info("Going to dump incrementally, based on log file " + properties.getProperty("default.log"));
 			
-			//remove any old statements
-			ArrayList<Statement> statementsToRemove = new ArrayList<Statement>();
+			//remove any old statements. Set instead of a List, to disallow duplicates
+			Set<Statement> statementsToRemove = new HashSet<Statement>();
 			StmtIterator stmtIter = resultModel.listStatements();
 			while (stmtIter.hasNext()) {
 				Statement stmt = stmtIter.next();
 				Resource type = stmt.getSubject().getPropertyResourceValue(RDF.type);
-				if (type == null || !type.equals(RDF.Statement)) {
+				if (type == null || !type.equals(RDF.Statement)) {  
 					statementsToRemove.add(stmt);
-					//TODO remove []    dc:source map:persons .
-					//statementsToRemove.add(resultModel.createStatement(stmt.getSubject(), DC.source, RDF.object));
 				}
 			}
 			stmtIter.close();
-			log.info("removing " + statementsToRemove.size() + " old statements.");
-			resultModel.remove(statementsToRemove);
+			log.info("Removing " + statementsToRemove.size() + " old statements.");
+			resultModel.remove(statementsToRemove.toArray(new Statement[statementsToRemove.size()]));
 		}
 		verbose = properties.containsKey("default.verbose") && (properties.getProperty("default.verbose").contains("true") || properties.getProperty("default.verbose").contains("yes"));
 		String databaseType = util.findDatabaseType(properties.getProperty("db.driver"));
@@ -155,7 +155,7 @@ public class Generator {
 					Property prop = stmt.getPredicate();
 					
 					RDFNode node = stmt.getObject();
-					if (verbose) log.info("found in last time log " + prop.getLocalName() + " " + node.toString());
+					if (verbose) log.info("Found in last time log " + prop.getLocalName() + " " + node.toString());
 			        lastRunStatistics.put(prop.getLocalName(), node.toString());
 				}
 				iter.close();
@@ -183,7 +183,7 @@ public class Generator {
 			ArrayList<Statement> triples = new ArrayList<Statement>();
 			if (executeMapping) {
 				
-				ArrayList<ReifiedStatement> reificationsToRemove = new ArrayList<ReifiedStatement>();
+				Set<ReifiedStatement> reificationsToRemove = new HashSet<ReifiedStatement>();
 				resultModel.listReifiedStatements();
 				RSIterator rsExistingIter = resultModel.listReifiedStatements();
 				while (rsExistingIter.hasNext()) {
@@ -199,10 +199,21 @@ public class Generator {
 					}
 				}
 				rsExistingIter.close();
-				log.info("removing " + reificationsToRemove.size() + " old reified statements from source " + logicalTableMapping.getUri() + ".");
+				
+				//Remove the reified statement itself, i.e. [] a rdf:Statement ; rdf:subject ... ; rdf:predicate ; rdf:object ... ;
+				//but also remove the statements having this statement as a subject and dc:source as a property
+				Set<Statement> statementsToRemove = new HashSet<Statement>();
+				for (ReifiedStatement rstmt : reificationsToRemove) {
+					statementsToRemove.add(rstmt.getRequiredProperty(DC.source));
+				}
+				
 				for (ReifiedStatement rstmt : reificationsToRemove) {
 					resultModel.removeReification(rstmt);
 				}
+				
+				log.info("Removing " + reificationsToRemove.size() + " old reified statements from source " + logicalTableMapping.getUri() + ".");
+				//log.info("statementsToRemove are " + statementsToRemove.size() + " statements.");
+				resultModel.remove(statementsToRemove.toArray(new Statement[statementsToRemove.size()]));
 				
 				//Then insert the newly generated ones
 			    try {
@@ -219,13 +230,13 @@ public class Generator {
 							if (logicalTableMapping.getSubjectMap().getClassUris() != null && logicalTableMapping.getSubjectMap().getClassUris().size() > 0) {
 								for (String classUri : logicalTableMapping.getSubjectMap().getClassUris()) {
 									Resource s = null; //resultModel.createResource();
-									if (verbose) log.info("subject termType: " + subjectTemplate.getTermType().toString());
+									if (verbose) log.info("Subject termType: " + subjectTemplate.getTermType().toString());
 									//we cannot have a literal as a subject, it has to be an iri or a blank node
 									if (subjectTemplate.getTermType() == TermType.IRI || subjectTemplate.getTermType() == TermType.LITERAL) {
 										s = resultModel.createResource(resultSubject);
 									} else if (subjectTemplate.getTermType() == TermType.BLANKNODE) {
 										s = resultModel.createResource(AnonId.create(resultSubject));
-										if (verbose) log.info("created blank node subject with id " + s.getId());
+										if (verbose) log.info("Created blank node subject with id " + s.getId());
 									} else {
 										s = resultModel.createResource(resultSubject);
 									}
@@ -247,12 +258,12 @@ public class Generator {
 							//for (int i = 0; i < logicalTableMapping.getPredicateObjectMaps()  resultPredicates.size(); i++) {
 							for (PredicateObjectMap predicateObjectMap : logicalTableMapping.getPredicateObjectMaps()) {
 								Resource s = null; //resultModel.createResource();
-								if (verbose) log.info("subject termType: " + subjectTemplate.getTermType().toString());
+								if (verbose) log.info("Subject termType: " + subjectTemplate.getTermType().toString());
 								if (subjectTemplate.getTermType() == TermType.IRI || subjectTemplate.getTermType() == TermType.LITERAL) {
 									s = resultModel.createResource(resultSubject);
 								} else if (subjectTemplate.getTermType() == TermType.BLANKNODE) {
 									s = resultModel.createResource(AnonId.create(resultSubject));
-									if (verbose) log.info("created blank node subject with id " + s.getId());
+									if (verbose) log.info("Created blank node subject with id " + s.getId());
 								} else {
 									s = resultModel.createResource(resultSubject);
 								}
@@ -260,9 +271,9 @@ public class Generator {
 								Template objectTemplate = predicateObjectMap.getObjectTemplate();
 								if (verbose) {
 									if (objectTemplate != null && objectTemplate.getTermType() != null) {
-										log.info("object type is " + objectTemplate.getTermType().toString());
+										log.info("Object type is " + objectTemplate.getTermType().toString());
 									} else {
-										log.info("object type is null");
+										log.info("Object type is null");
 									}
 								}
 								
@@ -307,7 +318,7 @@ public class Generator {
 												}
 											}
 										} else if (objectTemplate.getTermType() == TermType.IRI) {
-											if (verbose) log.info("filling in iri template " + objectTemplate.getText());
+											if (verbose) log.info("Filling in IRI template " + objectTemplate.getText());
 											String value = util.fillTemplate(objectTemplate, rs);
 											if (value != null) {
 												RDFNode o = resultModel.createResource(value);
@@ -382,7 +393,7 @@ public class Generator {
 									} else if (predicateObjectMap.getRefObjectMap() != null && predicateObjectMap.getRefObjectMap().getParentTriplesMapUri() != null) {
 										if (predicateObjectMap.getRefObjectMap().getParent() != null && predicateObjectMap.getRefObjectMap().getChild() != null) {
 											
-											if (verbose) log.info("Object uris will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMap().getParentTriplesMapUri() 
+											if (verbose) log.info("Object URIs will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMap().getParentTriplesMapUri() 
 													+ " with a rr:joinCondition containing rr:child " + predicateObjectMap.getRefObjectMap().getChild() + " and rr:parent " + predicateObjectMap.getRefObjectMap().getParent());
 											LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
 											
@@ -401,7 +412,7 @@ public class Generator {
 												System.exit(0);
 											}
 											
-											if (verbose) log.info("modified parent sql query to " + parentQuery);
+											if (verbose) log.info("Modified parent SQL query to " + parentQuery);
 											java.sql.ResultSet rsParent = db.query(parentQuery);
 											rsParent.beforeFirst();
 											while (rsParent.next()) {
@@ -420,7 +431,7 @@ public class Generator {
 											}
 											rsParent.close();
 										} else {
-											if (verbose) log.info("Object uris will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
+											if (verbose) log.info("Object URIs will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
 											LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
 											if (verbose) log.info("The logical table mapping with the uri " + l.getUri() + " has already generated "+ l.getTriples().size() + " triples.");
 											
@@ -443,7 +454,7 @@ public class Generator {
 							}
 						}
 						tripleCount++;
-						if (tripleCount % 1000 == 0) log.info("at " + tripleCount + " triples");
+						if (tripleCount % 1000 == 0) log.info("At " + tripleCount + " triples");
 					}
 					
 					rs.close();
@@ -556,15 +567,15 @@ public class Generator {
 	
 	BaseDatatype findFieldDataType(String field, ResultSet rs) {
 		field = field.trim();
-		if (verbose) log.info("figuring out datatype of field: " + field);
+		if (verbose) log.info("Figuring out datatype of field: " + field);
 		try {
 			ResultSetMetaData rsMeta = rs.getMetaData();
-			if (verbose) log.info("table name " + rsMeta.getTableName(1));
+			if (verbose) log.info("Table name " + rsMeta.getTableName(1));
 			for (int i = 1; i <= rsMeta.getColumnCount(); i++) {
-				if (verbose) log.info("column name is " + rsMeta.getColumnName(i));
+				if (verbose) log.info("Column name is " + rsMeta.getColumnName(i));
 				if (rsMeta.getColumnName(i).equals(field)) {
 					String sqlType = rsMeta.getColumnTypeName(i);
-					if (verbose) log.info("column " + i + " with name " + rsMeta.getColumnName(i) + " is of type " + sqlType);
+					if (verbose) log.info("Column " + i + " with name " + rsMeta.getColumnName(i) + " is of type " + sqlType);
 					return util.findDataTypeFromSql(sqlType);
 				}
 			}

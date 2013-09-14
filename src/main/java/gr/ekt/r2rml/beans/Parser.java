@@ -131,11 +131,11 @@ public class Parser {
 			//First find the logical table views
 			LinkedList<LogicalTableView> logicalTableViews = findLogicalTableViews();
 			mappingDocument.setLogicalTableViews(logicalTableViews);
-			log.info("Mapping document now has " + logicalTableViews.size() + " logical table views.");
+			log.info("Mapping document has " + logicalTableViews.size() + " logical table views.");
 			
 			LinkedList<LogicalTableMapping> logicalTableMappings = findLogicalTableMappings();
 			mappingDocument.setLogicalTableMappings(logicalTableMappings);
-			log.info("Mapping document now has " + logicalTableMappings.size() + " logical table mappings.");
+			log.info("Mapping document has " + logicalTableMappings.size() + " logical table mappings.");
 			
 			for (int i = 0; i < mappingDocument.getLogicalTableMappings().size(); i++) {
 				LogicalTableMapping logicalTableMapping = mappingDocument.getLogicalTableMappings().get(i);
@@ -152,7 +152,7 @@ public class Parser {
 			if (verbose) {
 				log.info("Logical table mappings will be parsed in the following order:");
 				for (LogicalTableMapping ltm : mappingDocument.getLogicalTableMappings()) {
-					log.info(" table mapping uri: " + ltm.getUri());
+					log.info(" Table mapping uri: " + ltm.getUri());
 				}
 			}
 			//resultModel.write(System.out, "TURTLE");
@@ -188,7 +188,7 @@ public class Parser {
 				    		RDFNode rnTermType = iterTermType.next();
 				    		if (rnTermType.isResource() && rnTermType.asResource().getNameSpace().equals(rrNs)) {
 				    			String termType = rnTermType.asResource().getLocalName();
-				    			log.info("found rr:termType " + termType);
+				    			log.info("Found rr:termType " + termType);
 				    			if ("IRI".equals(termType)) {
 				    				Template template = new Template(rnTemplate.asLiteral().toString(), TermType.IRI, baseNs, resultModel);
 							    	subjectMap.setTemplate(template);
@@ -233,7 +233,7 @@ public class Parser {
 			    		RDFNode rnTermType = iterTermType.next();
 			    		if (rnTermType.isResource() && rnTermType.asResource().getNameSpace().equals(rrNs)) {
 			    			String termType = rnTermType.asResource().getLocalName();
-			    			log.info("found rr:termType " + termType);
+			    			if (verbose) log.info("Found rr:termType " + termType);
 			    			if ("IRI".equals(termType)) {
 			    				Template template = new Template(templateText, TermType.IRI, baseNs, resultModel);
 						    	subjectMap.setTemplate(template);
@@ -415,7 +415,7 @@ public class Parser {
 			    		RDFNode rnTermType = iterTermType.next();
 			    		if (rnTermType.isResource() && rnTermType.asResource().getNameSpace().equals(rrNs)) {
 			    			String termType = rnTermType.asResource().getLocalName();
-			    			log.info("found rr:termType " + termType);
+			    			log.info("Found rr:termType " + termType);
 			    			if ("IRI".equals(termType)) {
 			    				template.setTermType(TermType.IRI);
 			    			} else if ("BlankNode".equals(termType)) {
@@ -434,25 +434,25 @@ public class Parser {
 		    	NodeIterator iterParentTriplesMap = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "parentTriplesMap"));
 			    while (iterParentTriplesMap.hasNext()) {
 			    	RDFNode rnParentTriplesMap = iterParentTriplesMap.next();
-			    	log.info("found rr:parentTriplesMap " + rnParentTriplesMap.asResource().getURI());
+			    	log.info("Found rr:parentTriplesMap " + rnParentTriplesMap.asResource().getURI());
 			    	RefObjectMap refObjectMap = new RefObjectMap();
 			    	refObjectMap.setParentTriplesMapUri(rnParentTriplesMap.asResource().getURI());
 			    	
 			    	NodeIterator iterJoinCondition = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "joinCondition"));
 			    	while (iterJoinCondition.hasNext()) {
 			    		RDFNode rnJoinCondition = iterJoinCondition.next();
-			    		log.info("found rr:joinCondition " + rnJoinCondition.asResource().getURI());
+			    		log.info("Found rr:joinCondition " + rnJoinCondition.asResource().getURI());
 			    		NodeIterator iterChild = mapModel.listObjectsOfProperty(rnJoinCondition.asResource(), mapModel.getProperty(rrNs + "child"));
 			    		while (iterChild.hasNext()) {
 			    			RDFNode rnChild = iterChild.next();
-			    			log.info("found rr:child " + rnChild.asLiteral().toString());
+			    			log.info("Found rr:child " + rnChild.asLiteral().toString());
 			    			refObjectMap.setChild(rnChild.asLiteral().toString());
 			    		}
 			    		
 			    		NodeIterator iterParent = mapModel.listObjectsOfProperty(rnJoinCondition.asResource(), mapModel.getProperty(rrNs + "parent"));
 			    		while (iterParent.hasNext()) {
 			    			RDFNode rnParent = iterParent.next();
-			    			log.info("found rr:parent " + rnParent.asLiteral().toString());
+			    			log.info("Found rr:parent " + rnParent.asLiteral().toString());
 			    			refObjectMap.setParent(rnParent.asLiteral().toString());
 			    		}
 			    	}
@@ -664,7 +664,7 @@ public class Parser {
 		} else {
 			result += " FROM " + tableName;
 		}
-		log.info("result is: " + result);
+		log.info("Result is: " + result);
 		return result;
 	}
 

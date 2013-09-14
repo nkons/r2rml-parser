@@ -69,20 +69,20 @@ public class Template {
 		if (msg.lastIndexOf(',') > 0) {
 			msg = msg.substring(0, msg.lastIndexOf(','));
 		}
-		log.info(msg);
+		//log.info(msg);
 	}
 	
 	public ArrayList<String> createTemplateFields() {
 		ArrayList<String> results = new ArrayList<String>();
 		String template = this.text;
-		log.info("\\{");
+		//log.info("\\{");
 		template = template.replaceAll("\\\\\\{", " "); //remove escaped braces \{ that could mix things
-		log.info("new template " + template);
+		//log.info("new template " + template);
 		while (template.indexOf('{') != -1) {
 			int from = template.indexOf('{') + 1;
 			int to = template.indexOf('}');
 			results.add(template.substring(from, to));
-			//System.out.println("adding variable '" + template.substring(from, to) + "'");
+			//log.info("adding variable '" + template.substring(from, to) + "'");
 			template = template.substring(to + 1, template.length());
 		}
 		return results;

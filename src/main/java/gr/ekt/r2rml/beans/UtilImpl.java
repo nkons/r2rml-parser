@@ -147,7 +147,7 @@ public class UtilImpl implements Util {
 		LocalResultSet result = new LocalResultSet();
 		ArrayList<LocalResultRow> resultRows = new ArrayList<LocalResultRow>();
 		
-		log.info("creating query\n" + query);
+		//log.info("creating query\n" + query);
 		Query q = QueryFactory.create(query);
 		QueryExecution qexec = QueryExecutionFactory.create(q, model);
 		com.hp.hpl.jena.query.ResultSet sparqlResults = qexec.execSelect();
@@ -181,15 +181,15 @@ public class UtilImpl implements Util {
 		}
 		result.setRows(resultRows);
 		
-		log.info("Sparql query result has the followinng " + result.getRows().size() + " rows: [");
-		for (LocalResultRow row : result.getRows()) {
-			String t = new String();
-    		for (LocalResource resource : row.getResources()) {
-    			t += resource.getLocalName() + " ";
-    		}
-    		log.info(t);
-    	}
-		log.info("]");
+//		log.info("Sparql query result has the followinng " + result.getRows().size() + " rows: [");
+//		for (LocalResultRow row : result.getRows()) {
+//			String t = new String();
+//    		for (LocalResource resource : row.getResources()) {
+//    			t += resource.getLocalName() + " ";
+//    		}
+//    		log.info(t);
+//    	}
+//		log.info("]");
 		
 		return result;
 	}
@@ -281,7 +281,7 @@ public class UtilImpl implements Util {
     	} else if ("unsignedShort".equalsIgnoreCase(dataType)) {
     		return XSDDatatype.XSDunsignedShort;
     	} else {
-    		log.info("Found unknown datatype " + dataType);
+    		log.error("Found unknown datatype " + dataType);
     		System.exit(0);
     	}
 		return null;
@@ -338,7 +338,7 @@ public class UtilImpl implements Util {
     			|| sqlDataType.equals("timestamptz")) {
         	return XSDDatatype.XSDdateTime;
         } else {
-    		log.info("Found unknown SQL sqlDataType " + sqlDataType);
+    		log.error("Found unknown SQL sqlDataType " + sqlDataType);
     		System.exit(0);
     	}
 		return null;
