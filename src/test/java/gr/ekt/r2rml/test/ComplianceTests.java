@@ -13,12 +13,15 @@ package gr.ekt.r2rml.test;
 
 import gr.ekt.r2rml.beans.Generator;
 import gr.ekt.r2rml.beans.Parser;
+import gr.ekt.r2rml.beans.Util;
 import gr.ekt.r2rml.entities.MappingDocument;
+import gr.ekt.r2rml.entities.sparql.LocalResultSet;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -35,6 +38,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.util.FileManager;
 
 @ContextConfiguration(locations = { "classpath:test-context.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -129,6 +136,27 @@ public class ComplianceTests {
 		generator.setProperties(parser.getProperties());
 		generator.setResultModel(parser.getResultModel());
 		generator.createTriples(mappingDocument);
+		
+		context.close();
+	}
+	
+	@Test
+	public void testSparqlQuery() {
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml");
+		Util util = (Util) context.getBean("util");
+		
+		Model model = ModelFactory.createDefaultModel();
+		String modelFilename = "dump1-epersons.rdf";
+		InputStream isMap = FileManager.get().open(modelFilename);
+		try {
+			model.read(isMap, null, "N3");
+		} catch (Exception e) {
+			log.error("Error reading model.");
+			System.exit(0);
+		}
+		String query = "SELECT ?x WHERE {?x rdf:type foaf:Person} ";
+		LocalResultSet rs = util.sparql(model, query);
+		log.info("found " + String.valueOf(rs.getRows().size()));
 		
 		context.close();
 	}

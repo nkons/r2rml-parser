@@ -704,7 +704,7 @@ public class Parser {
 		String storeInDatabase = properties.getProperty("jena.storeOutputModelInDatabase");
 		String cleanDbOnStartup = properties.getProperty("jena.cleanDbOnStartup");
 		
-		verbose =  properties.containsKey("default.verbose") && (properties.getProperty("default.verbose").contains("true") || properties.getProperty("default.verbose").contains("yes"));
+		verbose =  properties.containsKey("default.verbose") && properties.getProperty("default.verbose").contains("true");
 			
 		log.info("Initialising Parser");
 		

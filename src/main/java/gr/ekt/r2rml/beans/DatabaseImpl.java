@@ -120,7 +120,9 @@ public class DatabaseImpl implements Database {
 				
 				return jenaConnection;
 			} catch (Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
+				log.error(e.getMessage());
+				System.exit(0);
 			}
 		} else {
 			return jenaConnection;

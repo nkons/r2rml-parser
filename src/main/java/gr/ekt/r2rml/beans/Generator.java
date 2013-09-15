@@ -80,8 +80,8 @@ public class Generator {
 	private Properties properties;
 	
 	private boolean verbose;
-	
 	private boolean incremental;
+	private boolean storeOutputModelInDatabase;
 	
 	private Model logModel;
 		
@@ -89,7 +89,10 @@ public class Generator {
 	}
 	
 	public void createTriples(MappingDocument mappingDocument) {
-		incremental = properties.containsKey("default.incremental") && (properties.getProperty("default.incremental").contains("true") || properties.getProperty("default.incremental").contains("yes"));
+		verbose = properties.containsKey("default.verbose") && properties.getProperty("default.verbose").contains("true");
+		storeOutputModelInDatabase = properties.containsKey("jena.storeOutputModelInDatabase") && properties.getProperty("jena.storeOutputModelInDatabase").contains("true");
+		incremental = !storeOutputModelInDatabase && properties.containsKey("default.incremental") && properties.getProperty("default.incremental").contains("true");
+		
 		logModel = ModelFactory.createDefaultModel();
 		String logNs = properties.getProperty("default.namespace");
 		logModel.setNsPrefix("log", logNs);
@@ -128,7 +131,6 @@ public class Generator {
 			log.info("Removing " + statementsToRemove.size() + " old statements.");
 			resultModel.remove(statementsToRemove.toArray(new Statement[statementsToRemove.size()]));
 		}
-		verbose = properties.containsKey("default.verbose") && (properties.getProperty("default.verbose").contains("true") || properties.getProperty("default.verbose").contains("yes"));
 		String databaseType = util.findDatabaseType(properties.getProperty("db.driver"));
 		
 		//if there are statements in the result model, this means that last time incremental was set to false
@@ -469,7 +471,7 @@ public class Generator {
 		    if (verbose) log.info("Generated " + triples.size() + " statements from table mapping <" + logicalTableMapping.getUri() + ">");
 	    }
 		
-		if (properties.getProperty("jena.storeOutputModelInDatabase").contains("false")) {
+		if (!storeOutputModelInDatabase) {
 			log.info("Writing model to " + properties.getProperty("jena.destinationFileName") + ". Model has " + resultModel.listStatements().toList().size() + " statements.");
 			try {
 				resultModel.write(new FileOutputStream(properties.getProperty("jena.destinationFileName")), properties.getProperty("jena.destinationFileSyntax"));
