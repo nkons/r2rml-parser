@@ -117,31 +117,52 @@ public class Generator {
 			}
 			log.info("Going to dump incrementally, based on log file " + properties.getProperty("default.log"));
 			
-			//remove any old statements. Set instead of a List, to disallow duplicates
-			Set<Statement> statementsToRemove = new HashSet<Statement>();
-			StmtIterator stmtIter = resultModel.listStatements();
-			while (stmtIter.hasNext()) {
-				Statement stmt = stmtIter.next();
-				Resource type = stmt.getSubject().getPropertyResourceValue(RDF.type);
-				if (type == null || !type.equals(RDF.Statement)) {  
-					statementsToRemove.add(stmt);
-				}
-			}
-			stmtIter.close();
-			log.info("Removing " + statementsToRemove.size() + " old statements.");
-			resultModel.remove(statementsToRemove.toArray(new Statement[statementsToRemove.size()]));
+//			//remove any old statements. Set instead of a List, to disallow duplicates
+//			Set<Statement> statementsToRemove = new HashSet<Statement>();
+//			StmtIterator stmtIter = resultModel.listStatements();
+//			while (stmtIter.hasNext()) {
+//				Statement stmt = stmtIter.next();
+//				Resource type = stmt.getSubject().getPropertyResourceValue(RDF.type);
+//				if (type == null || !type.equals(RDF.Statement)) {  
+//					statementsToRemove.add(stmt);
+//				}
+//			}
+//			stmtIter.close();
+//			log.info("Removing " + statementsToRemove.size() + " old statements.");
+//			resultModel.remove(statementsToRemove.toArray(new Statement[statementsToRemove.size()]));
 		}
 		String databaseType = util.findDatabaseType(properties.getProperty("db.driver"));
 		
-		//if there are statements in the result model, this means that last time incremental was set to false
-		//so we need to re-create the model until there are no simple statements, only reified statements
 		boolean executeAllMappings = false;
+		int mappingsExecuted = 0;
+		
+		//if there are no reified statements in the result model, this means that last time incremental was set to false
+		//so we need to re-create the model only reified statements
 		if (incremental) {
-			RSIterator rsIter = resultModel.listReifiedStatements();
-			if (!rsIter.hasNext()) {
+			try {
+				RSIterator rsIter = resultModel.listReifiedStatements();
+				if (!rsIter.hasNext()) {
+					executeAllMappings = true;
+				}
+				rsIter.close();
+			} catch (Exception e) {
+				log.error("Error trying to read destination file. Forcing full mapping.");
 				executeAllMappings = true;
 			}
-			rsIter.close();
+			
+			try {
+				Resource destinationFile = logModel.getResource(logNs + "destinationFile");
+				Statement stmt = destinationFile.getProperty(logModel.getProperty(logNs + "destinationFileSize"));
+				Long fileSizeInLogFile = Long.valueOf(stmt.getObject().toString());
+				Long actualFileSize = new Long(new File(properties.getProperty("jena.destinationFileName")).length());
+				if (fileSizeInLogFile.longValue() != actualFileSize.longValue()) {
+					log.info("Destination file size was found " + actualFileSize + " bytes while it should be " + fileSizeInLogFile + " bytes. Forcing full mapping.");
+					executeAllMappings = true;
+				}
+			} catch (Exception e) {
+				log.error("Error trying to read log file. Forcing full mapping.");
+				executeAllMappings = true;
+			}
 		}
 		
 		int tripleCount = 0;
@@ -184,7 +205,9 @@ public class Generator {
 			
 			ArrayList<Statement> triples = new ArrayList<Statement>();
 			if (executeMapping) {
+				mappingsExecuted++;
 				
+				//Since we are executing the mapping again, we are removing old statements and their respective reifications
 				Set<ReifiedStatement> reificationsToRemove = new HashSet<ReifiedStatement>();
 				resultModel.listReifiedStatements();
 				RSIterator rsExistingIter = resultModel.listReifiedStatements();
@@ -207,13 +230,15 @@ public class Generator {
 				Set<Statement> statementsToRemove = new HashSet<Statement>();
 				for (ReifiedStatement rstmt : reificationsToRemove) {
 					statementsToRemove.add(rstmt.getRequiredProperty(DC.source));
+					//Also remove the statement itself
+					statementsToRemove.add(rstmt.getStatement());
 				}
 				
 				for (ReifiedStatement rstmt : reificationsToRemove) {
 					resultModel.removeReification(rstmt);
 				}
 				
-				log.info("Removing " + reificationsToRemove.size() + " old reified statements from source " + logicalTableMapping.getUri() + ".");
+				log.info("Removing " + statementsToRemove.size() + " old statements and " + reificationsToRemove.size() + " old reified statements from source " + logicalTableMapping.getUri() + ".");
 				//log.info("statementsToRemove are " + statementsToRemove.size() + " statements.");
 				resultModel.remove(statementsToRemove.toArray(new Statement[statementsToRemove.size()]));
 				
@@ -248,11 +273,10 @@ public class Generator {
 									Statement st = resultModel.createStatement(s, p, o);
 									if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.getURI() + ">");
 									triples.add(st);
+									resultModel.add(st);
 									if (incremental) {
 										ReifiedStatement rst = resultModel.createReifiedStatement(st);
 										rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
-									} else {
-										resultModel.add(st);
 									}
 								}
 							}
@@ -312,11 +336,10 @@ public class Generator {
 											if (o != null) {
 												Statement st = resultModel.createStatement(s, p, o);
 												triples.add(st);
+												resultModel.add(st);
 												if (incremental) {
 													ReifiedStatement rst = resultModel.createReifiedStatement(st);
 													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
-												} else {
-													resultModel.add(st);
 												}
 											}
 										} else if (objectTemplate.getTermType() == TermType.IRI) {
@@ -327,11 +350,10 @@ public class Generator {
 												if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
 												Statement st = resultModel.createStatement(s, p, o);
 												triples.add(st);
+												resultModel.add(st);
 												if (incremental) {
 													ReifiedStatement rst = resultModel.createReifiedStatement(st);
 													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
-												} else {
-													resultModel.add(st);
 												}
 											}
 										} else if (objectTemplate.getTermType() == TermType.BLANKNODE) {
@@ -342,11 +364,10 @@ public class Generator {
 												if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
 												Statement st = resultModel.createStatement(s, p, o);
 												triples.add(st);
+												resultModel.add(st);
 												if (incremental) {
 													ReifiedStatement rst = resultModel.createReifiedStatement(st);
 													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
-												} else {
-													resultModel.add(st);
 												}
 											}
 										}
@@ -385,11 +406,10 @@ public class Generator {
 											
 											Statement st = resultModel.createStatement(s, p, o);
 											triples.add(st);
+											resultModel.add(st);
 											if (incremental) {
 												ReifiedStatement rst = resultModel.createReifiedStatement(st);
 												rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
-											} else {
-												resultModel.add(st);
 											}
 										}
 									} else if (predicateObjectMap.getRefObjectMap() != null && predicateObjectMap.getRefObjectMap().getParentTriplesMapUri() != null) {
@@ -421,14 +441,13 @@ public class Generator {
 												Template parentTemplate = l.getSubjectMap().getTemplate();
 												String parentSubject = util.fillTemplate(parentTemplate, rsParent);
 												RDFNode o = resultModel.createResource(parentSubject);
-												Statement newStatement = resultModel.createStatement(s, p, o);
+												Statement st = resultModel.createStatement(s, p, o);
 												if (verbose) log.info("Adding triple referring to a parent statement subjetct: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
-												triples.add(newStatement);
+												triples.add(st);
+												resultModel.add(st);
 												if (incremental) {
-													ReifiedStatement rst = resultModel.createReifiedStatement(newStatement);
+													ReifiedStatement rst = resultModel.createReifiedStatement(st);
 													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
-												} else {
-													resultModel.add(newStatement);
 												}
 											}
 											rsParent.close();
@@ -440,14 +459,13 @@ public class Generator {
 											for (Statement existingStatement : l.getTriples()) {
 												String existingSubjectUri = existingStatement.asTriple().getSubject().getURI();
 												RDFNode o = resultModel.createResource(existingSubjectUri);
-												Statement newStatement = resultModel.createStatement(s, p, o);
+												Statement st = resultModel.createStatement(s, p, o);
 												if (verbose) log.info("Adding triple referring to an existing statement subjetct: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
-												triples.add(newStatement);
+												triples.add(st);
+												resultModel.add(st);
 												if (incremental) {
-													ReifiedStatement rst = resultModel.createReifiedStatement(newStatement);
+													ReifiedStatement rst = resultModel.createReifiedStatement(st);
 													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
-												} else {
-													resultModel.add(newStatement);
 												}
 											}
 										}
@@ -471,46 +489,50 @@ public class Generator {
 		    if (verbose) log.info("Generated " + triples.size() + " statements from table mapping <" + logicalTableMapping.getUri() + ">");
 	    }
 		
-		if (!storeOutputModelInDatabase) {
-			log.info("Writing model to " + properties.getProperty("jena.destinationFileName") + ". Model has " + resultModel.listStatements().toList().size() + " statements.");
-			try {
-				resultModel.write(new FileOutputStream(properties.getProperty("jena.destinationFileName")), properties.getProperty("jena.destinationFileSyntax"));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+		if (!incremental || mappingsExecuted > 0) {
+			if (!storeOutputModelInDatabase) {
+				log.info("Writing model to " + properties.getProperty("jena.destinationFileName") + ". Model has " + resultModel.listStatements().toList().size() + " statements.");
+				try {
+					resultModel.write(new FileOutputStream(properties.getProperty("jena.destinationFileName")), properties.getProperty("jena.destinationFileSyntax"));
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+			} else {
+				log.info("Writing model to database. Model has " + resultModel.listStatements().toList().size() + " statements.");
+				//SYNC START
+				//before writing the result, check the existing
+				Store store = db.jenaStore();
+			    Model existingDbModel = SDBFactory.connectDefaultModel(store);
+				//log.info("Existing model has " + existingDbModel.listStatements().toList().size() + " statements.");
+				
+				List<Statement> statementsToRemove = new ArrayList<Statement>();
+				List<Statement> statementsToAdd = new ArrayList<Statement>();
+				
+				//first clear the ones from the old model
+				StmtIterator stmtExistingIter = existingDbModel.listStatements();
+				while (stmtExistingIter.hasNext()) {
+					Statement stmt = stmtExistingIter.nextStatement();
+					if (!resultModel.contains(stmt)) {
+						statementsToRemove.add(stmt);
+					}
+				}
+				log.info("Will remove " + statementsToRemove.size() + " statements.");
+				
+				//then add the new ones
+				StmtIterator stmtResultIter = resultModel.listStatements();
+				while (stmtResultIter.hasNext()) {
+					Statement stmt = stmtResultIter.nextStatement();
+					if (!existingDbModel.contains(stmt)) {
+						statementsToAdd.add(stmt);
+					}
+				}
+				log.info("Will add " + statementsToAdd.size() + " statements.");
+				
+				existingDbModel.remove(statementsToRemove);
+				existingDbModel.add(statementsToAdd);
 			}
 		} else {
-			log.info("Writing model to database. Model has " + resultModel.listStatements().toList().size() + " statements.");
-			//SYNC START
-			//before writing the result, check the existing
-			Store store = db.jenaStore();
-		    Model existingDbModel = SDBFactory.connectDefaultModel(store);
-			//log.info("Existing model has " + existingDbModel.listStatements().toList().size() + " statements.");
-			
-			List<Statement> statementsToRemove = new ArrayList<Statement>();
-			List<Statement> statementsToAdd = new ArrayList<Statement>();
-			
-			//first clear the ones from the old model
-			StmtIterator stmtExistingIter = existingDbModel.listStatements();
-			while (stmtExistingIter.hasNext()) {
-				Statement stmt = stmtExistingIter.nextStatement();
-				if (!resultModel.contains(stmt)) {
-					statementsToRemove.add(stmt);
-				}
-			}
-			log.info("Will remove " + statementsToRemove.size() + " statements.");
-			
-			//then add the new ones
-			StmtIterator stmtResultIter = resultModel.listStatements();
-			while (stmtResultIter.hasNext()) {
-				Statement stmt = stmtResultIter.nextStatement();
-				if (!existingDbModel.contains(stmt)) {
-					statementsToAdd.add(stmt);
-				}
-			}
-			log.info("Will add " + statementsToAdd.size() + " statements.");
-			
-			existingDbModel.remove(statementsToRemove);
-			existingDbModel.add(statementsToAdd);
+			log.info("Skipping writing the output model. No changes detected.");
 		}
 		
 		//log the results
@@ -524,6 +546,12 @@ public class Generator {
 			logModel = ModelFactory.createDefaultModel();
 			logModel.setNsPrefix("log", logNs);
 
+			if (verbose) log.info("Logging destination file size");
+			Property pFileSize = logModel.createProperty(logNs + "destinationFileSize");
+			long fileSize = new File(properties.getProperty("jena.destinationFileName")).length();
+			Literal oFileSize = logModel.createLiteral(String.valueOf(fileSize));
+			logModel.add(logModel.createResource(logNs + "destinationFile"), pFileSize, oFileSize);
+			
 			//run on the table mappings
 			for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
 				Resource s = logModel.createResource(logicalTableMapping.getUri());

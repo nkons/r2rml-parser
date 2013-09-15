@@ -26,9 +26,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Properties;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +42,9 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RSIterator;
+import com.hp.hpl.jena.rdf.model.ReifiedStatement;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.util.FileManager;
 
 @ContextConfiguration(locations = { "classpath:test-context.xml" })
@@ -161,6 +165,31 @@ public class ComplianceTests {
 		context.close();
 	}
 	
+	@Test
+	public void createModelFromReified() {
+		Model model = ModelFactory.createDefaultModel();
+		String modelFilename = "example.rdf";
+		InputStream isMap = FileManager.get().open(modelFilename);
+		try {
+			model.read(isMap, null, "N3");
+		} catch (Exception e) {
+			log.error("Error reading model.");
+			System.exit(0);
+		}
+		
+		Set<Statement> stmtToAdd = new HashSet<Statement>();
+		Model newModel = ModelFactory.createDefaultModel();
+		RSIterator rsIter = model.listReifiedStatements();
+		while (rsIter.hasNext()) {
+			ReifiedStatement rstmt = rsIter.next();
+			stmtToAdd.add(rstmt.getStatement());
+		}
+		rsIter.close();
+		newModel.add(stmtToAdd.toArray(new Statement[stmtToAdd.size()]));
+		
+		log.info("newModel has " + newModel.listStatements().toList().size() + " statements");
+	}
+	
 	/**
 	 * Drops and re-creates source database
 	 */
@@ -182,7 +211,7 @@ public class ComplianceTests {
 			if (connection == null)
 				openConnection();
 
-			Statement statement = connection.createStatement();
+			java.sql.Statement statement = connection.createStatement();
 			log.info("sql query: " + query);
 			rowsAffected = statement.executeUpdate(query);
 		} catch (Exception e) {
@@ -198,7 +227,7 @@ public class ComplianceTests {
 			if (connection == null)
 				openConnection();
 
-			Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+			java.sql.Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			log.info("sql query: " + query);
 			result = statement.executeQuery(query);
 		} catch (Exception e) {

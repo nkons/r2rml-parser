@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gr.ekt</groupId>
 	<artifactId>r2rml</artifactId>
-	<version>0.2</version>
+	<version>0.3</version>
 	<packaging>jar</packaging>
 	<name>R2RML Parser</name>
 	<properties>
