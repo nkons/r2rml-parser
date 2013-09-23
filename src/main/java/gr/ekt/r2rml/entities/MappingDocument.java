@@ -12,6 +12,7 @@
 package gr.ekt.r2rml.entities;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ public class MappingDocument {
 
 	private LinkedList<LogicalTableView> logicalTableViews;
 	private LinkedList<LogicalTableMapping> logicalTableMappings;
+	private Map<String, String> prefixes;
 	
 	/**
 	 * 
@@ -85,5 +87,13 @@ public class MappingDocument {
 	 */
 	public void setLogicalTableMappings(LinkedList<LogicalTableMapping> logicalTableMappings) {
 		this.logicalTableMappings = logicalTableMappings;
+	}
+	
+	public Map<String, String> getPrefixes() {
+		return prefixes;
+	}
+	
+	public void setPrefixes(Map<String, String> prefixes) {
+		this.prefixes = prefixes;
 	}
 }

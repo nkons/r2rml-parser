@@ -741,11 +741,13 @@ public class Parser {
 				log.info(s + ": " + mapModel.getNsPrefixMap().get(s));
 			}
 			resultModel.setNsPrefixes(prefixes);
+			mappingDocument.setPrefixes(prefixes);
 			
 		} else {
 			//resultModel = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), resultBaseModel);
 			resultModel = ModelFactory.createDefaultModel();
 			resultModel.setNsPrefixes(mapModel.getNsPrefixMap());
+			mappingDocument.setPrefixes(mapModel.getNsPrefixMap());
 		}
 	}
 	
