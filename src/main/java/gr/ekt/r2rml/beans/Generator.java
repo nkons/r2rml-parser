@@ -160,12 +160,20 @@ public class Generator {
 			}
 			
 			try {
-				Resource destinationFile = logModel.getResource(logNs + "destinationFile");
-				Statement stmt = destinationFile.getProperty(logModel.getProperty(logNs + "destinationFileSize"));
-				Long fileSizeInLogFile = Long.valueOf(stmt.getObject().toString());
+				Resource r = logModel.getResource(logNs + "destinationFile");
+				Statement stmt1 = r.getProperty(logModel.getProperty(logNs + "destinationFileSize"));
+				Long fileSizeInLogFile = Long.valueOf(stmt1.getObject().toString());
 				Long actualFileSize = new Long(new File(destinationFileName).length());
 				if (fileSizeInLogFile.longValue() != actualFileSize.longValue()) {
 					log.info("Destination file size was found " + actualFileSize + " bytes while it should be " + fileSizeInLogFile + " bytes. Forcing full mapping.");
+					executeAllMappings = true;
+				}
+
+				Statement stmt2 = r.getProperty(logModel.getProperty(logNs + "reifiedModelFileSize"));
+				Long reifiedModelFileSizeInLogFile = Long.valueOf(stmt2.getObject().toString());
+				Long actualReifiedModelFileSize = new Long(new File(reifiedModelFileName).length());
+				if (reifiedModelFileSizeInLogFile.longValue() != actualReifiedModelFileSize.longValue()) {
+					log.info("Destination reified model file size was found " + actualFileSize + " bytes while it should be " + fileSizeInLogFile + " bytes. Forcing full mapping.");
 					executeAllMappings = true;
 				}
 			} catch (Exception e) {
@@ -636,6 +644,12 @@ public class Generator {
 			long fileSize = new File(destinationFileName).length();
 			Literal oFileSize = logModel.createLiteral(String.valueOf(fileSize));
 			logModel.add(logModel.createResource(logNs + "destinationFile"), pFileSize, oFileSize);
+
+			if (verbose) log.info("Logging reified model file size");
+			Property pReifiedModelFileSize = logModel.createProperty(logNs + "reifiedModelFileSize");
+			long reifiedModelfileSize = new File(reifiedModelFileName).length();
+			Literal oReifiedModelFileSize = logModel.createLiteral(String.valueOf(reifiedModelfileSize));
+			logModel.add(logModel.createResource(logNs + "destinationFile"), pReifiedModelFileSize, oReifiedModelFileSize);
 			
 			//run on the table mappings
 			for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
