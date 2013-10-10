@@ -390,7 +390,11 @@ public class UtilImpl implements Util {
 				s += predicateObjectMap.getObjectColumn();
 				s += predicateObjectMap.getDataType() != null ?  predicateObjectMap.getDataType().toString() : "null";
 				s += predicateObjectMap.getLanguage();
-				s += predicateObjectMap.getObjectTemplate().getText();
+				if (predicateObjectMap.getObjectTemplate() != null) {
+					s += predicateObjectMap.getObjectTemplate().getText();
+				} else {
+					s += predicateObjectMap.getObjectColumn();
+				}
 				
 				for (String predicate : predicateObjectMap.getPredicates()) {
 					s += predicate;

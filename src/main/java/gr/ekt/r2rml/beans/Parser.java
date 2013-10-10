@@ -614,6 +614,25 @@ public class Parser {
 				}
 		    	
 		    	SelectQuery selectQuery = new SelectQuery(query, properties);
+
+		    	//if the dump is incremental, add an order by to ensure results are retrieved in the same order
+		    	if (properties.containsKey("jena.storeOutputModelInDatabase")
+		    		&& properties.getProperty("jena.storeOutputModelInDatabase").contains("false")
+		    		&& properties.containsKey("default.incremental")
+		    		&& properties.getProperty("default.incremental").contains("true")) {
+		    		String q = selectQuery.getQuery();
+		    		if (q.toLowerCase().indexOf("order by") == -1) {
+		    			String fieldName = selectQuery.getFields().get(0).getName();
+		    			int as = fieldName.toLowerCase().indexOf(" as ");
+		    			if (as > -1) {
+		    				fieldName = fieldName.substring(0, as);
+			    			q += " order by " + fieldName;
+		    				selectQuery.setQuery(q);
+		    				log.info("Added ORDER BY to query that now is: " + q);
+		    			}
+		    		}
+		    	}
+		    	
 		    	logicalTableView.setSelectQuery(selectQuery);
 		    	results.add(logicalTableView);
 		    }
@@ -654,16 +673,18 @@ public class Parser {
 			}
 			result = result.substring(0, result.lastIndexOf(','));
 			rs.close();
+		
+			if (postgres) {
+				result += " FROM " + "\"" + tableName + "\"";
+			} else {
+				result += " FROM " + tableName;
+			}
+			result += " ORDER BY " + fields.get(0); //add order to ensure same order regardless the implementation
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		if (postgres) {
-			result += " FROM " + "\"" + tableName + "\"";
-		} else {
-			result += " FROM " + tableName;
-		}
 		log.info("Result is: " + result);
 		return result;
 	}
