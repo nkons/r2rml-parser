@@ -4,6 +4,8 @@ An R2RML implementation that can export relational database contents as RDF grap
 
 For more information, please [visit the wiki](https://github.com/nkons/r2rml-parser/wiki).
 
+Please send any feedback/questions by email to [nkons@live.com](mailto:nkons@live.com), or by direct message (dm) via twitter to [@nkonstantinou](https://twitter.com/nkonstantinou). We'll be happy to discuss how to export your data into RDF.
+
 ## Implementation details
 
 R2RML implementation written fully in Java 7, using Apache Jena 2.7, Spring 3.2, JUnit 4.8, and Maven 3.0. Tested against MySQL 5.6 and PostgreSQL 9.2.

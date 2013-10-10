@@ -551,11 +551,11 @@ public class Generator {
 							Calendar c1 = Calendar.getInstance();
 					        long t1 = c1.getTimeInMillis();
 					        log.info("Writing clean model to disk took " + (t1 - t0) + " milliseconds.");
-							mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Wrote clean model to disk.
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						}
 					}
+					mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Wrote clean model to disk.
 				} else {
 					log.info("Full run: Writing model to " + destinationFileName + ". Model has " + resultModel.listStatements().toList().size() + " statements.");
 					try {
