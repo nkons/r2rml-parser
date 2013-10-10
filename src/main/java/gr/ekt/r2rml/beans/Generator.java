@@ -514,25 +514,11 @@ public class Generator {
 		    logicalTableMapping.setTriples(triples);
 		    if (verbose) log.info("Generated " + triples.size() + " statements from table mapping <" + logicalTableMapping.getUri() + ">");
 	    }
+		mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //2 Generated jena model in memory
 		
 		if (!incremental || mappingsExecuted > 0) {
 			if (!storeOutputModelInDatabase) {
 
-				if (writeReifiedModel) {
-					
-					log.info("Writing reified model to " + reifiedModelFileName + ". Reified model has " + resultModel.listStatements().toList().size() + " statements.");
-					try {
-						Calendar c0 = Calendar.getInstance();
-				        long t0 = c0.getTimeInMillis();
-						resultModel.write(new FileOutputStream(reifiedModelFileName), properties.getProperty("jena.destinationFileSyntax"));
-						Calendar c1 = Calendar.getInstance();
-				        long t1 = c1.getTimeInMillis();
-				        log.info("Writing reified model to disk took " + (t1 - t0) + " milliseconds.");
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
-					}
-				}
-				
 				if ((!incremental && writeReifiedModel) || incremental) {
 					Model cleanModel = ModelFactory.createDefaultModel();
 					cleanModel.setNsPrefixes(resultModel.getNsPrefixMap());
@@ -565,6 +551,7 @@ public class Generator {
 							Calendar c1 = Calendar.getInstance();
 					        long t1 = c1.getTimeInMillis();
 					        log.info("Writing clean model to disk took " + (t1 - t0) + " milliseconds.");
+							mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Wrote clean model to disk.
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						}
@@ -578,6 +565,7 @@ public class Generator {
 						Calendar c1 = Calendar.getInstance();
 				        long t1 = c1.getTimeInMillis();
 				        log.info("Writing model to disk took " + (t1 - t0) + " milliseconds.");
+						mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Wrote clean model to disk
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
 					}
@@ -588,9 +576,27 @@ public class Generator {
 //					}
 //					stmtIter.close();
 				}
+				
+				if (writeReifiedModel) {
+					
+					log.info("Writing reified model to " + reifiedModelFileName + ". Reified model has " + resultModel.listStatements().toList().size() + " statements.");
+					try {
+						Calendar c0 = Calendar.getInstance();
+				        long t0 = c0.getTimeInMillis();
+						resultModel.write(new FileOutputStream(reifiedModelFileName), properties.getProperty("jena.destinationFileSyntax"));
+						Calendar c1 = Calendar.getInstance();
+				        long t1 = c1.getTimeInMillis();
+				        log.info("Writing reified model to disk took " + (t1 - t0) + " milliseconds.");
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+				}
+				
 			} else {
 				log.info("Writing model to database. Model has " + resultModel.listStatements().toList().size() + " statements.");
-				//SYNC START
+				Calendar c0 = Calendar.getInstance();
+		        long t0 = c0.getTimeInMillis();
+				//Sync start
 				//before writing the result, check the existing
 				Store store = db.jenaStore();
 			    Model existingDbModel = SDBFactory.connectDefaultModel(store);
@@ -623,9 +629,15 @@ public class Generator {
 				
 				existingDbModel.remove(statementsToRemove);
 				existingDbModel.add(statementsToAdd);
+				//Sync end
+				Calendar c1 = Calendar.getInstance();
+		        long t1 = c1.getTimeInMillis();
+		        log.info("Updating model in database took " + (t1 - t0) + " milliseconds.");
+		        mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Wrote clean model to database.
 			}
 		} else {
 			log.info("Skipping writing the output model. No changes detected.");
+	        mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Finished writing output model. No changes detected.
 		}
 		
 		//log the results
@@ -691,7 +703,7 @@ public class Generator {
 		Calendar c1 = Calendar.getInstance();
         long t1 = c1.getTimeInMillis();
         log.info("Logging took " + (t1 - t0) + " milliseconds.");
-        
+        mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Finished logging
 	}
 	
 	BaseDatatype findFieldDataType(String field, ResultSet rs) {

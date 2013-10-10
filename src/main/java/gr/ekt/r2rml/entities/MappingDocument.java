@@ -11,6 +11,7 @@
  */
 package gr.ekt.r2rml.entities;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ public class MappingDocument {
 	private LinkedList<LogicalTableView> logicalTableViews;
 	private LinkedList<LogicalTableMapping> logicalTableMappings;
 	private Map<String, String> prefixes;
+	private ArrayList<Long> timestamps = new ArrayList<Long>();
 	
 	/**
 	 * 
@@ -95,5 +97,13 @@ public class MappingDocument {
 	
 	public void setPrefixes(Map<String, String> prefixes) {
 		this.prefixes = prefixes;
+	}
+	
+	public ArrayList<Long> getTimestamps() {
+		return timestamps;
+	}
+
+	public void setTimestamps(ArrayList<Long> timestamps) {
+		this.timestamps = timestamps;
 	}
 }

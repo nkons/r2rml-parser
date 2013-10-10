@@ -24,6 +24,8 @@ public class Main {
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) {
+		Calendar c0 = Calendar.getInstance();
+        long t0 = c0.getTimeInMillis();
 		String appContextFile = "app-context.xml";
 		if (args.length > 0) {
 			File f = new File(args[0]);
@@ -36,12 +38,13 @@ public class Main {
 		} else {
 			log.info("Spring context file not provided, using app-context.xml");
 		}
-		Calendar c0 = Calendar.getInstance();
-        long t0 = c0.getTimeInMillis();
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(appContextFile);
 		
 		Parser parser = (Parser) context.getBean("parser");
 		MappingDocument mappingDocument = parser.parse();
+		
+		mappingDocument.getTimestamps().add(t0); //0 Started
+		mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //1 Finished parsing. Starting generating result model.
 		
 		Generator generator = (Generator) context.getBean("generator");
 		generator.setProperties(parser.getProperties());
@@ -53,6 +56,15 @@ public class Main {
 		context.close();
 		Calendar c1 = Calendar.getInstance();
         long t1 = c1.getTimeInMillis();
-        log.info("Finished in " + (t1 - t0) + " milliseconds.");
+        log.info("Finished in " + (t1 - t0) + " milliseconds. Done.");
+		mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //5
+
+		//output the result
+//        for (int i = 0; i < mappingDocument.getTimestamps().size(); i++) {
+//        	if (i > 1) {
+//        		System.out.println((mappingDocument.getTimestamps().get(i).longValue() - mappingDocument.getTimestamps().get(i - 1).longValue()));	
+//        	}
+//        }
+//        System.out.println("Parse. Generate in memory. Dump to disk/database. Log. - Alltogether: " + String.valueOf(mappingDocument.getTimestamps().get(5).longValue() - mappingDocument.getTimestamps().get(0).longValue()));
 	}
 }
