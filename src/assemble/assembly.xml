@@ -23,7 +23,7 @@
 	</fileSets>
 
 	<files>
-		<file>
+		<!-- <file>
 			<source>src/main/resources/app-context.xml</source>
 			<outputDirectory>.</outputDirectory>
 			<destName>app-context.xml</destName>
@@ -34,7 +34,7 @@
 			<outputDirectory>.</outputDirectory>
 			<destName>log4j.xml</destName>
 			<filtered>false</filtered>
-		</file>
+		</file> -->
 		<file>
 			<source>r2rml.properties</source>
 			<outputDirectory>.</outputDirectory>

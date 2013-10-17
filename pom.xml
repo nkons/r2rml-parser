@@ -15,13 +15,27 @@
 		<resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <excludes>
+                <!-- <excludes>
                     <exclude>**</exclude>
-                </excludes>
+                </excludes>-->
                 <filtering>false</filtering>
             </resource>
         </resources>
 		<plugins>
+			<plugin>
+				<!-- Build an executable JAR -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+						<addClasspath>true</addClasspath>
+						<classpathPrefix></classpathPrefix>
+						<mainClass>gr.ekt.r2rml.beans.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
 			<!-- overall project assembly -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -101,6 +115,11 @@
 			<artifactId>junit</artifactId>
 			<version>4.8.1</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.4</version>
 		</dependency>
 	</dependencies>
 
