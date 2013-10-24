@@ -10,8 +10,17 @@
 		</layout>
 	</appender>
 	
+	<appender name="fileAppender" class="org.apache.log4j.FileAppender">
+		<param name="file" value="status.log" />
+		<param name="append" value="false" />
+		<param name="threshold" value="debug" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %-5p [%c{1}] - %m%n" />
+		</layout>
+	</appender>
+    
 	<!-- Application Loggers -->
-	<logger name="gr.ekt.r2rml">
+	<logger name="gr.seab.r2rml">
 		<level value="debug" />
 	</logger>
 	
@@ -35,7 +44,8 @@
 	<!-- Root Logger -->
 	<root>
 		<priority value="warn" />
-		<appender-ref ref="console" />
+		<!-- <appender-ref ref="console" /> -->
+		<appender-ref ref="fileAppender" />
 	</root>
 	
 </log4j:configuration>

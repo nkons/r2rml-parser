@@ -9,14 +9,14 @@
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied.
  */
-package gr.ekt.r2rml.beans;
+package gr.seab.r2rml.beans;
 
-import gr.ekt.r2rml.entities.LogicalTableMapping;
-import gr.ekt.r2rml.entities.MappingDocument;
-import gr.ekt.r2rml.entities.PredicateObjectMap;
-import gr.ekt.r2rml.entities.Template;
-import gr.ekt.r2rml.entities.TermType;
-import gr.ekt.r2rml.entities.sql.SelectQuery;
+import gr.seab.r2rml.entities.LogicalTableMapping;
+import gr.seab.r2rml.entities.MappingDocument;
+import gr.seab.r2rml.entities.PredicateObjectMap;
+import gr.seab.r2rml.entities.Template;
+import gr.seab.r2rml.entities.TermType;
+import gr.seab.r2rml.entities.sql.SelectQuery;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -500,7 +500,10 @@ public class Generator {
 							}
 						}
 						tripleCount++;
-						if (tripleCount % 1000 == 0) log.info("At " + tripleCount + " triples");
+						if (tripleCount % 1000 == 0) {
+							log.info("At " + tripleCount + " triples");
+							System.out.println("At " + tripleCount + " triples");
+						}
 					}
 					
 					rs.close();

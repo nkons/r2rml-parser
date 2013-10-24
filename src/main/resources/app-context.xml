@@ -10,22 +10,22 @@
 
 	<description>Spring configuration.</description>
 
-	<!-- <context:component-scan base-package="gr.ekt.r2rml" /> -->
+	<!-- <context:component-scan base-package="gr.seab.r2rml" /> -->
 	
-	<bean id="util" class="gr.ekt.r2rml.beans.UtilImpl" />
+	<bean id="util" class="gr.seab.r2rml.beans.UtilImpl" />
 	
-	<bean id="db" class="gr.ekt.r2rml.beans.DatabaseImpl">
+	<bean id="db" class="gr.seab.r2rml.beans.DatabaseImpl">
 		<constructor-arg value="r2rml.properties" />
 		<property name="util" ref="util" />
 	</bean>
 	
-	<bean id="parser" class="gr.ekt.r2rml.beans.Parser">
+	<bean id="parser" class="gr.seab.r2rml.beans.Parser">
 		<constructor-arg value="r2rml.properties" />
 		<property name="db" ref="db" />
 		<property name="util" ref="util" />
 	</bean>
 	
-	<bean id="generator" class="gr.ekt.r2rml.beans.Generator">
+	<bean id="generator" class="gr.seab.r2rml.beans.Generator">
 		<property name="db" ref="db" />
 		<property name="util" ref="util" />
 	</bean>

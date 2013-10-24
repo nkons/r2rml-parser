@@ -11,7 +11,7 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="gr.ekt.r2rml">
+	<logger name="gr.seab.r2rml">
 		<level value="debug" />
 	</logger>
 	

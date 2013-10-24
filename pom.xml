@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>gr.ekt</groupId>
+	<groupId>gr.seab</groupId>
 	<artifactId>r2rml</artifactId>
 	<version>0.3</version>
 	<packaging>jar</packaging>
@@ -9,6 +9,7 @@
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>3.2.1.RELEASE</spring.framework.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<build>
@@ -26,12 +27,13 @@
 				<!-- Build an executable JAR -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
 				<configuration>
 					<archive>
 						<manifest>
 						<addClasspath>true</addClasspath>
 						<classpathPrefix></classpathPrefix>
-						<mainClass>gr.ekt.r2rml.beans.Main</mainClass>
+						<mainClass>gr.seab.r2rml.beans.Main</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -140,8 +142,8 @@
 			<name>Nikolaos Konstantinou</name>
 			<email>nkons at cn.ntua.gr</email>
 			<url>http://www.cn.ntua.gr/~nkons/</url>
-			<organization>National Technical University of Athens</organization>
-			<organizationUrl>http://www.ntua.gr</organizationUrl>
+			<organization>Hellenic Academic Libraries Link/National Technical University of Athens (HEAL-Link/NTUA)</organization>
+			<organizationUrl>http://www.seab.gr</organizationUrl>
 			<roles>
 				<role>committer</role>
 			</roles>
