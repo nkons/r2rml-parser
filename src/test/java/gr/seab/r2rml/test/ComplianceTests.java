@@ -9,13 +9,13 @@
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied.
  */
-package gr.ekt.r2rml.test;
+package gr.seab.r2rml.test;
 
-import gr.ekt.r2rml.beans.Generator;
-import gr.ekt.r2rml.beans.Parser;
-import gr.ekt.r2rml.beans.Util;
-import gr.ekt.r2rml.entities.MappingDocument;
-import gr.ekt.r2rml.entities.sparql.LocalResultSet;
+import gr.seab.r2rml.beans.Generator;
+import gr.seab.r2rml.beans.Parser;
+import gr.seab.r2rml.beans.Util;
+import gr.seab.r2rml.entities.MappingDocument;
+import gr.seab.r2rml.entities.sparql.LocalResultSet;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -158,7 +157,7 @@ public class ComplianceTests {
 			log.error("Error reading model.");
 			System.exit(0);
 		}
-		String query = "SELECT ?x WHERE {?x rdf:type foaf:Person} ";
+		String query = "SELECT ?x ?z WHERE {?x dc:source ?z} ";
 		LocalResultSet rs = util.sparql(model, query);
 		log.info("found " + String.valueOf(rs.getRows().size()));
 		
@@ -220,22 +219,6 @@ public class ComplianceTests {
 		return rowsAffected;
 	}
 	
-	private ResultSet query(String query) {
-		ResultSet result = null;
-
-		try {
-			if (connection == null)
-				openConnection();
-
-			java.sql.Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-			log.info("sql query: " + query);
-			result = statement.executeQuery(query);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
-
 	private String fileContents(String filePath) {
 		try {
 			FileInputStream fi = new FileInputStream(filePath);
