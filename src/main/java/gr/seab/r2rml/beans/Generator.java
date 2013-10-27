@@ -644,18 +644,28 @@ public class Generator {
 				log.info("Will remove " + statementsToRemove.size() + " statements.");
 				
 				//then add the new ones
-				int statementsToAddIter = 0;
-				StmtIterator stmtResultIter = resultModel.listStatements();
+				Model differenceModel = resultModel.difference(existingDbModel);
+				StmtIterator stmtResultIter = differenceModel.listStatements();
 				while (stmtResultIter.hasNext()) {
 					Statement stmt = stmtResultIter.nextStatement();
-					if (!existingDbModel.contains(stmt)) {
-						statementsToAdd.add(stmt);
-						statementsToAddIter++;
-					}
-					if (statementsToAddIter % 10000 == 0) log.info("At " + statementsToAddIter);
+					statementsToAdd.add(stmt);
 				}
 				stmtResultIter.close();
+				differenceModel.close();
 				log.info("Will add " + statementsToAdd.size() + " statements.");
+				
+//				int statementsToAddIter = 0;
+//				StmtIterator stmtResultIter = resultModel.listStatements();
+//				while (stmtResultIter.hasNext()) {
+//					Statement stmt = stmtResultIter.nextStatement();
+//					if (existingDbModel.isEmpty() || !existingDbModel.contains(stmt)) {
+//						statementsToAdd.add(stmt);
+//						statementsToAddIter++;
+//					}
+//					if (statementsToAddIter % 10000 == 0) log.info("At " + statementsToAddIter);
+//				}
+//				stmtResultIter.close();
+//				log.info("Will add " + statementsToAdd.size() + " statements.");
 				
 				existingDbModel.remove(statementsToRemove);
 				existingDbModel.add(statementsToAdd);
