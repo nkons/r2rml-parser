@@ -1,3 +1,3 @@
 @echo off
-echo This is R2RML Parser 0.3-alpha
-java -cp "./*;./lib/*;" gr.seab.r2rml.beans.Main %1
+echo This is R2RML Parser 0.4-alpha
+java -Xms128m -Xmx1024m -cp "./*;./lib/*;" gr.seab.r2rml.beans.Main %1

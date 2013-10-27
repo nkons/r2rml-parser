@@ -44,9 +44,9 @@ public class LogicalTableMapping {
 	private ArrayList<PredicateObjectMap> predicateObjectMaps = new ArrayList<PredicateObjectMap>();
 	
 	/**
-	 * TODO Hold the resulting triples
+	 * Hold the resulting subjects, needed when referenced by a parentTriplesMap
 	 */
-	private ArrayList<Statement> triples;
+	private ArrayList<String> subjects;
 	
 	/**
 	 * Default no-argument constructor
@@ -105,11 +105,11 @@ public class LogicalTableMapping {
 		this.view = view;
 	}
 	
-	public ArrayList<Statement> getTriples() {
-		return triples;
+	public ArrayList<String> getSubjects() {
+		return subjects;
 	}
 	
-	public void setTriples(ArrayList<Statement> triples) {
-		this.triples = triples;
+	public void setSubjects(ArrayList<String> subjects) {
+		this.subjects = subjects;
 	}
 }

@@ -18,10 +18,12 @@ import gr.seab.r2rml.entities.Template;
 import gr.seab.r2rml.entities.TermType;
 import gr.seab.r2rml.entities.sql.SelectQuery;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -29,10 +31,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,8 +126,8 @@ public class Generator {
 				//System.exit(0);
 			}
 			
-//			remove any old statements. Set instead of a List, to disallow duplicates
-			Set<Statement> statementsToRemove = new HashSet<Statement>();
+			//remove any old statements. Set instead of a List would disallow duplicates but perform worse
+			ArrayList<Statement> statementsToRemove = new ArrayList<Statement>();
 			StmtIterator stmtIter = resultModel.listStatements();
 			while (stmtIter.hasNext()) {
 				Statement stmt = stmtIter.next();
@@ -137,11 +137,11 @@ public class Generator {
 				}
 			}
 			stmtIter.close();
-			log.info("Removing " + statementsToRemove.size() + " old statements.");
-			resultModel.remove(statementsToRemove.toArray(new Statement[statementsToRemove.size()]));
+			resultModel.remove(statementsToRemove); //.toArray(new Statement[statementsToRemove.size()]));
+			log.info("Removed " + statementsToRemove.size() + " old statements.");
 		}
 		String databaseType = util.findDatabaseType(properties.getProperty("db.driver"));
-		
+
 		boolean executeAllMappings = false;
 		int mappingsExecuted = 0;
 		
@@ -168,7 +168,6 @@ public class Generator {
 					log.info("Destination file size was found " + actualFileSize + " bytes while it should be " + fileSizeInLogFile + " bytes. Forcing full mapping.");
 					executeAllMappings = true;
 				}
-
 				Statement stmt2 = r.getProperty(logModel.getProperty(logNs + "reifiedModelFileSize"));
 				Long reifiedModelFileSizeInLogFile = Long.valueOf(stmt2.getObject().toString());
 				Long actualReifiedModelFileSize = new Long(new File(reifiedModelFileName).length());
@@ -182,7 +181,7 @@ public class Generator {
 			}
 		}
 		
-		int tripleCount = 0;
+		int iterCount = 0;
 		for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
 			boolean executeMapping = true;
 			
@@ -220,13 +219,13 @@ public class Generator {
 				}
 			}
 			
-			ArrayList<Statement> triples = new ArrayList<Statement>();
+			ArrayList<String> subjects = new ArrayList<String>();
 			if (executeMapping) {
 				mappingsExecuted++;
 				
 				if (incremental) {
 					//Since we are executing the mapping again, we are removing old statements and their respective reifications
-					Set<ReifiedStatement> reificationsToRemove = new HashSet<ReifiedStatement>();
+					ArrayList<ReifiedStatement> reificationsToRemove = new ArrayList<ReifiedStatement>();
 					resultModel.listReifiedStatements();
 					RSIterator rsExistingIter = resultModel.listReifiedStatements();
 					while (rsExistingIter.hasNext()) {
@@ -245,7 +244,7 @@ public class Generator {
 					
 					//Remove the reified statement itself, i.e. [] a rdf:Statement ; rdf:subject ... ; rdf:predicate ; rdf:object ... ;
 					//but also remove the statements having this statement as a subject and dc:source as a property
-					Set<Statement> statementsToRemove = new HashSet<Statement>();
+					ArrayList<Statement> statementsToRemove = new ArrayList<Statement>();
 					for (ReifiedStatement rstmt : reificationsToRemove) {
 						statementsToRemove.add(rstmt.getRequiredProperty(DC.source));
 						//Also remove the statement itself
@@ -258,7 +257,7 @@ public class Generator {
 					
 					log.info("Removing " + statementsToRemove.size() + " old statements and " + reificationsToRemove.size() + " old reified statements from source " + logicalTableMapping.getUri() + ".");
 					//log.info("statementsToRemove are " + statementsToRemove.size() + " statements.");
-					resultModel.remove(statementsToRemove.toArray(new Statement[statementsToRemove.size()]));
+					resultModel.remove(statementsToRemove); //.toArray(new Statement[statementsToRemove.size()]));
 				}
 				
 				//Then insert the newly generated ones
@@ -291,7 +290,7 @@ public class Generator {
 									Resource o = resultModel.createResource(classUri);
 									Statement st = resultModel.createStatement(s, p, o);
 									if (verbose) log.info("Adding triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.getURI() + ">");
-									triples.add(st);
+									subjects.add(st.getSubject().getURI());
 									if (incremental || writeReifiedModel) {
 										ReifiedStatement rst = resultModel.createReifiedStatement(st);
 										rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
@@ -355,7 +354,7 @@ public class Generator {
 											
 											if (o != null) {
 												Statement st = resultModel.createStatement(s, p, o);
-												triples.add(st);
+												subjects.add(st.getSubject().getURI());
 												if (incremental || writeReifiedModel) {
 													ReifiedStatement rst = resultModel.createReifiedStatement(st);
 													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
@@ -370,7 +369,7 @@ public class Generator {
 												RDFNode o = resultModel.createResource(value);
 												if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
 												Statement st = resultModel.createStatement(s, p, o);
-												triples.add(st);
+												subjects.add(st.getSubject().getURI());
 												if (incremental || writeReifiedModel) {
 													ReifiedStatement rst = resultModel.createReifiedStatement(st);
 													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
@@ -385,7 +384,7 @@ public class Generator {
 												RDFNode o = resultModel.createResource(AnonId.create(value));
 												if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
 												Statement st = resultModel.createStatement(s, p, o);
-												triples.add(st);
+												subjects.add(st.getSubject().getURI());
 												if (incremental || writeReifiedModel) {
 													ReifiedStatement rst = resultModel.createReifiedStatement(st);
 													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
@@ -428,7 +427,7 @@ public class Generator {
 											}
 											
 											Statement st = resultModel.createStatement(s, p, o);
-											triples.add(st);
+											subjects.add(st.getSubject().getURI());
 											if (incremental || writeReifiedModel) {
 												ReifiedStatement rst = resultModel.createReifiedStatement(st);
 												rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
@@ -466,8 +465,8 @@ public class Generator {
 												String parentSubject = util.fillTemplate(parentTemplate, rsParent);
 												RDFNode o = resultModel.createResource(parentSubject);
 												Statement st = resultModel.createStatement(s, p, o);
-												if (verbose) log.info("Adding triple referring to a parent statement subjetct: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
-												triples.add(st);
+												if (verbose) log.info("Adding triple referring to a parent statement subject: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
+												subjects.add(st.getSubject().getURI());
 												if (incremental || writeReifiedModel) {
 													ReifiedStatement rst = resultModel.createReifiedStatement(st);
 													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
@@ -479,19 +478,19 @@ public class Generator {
 										} else {
 											if (verbose) log.info("Object URIs will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
 											LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
-											if (verbose) log.info("The logical table mapping with the uri " + l.getUri() + " has already generated "+ l.getTriples().size() + " triples.");
+											if (verbose) log.info("The logical table mapping with the uri " + l.getUri() + " has already generated "+ l.getSubjects().size() + " triples.");
 											
-											for (Statement existingStatement : l.getTriples()) {
-												String existingSubjectUri = existingStatement.asTriple().getSubject().getURI();
+											for (String existingStatementSubject : l.getSubjects()) {
+												String existingSubjectUri = existingStatementSubject;
 												RDFNode o = resultModel.createResource(existingSubjectUri);
 												Statement st = resultModel.createStatement(s, p, o);
-												if (verbose) log.info("Adding triple referring to an existing statement subjetct: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
-												triples.add(st);
+												if (verbose) log.info("Adding triple referring to an existing statement subject: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
+												subjects.add(st.getSubject().getURI());
 												if (incremental || writeReifiedModel) {
 													ReifiedStatement rst = resultModel.createReifiedStatement(st);
 													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
 												} else {
-													resultModel.add(st);													
+													resultModel.add(st);
 												}
 											}
 										}
@@ -499,10 +498,10 @@ public class Generator {
 								}
 							}
 						}
-						tripleCount++;
-						if (tripleCount % 1000 == 0) {
-							log.info("At " + tripleCount + " triples");
-							System.out.println("At " + tripleCount + " triples");
+						iterCount++;
+						if (iterCount % 10000 == 0) {
+							log.info("At " + iterCount);
+							//System.out.println("At " + iterCount);
 						}
 					}
 					
@@ -514,50 +513,69 @@ public class Generator {
 				log.info("Skipping triple generation from " + logicalTableMapping.getUri() + ". Nothing changed here.");
 			}
 			
-		    logicalTableMapping.setTriples(triples);
-		    if (verbose) log.info("Generated " + triples.size() + " statements from table mapping <" + logicalTableMapping.getUri() + ">");
+		    logicalTableMapping.setSubjects(subjects);
+		    if (verbose) log.info("Generated " + subjects.size() + " statements from table mapping <" + logicalTableMapping.getUri() + ">");
 	    }
 		mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //2 Generated jena model in memory
-		//log.info("2 Generated jena model in memory");
+		log.info("Finished generating jena model in memory.");
 		
 		if (!incremental || mappingsExecuted > 0) {
 			if (!storeOutputModelInDatabase) {
 
 				if ((!incremental && writeReifiedModel) || incremental) {
+					log.info("Generating clean model.");
 					Model cleanModel = ModelFactory.createDefaultModel();
+					//TODO disable reasoning/rules on cleanModel
 					cleanModel.setNsPrefixes(resultModel.getNsPrefixMap());
+					ArrayList<Statement> cleanStatements = new ArrayList<Statement>();
 					
 					RSIterator rsIter = resultModel.listReifiedStatements();
+					long addedStatements = 0;
 					while (rsIter.hasNext()) {
 						ReifiedStatement rstmt = rsIter.next();
 						Statement st = rstmt.getStatement();
-						cleanModel.add(st);
+						//cleanModel.add(st);
+						cleanStatements.add(st);
+						addedStatements++;
+						if (addedStatements % 10000 == 0) log.info("At " + addedStatements);
 					}
 					rsIter.close();
 					
 					//If no reified statements were found, try actual statements
-					if (!cleanModel.listStatements().hasNext()) {
+					//if (!cleanModel.listStatements().hasNext()) {
+					if (addedStatements == 0) {
+						log.info("No reified statements were found, business as usual.");
 						StmtIterator stmtIter = resultModel.listStatements();
 						while (stmtIter.hasNext()) {
 							Statement st = stmtIter.nextStatement();
-							cleanModel.add(st);
+							cleanStatements.add(st);
+							//cleanModel.add(st);
+							addedStatements++;
+							if (addedStatements % 10000 == 0) log.info("At " + addedStatements);
 						}
 						stmtIter.close();
 					}
+					log.info("Adding " + cleanStatements.size() + " statements to clean model.");
+					cleanModel.add(cleanStatements);
+					cleanStatements.clear(); //free some memory
 					log.info("Writing clean model to " + destinationFileName + ". Clean model has " + cleanModel.listStatements().toList().size() + " statements.");
 					
 					//Could as well be an empty model, this is why we check if it actually has any triples
-					if (cleanModel.listStatements().hasNext()) {
+					//if (cleanModel.listStatements().hasNext()) {
+					if (!cleanModel.isEmpty()) {
 						try {
 							Calendar c0 = Calendar.getInstance();
 					        long t0 = c0.getTimeInMillis();
-							cleanModel.write(new FileOutputStream(destinationFileName), properties.getProperty("jena.destinationFileSyntax"));
+							cleanModel.write(new BufferedWriter(new PrintWriter(new FileOutputStream(destinationFileName))), properties.getProperty("jena.destinationFileSyntax"));
 							Calendar c1 = Calendar.getInstance();
 					        long t1 = c1.getTimeInMillis();
 					        log.info("Writing clean model to disk took " + (t1 - t0) + " milliseconds.");
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						}
+						cleanModel.close();
+					} else {
+						log.info("Nothing to write.");
 					}
 					mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Wrote clean model to disk.
 					//log.info("3 Wrote clean model to disk.");
@@ -566,7 +584,7 @@ public class Generator {
 					try {
 						Calendar c0 = Calendar.getInstance();
 				        long t0 = c0.getTimeInMillis();
-						resultModel.write(new FileOutputStream(destinationFileName), properties.getProperty("jena.destinationFileSyntax"));
+						resultModel.write(new BufferedWriter(new PrintWriter(new FileOutputStream(destinationFileName))), properties.getProperty("jena.destinationFileSyntax"));
 						Calendar c1 = Calendar.getInstance();
 				        long t1 = c1.getTimeInMillis();
 				        log.info("Writing model to disk took " + (t1 - t0) + " milliseconds.");
@@ -585,17 +603,20 @@ public class Generator {
 				
 				if (writeReifiedModel) {
 					
-					log.info("Writing reified model to " + reifiedModelFileName + ". Reified model has " + resultModel.listStatements().toList().size() + " statements.");
+					log.info("Writing reified model to " + reifiedModelFileName + ".");
+					log.info("Reified model has " + resultModel.listStatements().toList().size() + " statements.");
 					try {
 						Calendar c0 = Calendar.getInstance();
 				        long t0 = c0.getTimeInMillis();
-						resultModel.write(new FileOutputStream(reifiedModelFileName), properties.getProperty("jena.destinationFileSyntax"));
+						resultModel.write(new BufferedWriter(new PrintWriter(new FileOutputStream(reifiedModelFileName))), properties.getProperty("jena.destinationFileSyntax"));
 						Calendar c1 = Calendar.getInstance();
 				        long t1 = c1.getTimeInMillis();
 				        log.info("Writing reified model to disk took " + (t1 - t0) + " milliseconds.");
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
 					}
+				} else {
+					log.info("Not Writing reified model.");
 				}
 				
 			} else {
@@ -647,6 +668,7 @@ public class Generator {
 	        mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Finished writing output model. No changes detected.
 	        //log.info("3 Finished writing output model. No changes detected.");
 		}
+		resultModel.close();
 		
 		//log the results
 		Calendar c0 = Calendar.getInstance();
@@ -665,46 +687,48 @@ public class Generator {
 			Literal oFileSize = logModel.createLiteral(String.valueOf(fileSize));
 			logModel.add(logModel.createResource(logNs + "destinationFile"), pFileSize, oFileSize);
 
-			if (verbose) log.info("Logging reified model file size");
-			Property pReifiedModelFileSize = logModel.createProperty(logNs + "reifiedModelFileSize");
-			long reifiedModelfileSize = new File(reifiedModelFileName).length();
-			Literal oReifiedModelFileSize = logModel.createLiteral(String.valueOf(reifiedModelfileSize));
-			logModel.add(logModel.createResource(logNs + "destinationFile"), pReifiedModelFileSize, oReifiedModelFileSize);
-			
-			//run on the table mappings
-			for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
-				Resource s = logModel.createResource(logicalTableMapping.getUri());
+			if (incremental) {
+				if (verbose) log.info("Logging reified model file size");
+				Property pReifiedModelFileSize = logModel.createProperty(logNs + "reifiedModelFileSize");
+				long reifiedModelfileSize = new File(reifiedModelFileName).length();
+				Literal oReifiedModelFileSize = logModel.createLiteral(String.valueOf(reifiedModelfileSize));
+				logModel.add(logModel.createResource(logNs + "destinationFile"), pReifiedModelFileSize, oReifiedModelFileSize);
 				
-				if (verbose) log.info("Logging selectQueryHash");
-				Property pSelectQueryHash = logModel.createProperty(logNs + "selectQueryHash");
-				String selectQuery = logicalTableMapping.getView().getSelectQuery().getQuery();
-				Literal oSelectQueryHash = logModel.createLiteral(String.valueOf(util.md5(selectQuery)));
-				logModel.add(s, pSelectQueryHash, oSelectQueryHash);
-				
-				if (verbose) log.info("Logging logicalTableMappingHash");
-				Property pLogicalTableMappingHash = logModel.createProperty(logNs + "logicalTableMappingHash");
-				String logicalTableMappingHash = util.md5(logicalTableMapping);
-				Literal oLogicalTableMappingHash = logModel.createLiteral(String.valueOf(logicalTableMappingHash));
-				logModel.add(s, pLogicalTableMappingHash, oLogicalTableMappingHash);
-				
-				if (verbose) log.info("Logging selectQueryResultsHash");
-				Property pSelectQueryResultsHash = logModel.createProperty(logNs + "selectQueryResultsHash");
-				ResultSet rsSelectQueryResultsHash = db.query(logicalTableMapping.getView().getSelectQuery().getQuery());
-				Literal oSelectQueryResultsHash = logModel.createLiteral(String.valueOf(util.md5(rsSelectQueryResultsHash)));
-				logModel.add(s, pSelectQueryResultsHash, oSelectQueryResultsHash);
-				
-//				if (verbose) log.info("Logging tripleCount");
-//				Property pTripleCount = logModel.createProperty(logNs + "tripleCount");
-//				Literal oTripleCount = logModel.createLiteral(String.valueOf(logicalTableMapping.getTriples().size()));
-//				logModel.add(s, pTripleCount, oTripleCount);
-				
-				if (verbose) log.info("Logging timestamp");
-				Property pTimestamp = logModel.createProperty(logNs + "timestamp");
-				Literal oTimestamp = logModel.createLiteral(String.valueOf(new Date()));
-				logModel.add(s, pTimestamp, oTimestamp);
+				//run on the table mappings
+				for (LogicalTableMapping logicalTableMapping : mappingDocument.getLogicalTableMappings()) {
+					Resource s = logModel.createResource(logicalTableMapping.getUri());
+					
+					if (verbose) log.info("Logging selectQueryHash");
+					Property pSelectQueryHash = logModel.createProperty(logNs + "selectQueryHash");
+					String selectQuery = logicalTableMapping.getView().getSelectQuery().getQuery();
+					Literal oSelectQueryHash = logModel.createLiteral(String.valueOf(util.md5(selectQuery)));
+					logModel.add(s, pSelectQueryHash, oSelectQueryHash);
+					
+					if (verbose) log.info("Logging logicalTableMappingHash");
+					Property pLogicalTableMappingHash = logModel.createProperty(logNs + "logicalTableMappingHash");
+					String logicalTableMappingHash = util.md5(logicalTableMapping);
+					Literal oLogicalTableMappingHash = logModel.createLiteral(String.valueOf(logicalTableMappingHash));
+					logModel.add(s, pLogicalTableMappingHash, oLogicalTableMappingHash);
+					
+					if (verbose) log.info("Logging selectQueryResultsHash");
+					Property pSelectQueryResultsHash = logModel.createProperty(logNs + "selectQueryResultsHash");
+					ResultSet rsSelectQueryResultsHash = db.query(logicalTableMapping.getView().getSelectQuery().getQuery());
+					Literal oSelectQueryResultsHash = logModel.createLiteral(String.valueOf(util.md5(rsSelectQueryResultsHash)));
+					logModel.add(s, pSelectQueryResultsHash, oSelectQueryResultsHash);
+					
+//					if (verbose) log.info("Logging tripleCount");
+//					Property pTripleCount = logModel.createProperty(logNs + "tripleCount");
+//					Literal oTripleCount = logModel.createLiteral(String.valueOf(logicalTableMapping.getTriples().size()));
+//					logModel.add(s, pTripleCount, oTripleCount);
+				}
 			}
+
+			if (verbose) log.info("Logging timestamp");
+			Property pTimestamp = logModel.createProperty(logNs + "timestamp");
+			Literal oTimestamp = logModel.createLiteral(String.valueOf(new Date()));
+			logModel.add(logModel.createResource(logNs + "destinationFile"), pTimestamp, oTimestamp);
 			
-			logModel.write(new FileOutputStream(properties.getProperty("default.log")), properties.getProperty("mapping.file.type"));
+			logModel.write(new BufferedWriter(new PrintWriter(new FileOutputStream(properties.getProperty("default.log")))), properties.getProperty("mapping.file.type"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
