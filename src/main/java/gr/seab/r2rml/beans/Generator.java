@@ -644,12 +644,15 @@ public class Generator {
 				log.info("Will remove " + statementsToRemove.size() + " statements.");
 				
 				//then add the new ones
+				int statementsToAddIter = 0;
 				StmtIterator stmtResultIter = resultModel.listStatements();
 				while (stmtResultIter.hasNext()) {
 					Statement stmt = stmtResultIter.nextStatement();
 					if (!existingDbModel.contains(stmt)) {
 						statementsToAdd.add(stmt);
+						statementsToAddIter++;
 					}
+					if (statementsToAddIter % 10000 == 0) log.info("At " + statementsToAddIter);
 				}
 				stmtResultIter.close();
 				log.info("Will add " + statementsToAdd.size() + " statements.");
