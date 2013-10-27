@@ -61,12 +61,15 @@ public class Main {
 		//log.info("5 Finished.");
 
 		//output the result
-//        for (int i = 0; i < mappingDocument.getTimestamps().size(); i++) {
-//        	if (i > 0) {
-//        		System.out.println((mappingDocument.getTimestamps().get(i).longValue() - mappingDocument.getTimestamps().get(i - 1).longValue()));	
-//        	}
-//        }
-//        System.out.println("Parse. Generate in memory. Dump to disk/database. Log. - Alltogether: " + String.valueOf(mappingDocument.getTimestamps().get(5).longValue() - mappingDocument.getTimestamps().get(0).longValue()));
+        for (int i = 0; i < mappingDocument.getTimestamps().size(); i++) {
+        	if (i > 0) {
+        		long l = (mappingDocument.getTimestamps().get(i).longValue() - mappingDocument.getTimestamps().get(i - 1).longValue());
+        		//System.out.println(l);
+        		log.info(String.valueOf(l));
+        	}
+        }
+        log.info("Parse. Generate in memory. Dump to disk/database. Log. - Alltogether in " + String.valueOf(mappingDocument.getTimestamps().get(5).longValue() - mappingDocument.getTimestamps().get(0).longValue()) + " msec.");
+        log.info("Done.");
         System.out.println("Done.");
 	}
 }
