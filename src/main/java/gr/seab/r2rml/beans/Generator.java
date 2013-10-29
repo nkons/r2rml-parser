@@ -577,7 +577,7 @@ public class Generator {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-						log.info("Clean model has " + cleanModel.listStatements().toList().size() + " statements.");
+						log.info("Clean model has " + cleanModel.size() + " statements.");
 						cleanModel.close();
 					} else {
 						log.info("Nothing to write.");
@@ -585,7 +585,7 @@ public class Generator {
 					mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Wrote clean model to disk.
 					//log.info("3 Wrote clean model to disk.");
 				} else {
-					log.info("Full run: Writing model to " + destinationFileName + ". Model has " + resultModel.listStatements().toList().size() + " statements.");
+					log.info("Full run: Writing model to " + destinationFileName + ". Model has " + resultModel.size() + " statements.");
 					try {
 						Calendar c0 = Calendar.getInstance();
 				        long t0 = c0.getTimeInMillis();
@@ -626,13 +626,13 @@ public class Generator {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					log.info("Reified model has " + resultModel.listStatements().toList().size() + " statements.");
+					log.info("Reified model has " + resultModel.size() + " statements.");
 				} else {
 					log.info("Not Writing reified model.");
 				}
 				
 			} else {
-				log.info("Writing model to database. Model has " + resultModel.listStatements().toList().size() + " statements.");
+				log.info("Writing model to database. Model has " + resultModel.size() + " statements.");
 				Calendar c0 = Calendar.getInstance();
 		        long t0 = c0.getTimeInMillis();
 				//Sync start
