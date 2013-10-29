@@ -21,9 +21,9 @@ import gr.seab.r2rml.entities.sql.SelectQuery;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -533,11 +533,11 @@ public class Generator {
 					long addedStatements = 0;
 					while (rsIter.hasNext()) {
 						ReifiedStatement rstmt = rsIter.next();
-						Statement st = rstmt.getStatement();
+						//Statement st = rstmt.getStatement();
 						//cleanModel.add(st);
-						cleanStatements.add(st);
+						cleanStatements.add(rstmt.getStatement());
 						addedStatements++;
-						if (addedStatements % 10000 == 0) log.info("At " + addedStatements);
+						if (verbose && addedStatements % 10000 == 0) log.info("At " + addedStatements);
 					}
 					rsIter.close();
 					
@@ -551,7 +551,7 @@ public class Generator {
 							cleanStatements.add(st);
 							//cleanModel.add(st);
 							addedStatements++;
-							if (addedStatements % 10000 == 0) log.info("At " + addedStatements);
+							if (verbose && addedStatements % 10000 == 0) log.info("At " + addedStatements);
 						}
 						stmtIter.close();
 					}
@@ -566,11 +566,15 @@ public class Generator {
 						try {
 							Calendar c0 = Calendar.getInstance();
 					        long t0 = c0.getTimeInMillis();
-							cleanModel.write(new BufferedWriter(new PrintWriter(new FileOutputStream(destinationFileName))), properties.getProperty("jena.destinationFileSyntax"));
+					        BufferedWriter out = new BufferedWriter(new FileWriter(destinationFileName));
+					        cleanModel.write(out, properties.getProperty("jena.destinationFileSyntax"));
+					        out.flush();
 							Calendar c1 = Calendar.getInstance();
 					        long t1 = c1.getTimeInMillis();
 					        log.info("Writing clean model to disk took " + (t1 - t0) + " milliseconds.");
 						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
 							e.printStackTrace();
 						}
 						cleanModel.close();
@@ -584,13 +588,17 @@ public class Generator {
 					try {
 						Calendar c0 = Calendar.getInstance();
 				        long t0 = c0.getTimeInMillis();
-						resultModel.write(new BufferedWriter(new PrintWriter(new FileOutputStream(destinationFileName))), properties.getProperty("jena.destinationFileSyntax"));
+				        BufferedWriter out = new BufferedWriter(new FileWriter(destinationFileName));
+						resultModel.write(out, properties.getProperty("jena.destinationFileSyntax"));
+						out.flush();
 						Calendar c1 = Calendar.getInstance();
 				        long t1 = c1.getTimeInMillis();
 				        log.info("Writing model to disk took " + (t1 - t0) + " milliseconds.");
 						mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Wrote clean model to disk
 						//log.info("3 Wrote clean model to disk");
 					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
 						e.printStackTrace();
 					}
 //					StmtIterator stmtIter = resultModel.listStatements();
@@ -608,11 +616,15 @@ public class Generator {
 					try {
 						Calendar c0 = Calendar.getInstance();
 				        long t0 = c0.getTimeInMillis();
-						resultModel.write(new BufferedWriter(new PrintWriter(new FileOutputStream(reifiedModelFileName))), properties.getProperty("jena.destinationFileSyntax"));
-						Calendar c1 = Calendar.getInstance();
+				        BufferedWriter out = new BufferedWriter(new FileWriter(reifiedModelFileName));
+				        resultModel.write(out, properties.getProperty("jena.destinationFileSyntax"));
+				        out.flush();
+				        Calendar c1 = Calendar.getInstance();
 				        long t1 = c1.getTimeInMillis();
 				        log.info("Writing reified model to disk took " + (t1 - t0) + " milliseconds.");
 					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
 						e.printStackTrace();
 					}
 				} else {
@@ -645,12 +657,12 @@ public class Generator {
 				
 				//then add the new ones
 				Model differenceModel = resultModel.difference(existingDbModel);
-				StmtIterator stmtResultIter = differenceModel.listStatements();
-				while (stmtResultIter.hasNext()) {
-					Statement stmt = stmtResultIter.nextStatement();
+				StmtIterator stmtDiffIter = differenceModel.listStatements();
+				while (stmtDiffIter.hasNext()) {
+					Statement stmt = stmtDiffIter.nextStatement();
 					statementsToAdd.add(stmt);
 				}
-				stmtResultIter.close();
+				stmtDiffIter.close();
 				differenceModel.close();
 				log.info("Will add " + statementsToAdd.size() + " statements.");
 				
@@ -741,8 +753,12 @@ public class Generator {
 			Literal oTimestamp = logModel.createLiteral(String.valueOf(new Date()));
 			logModel.add(logModel.createResource(logNs + "destinationFile"), pTimestamp, oTimestamp);
 			
-			logModel.write(new BufferedWriter(new PrintWriter(new FileOutputStream(properties.getProperty("default.log")))), properties.getProperty("mapping.file.type"));
+			BufferedWriter out = new BufferedWriter(new FileWriter(properties.getProperty("default.log")));
+			logModel.write(out, properties.getProperty("mapping.file.type"));
+			out.flush();
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		Calendar c1 = Calendar.getInstance();
