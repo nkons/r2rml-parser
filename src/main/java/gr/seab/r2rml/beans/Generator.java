@@ -105,7 +105,7 @@ public class Generator {
 			InputStream isMap = FileManager.get().open(reifiedModelFileName);
 			resultModel = ModelFactory.createDefaultModel();
 			try {
-				resultModel.read(isMap, null, properties.getProperty("jena.destinationFileSyntax"));
+				resultModel.read(isMap, null, "N-TRIPLE");
 			} catch (Exception e) {
 				log.error("Error reading last run model. Cannot proceed with incremental, going for a full run."); // Please change property default.incremental in file r2rml.properties to false.
 				resultModel.setNsPrefixes(mappingDocument.getPrefixes());
@@ -525,17 +525,16 @@ public class Generator {
 				if ((!incremental && writeReifiedModel) || incremental) {
 					log.info("Generating clean model.");
 					Model cleanModel = ModelFactory.createDefaultModel();
-					//TODO disable reasoning/rules on cleanModel
 					cleanModel.setNsPrefixes(resultModel.getNsPrefixMap());
-					ArrayList<Statement> cleanStatements = new ArrayList<Statement>();
+					//ArrayList<Statement> cleanStatements = new ArrayList<Statement>();
 					
 					RSIterator rsIter = resultModel.listReifiedStatements();
 					long addedStatements = 0;
 					while (rsIter.hasNext()) {
 						ReifiedStatement rstmt = rsIter.next();
 						//Statement st = rstmt.getStatement();
-						//cleanModel.add(st);
-						cleanStatements.add(rstmt.getStatement());
+						cleanModel.add(rstmt.getStatement());
+						//cleanStatements.add(rstmt.getStatement());
 						addedStatements++;
 						if (verbose && addedStatements % 10000 == 0) log.info("At " + addedStatements);
 					}
@@ -548,17 +547,18 @@ public class Generator {
 						StmtIterator stmtIter = resultModel.listStatements();
 						while (stmtIter.hasNext()) {
 							Statement st = stmtIter.nextStatement();
-							cleanStatements.add(st);
-							//cleanModel.add(st);
+							//cleanStatements.add(st);
+							cleanModel.add(st);
 							addedStatements++;
 							if (verbose && addedStatements % 10000 == 0) log.info("At " + addedStatements);
 						}
 						stmtIter.close();
 					}
-					log.info("Adding " + cleanStatements.size() + " statements to clean model.");
-					cleanModel.add(cleanStatements);
-					cleanStatements.clear(); //free some memory
-					log.info("Writing clean model to " + destinationFileName + ". Clean model has " + cleanModel.listStatements().toList().size() + " statements.");
+					//log.info("Adding " + cleanStatements.size() + " statements to clean model.");
+					//cleanModel.add(cleanStatements);
+					//cleanStatements.clear(); //free some memory
+					log.info("Writing clean model to " + destinationFileName);
+					//log.info("Clean model has " + cleanModel.listStatements().toList().size() + " statements.");
 					
 					//Could as well be an empty model, this is why we check if it actually has any triples
 					//if (cleanModel.listStatements().hasNext()) {
@@ -568,7 +568,7 @@ public class Generator {
 					        long t0 = c0.getTimeInMillis();
 					        BufferedWriter out = new BufferedWriter(new FileWriter(destinationFileName));
 					        cleanModel.write(out, properties.getProperty("jena.destinationFileSyntax"));
-					        out.flush();
+					        out.close();
 							Calendar c1 = Calendar.getInstance();
 					        long t1 = c1.getTimeInMillis();
 					        log.info("Writing clean model to disk took " + (t1 - t0) + " milliseconds.");
@@ -577,6 +577,7 @@ public class Generator {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
+						log.info("Clean model has " + cleanModel.listStatements().toList().size() + " statements.");
 						cleanModel.close();
 					} else {
 						log.info("Nothing to write.");
@@ -590,7 +591,7 @@ public class Generator {
 				        long t0 = c0.getTimeInMillis();
 				        BufferedWriter out = new BufferedWriter(new FileWriter(destinationFileName));
 						resultModel.write(out, properties.getProperty("jena.destinationFileSyntax"));
-						out.flush();
+						out.close();
 						Calendar c1 = Calendar.getInstance();
 				        long t1 = c1.getTimeInMillis();
 				        log.info("Writing model to disk took " + (t1 - t0) + " milliseconds.");
@@ -610,15 +611,13 @@ public class Generator {
 				}
 				
 				if (writeReifiedModel) {
-					
 					log.info("Writing reified model to " + reifiedModelFileName + ".");
-					log.info("Reified model has " + resultModel.listStatements().toList().size() + " statements.");
 					try {
 						Calendar c0 = Calendar.getInstance();
 				        long t0 = c0.getTimeInMillis();
 				        BufferedWriter out = new BufferedWriter(new FileWriter(reifiedModelFileName));
-				        resultModel.write(out, properties.getProperty("jena.destinationFileSyntax"));
-				        out.flush();
+				        resultModel.write(out, "N-TRIPLE"); //properties.getProperty("jena.destinationFileSyntax"));
+				        out.close();
 				        Calendar c1 = Calendar.getInstance();
 				        long t1 = c1.getTimeInMillis();
 				        log.info("Writing reified model to disk took " + (t1 - t0) + " milliseconds.");
@@ -627,6 +626,7 @@ public class Generator {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+					log.info("Reified model has " + resultModel.listStatements().toList().size() + " statements.");
 				} else {
 					log.info("Not Writing reified model.");
 				}
@@ -755,7 +755,7 @@ public class Generator {
 			
 			BufferedWriter out = new BufferedWriter(new FileWriter(properties.getProperty("default.log")));
 			logModel.write(out, properties.getProperty("mapping.file.type"));
-			out.flush();
+			out.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
