@@ -289,7 +289,7 @@ map:dc-format-medium
 #map:dc-format-mimetype
 
 map:dc-identifier
-    rr:logicalTable <#dc-identifier-uri-view>;
+    rr:logicalTable <#dc-identifier-view>;
     rr:subjectMap [
         rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];

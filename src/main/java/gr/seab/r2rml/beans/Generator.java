@@ -107,6 +107,7 @@ public class Generator {
 			try {
 				resultModel.read(isMap, null, "N-TRIPLE");
 			} catch (Exception e) {
+				log.error(e.toString());
 				log.error("Error reading last run model. Cannot proceed with incremental, going for a full run."); // Please change property default.incremental in file r2rml.properties to false.
 				resultModel.setNsPrefixes(mappingDocument.getPrefixes());
 				incremental = false;
@@ -120,6 +121,7 @@ public class Generator {
 				logModel.read(isMapLog, properties.getProperty("default.namespace"), properties.getProperty("mapping.file.type"));
 				if (incremental) log.info("Going to dump incrementally, based on log file " + properties.getProperty("default.log"));
 			} catch (Exception e) {
+				log.error(e.toString());
 				log.error("Error reading log. Cannot proceed with incremental, going for a full run."); //Please change property default.incremental in file r2rml.properties to false.
 				incremental = false;
 				writeReifiedModel = true;
@@ -155,6 +157,7 @@ public class Generator {
 				}
 				rsIter.close();
 			} catch (Exception e) {
+				log.error(e.toString());
 				log.error("Error trying to read destination file. Forcing full mapping.");
 				executeAllMappings = true;
 			}
@@ -176,6 +179,7 @@ public class Generator {
 					executeAllMappings = true;
 				}
 			} catch (Exception e) {
+				log.error(e.toString());
 				log.error("Error trying to read log file. Forcing full mapping.");
 				executeAllMappings = true;
 			}
@@ -406,7 +410,7 @@ public class Generator {
 											BaseDatatype xsdDataType = findFieldDataType(field, rs);
 											predicateObjectMap.setDataType(xsdDataType);
 										} catch (Exception e) {
-											log.error(e.getMessage());
+											log.error(e.toString());
 										}
 										
 										if (test != null) {
@@ -712,7 +716,7 @@ public class Generator {
 			Literal oFileSize = logModel.createLiteral(String.valueOf(fileSize));
 			logModel.add(logModel.createResource(logNs + "destinationFile"), pFileSize, oFileSize);
 
-			if (incremental) {
+			if (writeReifiedModel) {
 				if (verbose) log.info("Logging reified model file size");
 				Property pReifiedModelFileSize = logModel.createProperty(logNs + "reifiedModelFileSize");
 				long reifiedModelfileSize = new File(reifiedModelFileName).length();
