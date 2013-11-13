@@ -636,7 +636,7 @@ public class Generator {
 				}
 				
 			} else {
-				log.info("Writing model to database. Model has " + resultModel.size() + " statements.");
+				log.info("Storing model to database. Model has " + resultModel.size() + " statements.");
 				Calendar c0 = Calendar.getInstance();
 		        long t0 = c0.getTimeInMillis();
 				//Sync start
