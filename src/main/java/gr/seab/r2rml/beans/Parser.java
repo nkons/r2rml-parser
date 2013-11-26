@@ -41,6 +41,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.datatypes.BaseDatatype;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.ReadWrite;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
@@ -48,7 +50,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.sdb.SDBFactory;
+import com.hp.hpl.jena.tdb.TDBFactory;
 import com.hp.hpl.jena.util.FileManager;
 
 /**
@@ -616,8 +618,8 @@ public class Parser {
 		    	SelectQuery selectQuery = new SelectQuery(query, properties);
 
 		    	//if the dump is incremental, add an order by to ensure results are retrieved in the same order
-		    	if (properties.containsKey("jena.storeOutputModelInDatabase")
-		    		&& properties.getProperty("jena.storeOutputModelInDatabase").contains("false")
+		    	if (properties.containsKey("jena.jena.storeOutputModelUsingTdb")
+		    		&& properties.getProperty("jena.jena.storeOutputModelUsingTdb").contains("false")
 		    		&& properties.containsKey("default.incremental")
 		    		&& properties.getProperty("default.incremental").contains("true")) {
 		    		String q = selectQuery.getQuery();
@@ -694,11 +696,6 @@ public class Parser {
 		
 		//test source database
 		db.openConnection();
-				
-		//test destination database
-		if (properties.containsKey("jena.storeOutputModelInDatabase") && properties.getProperty("jena.storeOutputModelInDatabase").contains("true")) {
-			db.openJenaConnection();
-		}
 		
 		this.baseNs = properties.getProperty("default.namespace");
 		String mappingFilename = properties.getProperty("mapping.file");
@@ -722,38 +719,36 @@ public class Parser {
 		}
 		//resultBaseModel.write(System.out, properties.getProperty("input.model.type"));
 		
-		String storeInDatabase = properties.getProperty("jena.storeOutputModelInDatabase");
-		String cleanDbOnStartup = properties.getProperty("jena.cleanDbOnStartup");
+		String storeInTdb = properties.getProperty("jena.storeOutputModelUsingTdb");
+		String cleanTdbOnStartup = properties.getProperty("jena.cleanTdbOnStartup");
 		
 		verbose =  properties.containsKey("default.verbose") && properties.getProperty("default.verbose").contains("true");
 			
 		log.info("Initialising Parser");
 		
-		if (Boolean.valueOf(storeInDatabase)) {
-			if (Boolean.valueOf(cleanDbOnStartup)) {
-				db.jenaStore().getTableFormatter().create();
+		if (Boolean.valueOf(storeInTdb)) {
+			if (Boolean.valueOf(cleanTdbOnStartup)) {
+				Dataset dataset = TDBFactory.createDataset(properties.getProperty("jena.tdb.directory"));
+				dataset.begin(ReadWrite.WRITE);
+					Model m = dataset.getDefaultModel();
+					m.removeAll();
+					dataset.commit();
+				dataset.end();
 			}
 
-			Model resultDbModel = SDBFactory.connectDefaultModel(db.jenaStore());
-		    
+			Dataset dataset = TDBFactory.createDataset(properties.getProperty("jena.tdb.directory"));
+			dataset.begin(ReadWrite.READ);
+				Model resultDbModel = dataset.getDefaultModel();
+			dataset.end();
+			
 		    if (StringUtils.isNotBlank(inputModelFileName)) {
 				InputStream isRes = FileManager.get().open(inputModelFileName);
 				resultDbModel.read(isRes, baseNs, properties.getProperty("input.model.type"));
 		    }
-		    log.info("Store size is " + db.jenaStore().getSize());
-//			    if (store.getSize() > 0) {
-//				    StmtIterator sIter = resultDbModel.listStatements();
-//				    for ( ; sIter.hasNext() ; ) {
-//				        Statement stmt = sIter.nextStatement() ;
-//				        log.info("stmt " + stmt) ;
-//				    }
-//				    sIter.close() ;
-//			    }
+		    log.info("Store size is " + resultDbModel.size());
 		    
-		    //Model resultDbModel = ModelFactory.createModelRDBMaker(db.getJenaConnection()).createModel("fresh");
 			resultDbModel.add(resultBaseModel);
 			
-			//resultModel = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), resultDbModel);
 			resultModel = ModelFactory.createDefaultModel();
 
 			Map<String, String> prefixes = mapModel.getNsPrefixMap();

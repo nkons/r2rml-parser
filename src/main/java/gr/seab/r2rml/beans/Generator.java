@@ -38,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.datatypes.BaseDatatype;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.ReadWrite;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -49,8 +51,7 @@ import com.hp.hpl.jena.rdf.model.ReifiedStatement;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sdb.SDBFactory;
-import com.hp.hpl.jena.sdb.Store;
+import com.hp.hpl.jena.tdb.TDBFactory;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -91,7 +92,7 @@ public class Generator {
 	
 	public void createTriples(MappingDocument mappingDocument) {
 		verbose = properties.containsKey("default.verbose") && properties.getProperty("default.verbose").contains("true");
-		storeOutputModelInDatabase = properties.containsKey("jena.storeOutputModelInDatabase") && properties.getProperty("jena.storeOutputModelInDatabase").contains("true");
+		storeOutputModelInDatabase = properties.containsKey("jena.storeOutputModelUsingTdb") && properties.getProperty("jena.storeOutputModelUsingTdb").contains("true");
 		incremental = !storeOutputModelInDatabase && properties.containsKey("default.incremental") && properties.getProperty("default.incremental").contains("true");
 		writeReifiedModel = incremental;
 		
@@ -640,10 +641,11 @@ public class Generator {
 				Calendar c0 = Calendar.getInstance();
 		        long t0 = c0.getTimeInMillis();
 				//Sync start
-				//before writing the result, check the existing
-				Store store = db.jenaStore();
-			    Model existingDbModel = SDBFactory.connectDefaultModel(store);
-				//log.info("Existing model has " + existingDbModel.listStatements().toList().size() + " statements.");
+				Dataset dataset = TDBFactory.createDataset(properties.getProperty("jena.tdb.directory"));
+				dataset.begin(ReadWrite.WRITE);
+				Model existingDbModel = dataset.getDefaultModel();
+			    
+			    log.info("Existing model has " + existingDbModel.size() + " statements.");
 				
 				List<Statement> statementsToRemove = new ArrayList<Statement>();
 				List<Statement> statementsToAdd = new ArrayList<Statement>();
@@ -670,27 +672,17 @@ public class Generator {
 				differenceModel.close();
 				log.info("Will add " + statementsToAdd.size() + " statements.");
 				
-//				int statementsToAddIter = 0;
-//				StmtIterator stmtResultIter = resultModel.listStatements();
-//				while (stmtResultIter.hasNext()) {
-//					Statement stmt = stmtResultIter.nextStatement();
-//					if (existingDbModel.isEmpty() || !existingDbModel.contains(stmt)) {
-//						statementsToAdd.add(stmt);
-//						statementsToAddIter++;
-//					}
-//					if (statementsToAddIter % 10000 == 0) log.info("At " + statementsToAddIter);
-//				}
-//				stmtResultIter.close();
-//				log.info("Will add " + statementsToAdd.size() + " statements.");
-				
 				existingDbModel.remove(statementsToRemove);
 				existingDbModel.add(statementsToAdd);
+				dataset.commit();
+				dataset.end();
+				
 				//Sync end
 				Calendar c1 = Calendar.getInstance();
 		        long t1 = c1.getTimeInMillis();
 		        log.info("Updating model in database took " + (t1 - t0) + " milliseconds.");
-		        mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Wrote clean model to database.
-		        //log.info("3 Wrote clean model to database.");
+		        mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //3 Wrote clean model to tdb.
+		        //log.info("3 Wrote clean model to tdb.");
 			}
 		} else {
 			log.info("Skipping writing the output model. No changes detected.");
