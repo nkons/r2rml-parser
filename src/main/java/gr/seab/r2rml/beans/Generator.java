@@ -455,7 +455,13 @@ public class Generator {
 												String parentFieldName = predicateObjectMap.getRefObjectMap().getParent();
 												if (!databaseType.equals("postgresql")) parentFieldName = parentFieldName.replaceAll("\"", ""); //in mysql, table names must not be enclosed in quotes
 												String addition = " WHERE " + parentFieldName + " = " + childValue;
-												parentQuery += addition;
+												int order = parentQuery.toUpperCase().indexOf("ORDER BY");
+												if (order != -1) {
+													String orderCondition = parentQuery.substring(order);
+													parentQuery = parentQuery.substring(0, order) + addition + " " + orderCondition;
+												} else {
+													parentQuery += addition;
+												}
 											} else {
 												log.error("In the logical table mapping <" + logicalTableMapping.getUri() + ">, the SQL query that generates the parent triples in the parent logical table mapping <" + l.getUri() + "> contains results from more than one tables. " +
 													" Consider using rr:tableName instead of rr:sqlQuery in the parent logical table mapping. Terminating.");
