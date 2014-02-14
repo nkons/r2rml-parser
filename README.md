@@ -8,7 +8,7 @@ Please send any feedback/questions by email to [nkons@live.com](mailto:nkons@liv
 
 ## Implementation details
 
-R2RML implementation written fully in Java 7, using Apache Jena 2.7, Spring 3.2, JUnit 4.8, and Maven 3.0. Tested against MySQL 5.6 and PostgreSQL 9.2.
+R2RML implementation written fully in Java 7, using Apache Jena 2.11, Spring 4.0, JUnit 4.9, and Maven 3.1. Tested against MySQL 5.6 and PostgreSQL 9.2.
 
 ## Licence
 
