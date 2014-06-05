@@ -20,7 +20,7 @@ You are free to use and distribute this work as long as you provide proper refer
 
 ## Publications
 
-1. N. Konstantinou, D. Kouis, N. Mitrou: "Incremental Export of Relational Database Contents into RDF Graphs". In 4th International Conference on Web Intelligence, Mining and Semantics (WIMS'14), Thessaloniki, Greece, June 2014 (to appear)
+1. N. Konstantinou, D. Kouis, N. Mitrou: ["Incremental Export of Relational Database Contents into RDF Graphs"](https://www.researchgate.net/publication/262098563_Incremental_Export_of_Relational_Database_Contents_into_RDF_Graphs). In 4th International Conference on Web Intelligence, Mining and Semantics (WIMS'14), Thessaloniki, Greece, June 2014 [(doi:10.1145/2611040.2611082)](http://dx.doi.org/10.1145/2611040.2611082) [(slides)](http://www.slideshare.net/nkons/wims14-v2)
 
 1. N. Konstantinou, D.E. Spanos, N. Houssos, N. Mitrou: ["Exposing Scholarly Information as Linked Open Data: RDFizing DSpace contents"](https://www.researchgate.net/publication/236881378_Exposing_Scholarly_Information_as_Linked_Open_Data_RDFizing_DSpace_contents). In The Electronic Library, Vol. 32, No. 6, 2014 (to appear)
 
