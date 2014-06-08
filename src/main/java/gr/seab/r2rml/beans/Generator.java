@@ -450,18 +450,25 @@ public class Generator {
 											String childValue = rs.getString(predicateObjectMap.getRefObjectMap().getChild().replaceAll("\"", "")); //table names need to be e.g. Sport instead of "Sport", and this is why we remove the quotes
 											if (verbose) log.info("child value is " + childValue); 
 											
-											String parentQuery = l.getSubjectMap().getSelectQuery().getQuery();
-											if (l.getSubjectMap().getSelectQuery().getTables().size() == 1) {
+											SelectQuery parentQuery;
+											if (l.getSubjectMap().getSelectQuery() != null) {
+												parentQuery = l.getSubjectMap().getSelectQuery();
+											} else {
+												parentQuery = l.getView().getSelectQuery(); //assure the select query is not null
+											}
+											String parentQueryText = parentQuery.getQuery();
+											
+											if (parentQuery.getTables().size() == 1) {
 												String parentFieldName = predicateObjectMap.getRefObjectMap().getParent();
 												if (!databaseType.equals("postgresql")) parentFieldName = parentFieldName.replaceAll("\"", ""); //in mysql, table names must not be enclosed in quotes
-												boolean containsWhere = parentQuery.toLowerCase().contains("where");
+												boolean containsWhere = parentQueryText.toLowerCase().contains("where");
 												String addition = (containsWhere ? " AND " : " WHERE ") + parentFieldName + " = " + childValue;
-												int order = parentQuery.toUpperCase().indexOf("ORDER BY");
+												int order = parentQueryText.toUpperCase().indexOf("ORDER BY");
 												if (order != -1) {
-													String orderCondition = parentQuery.substring(order);
-													parentQuery = parentQuery.substring(0, order) + addition + " " + orderCondition;
+													String orderCondition = parentQueryText.substring(order);
+													parentQueryText = parentQueryText.substring(0, order) + addition + " " + orderCondition;
 												} else {
-													parentQuery += addition;
+													parentQueryText += addition;
 												}
 											} else {
 												log.error("In the logical table mapping <" + logicalTableMapping.getUri() + ">, the SQL query that generates the parent triples in the parent logical table mapping <" + l.getUri() + "> contains results from more than one tables. " +
@@ -470,7 +477,7 @@ public class Generator {
 											}
 											
 											if (verbose) log.info("Modified parent SQL query to " + parentQuery);
-											java.sql.ResultSet rsParent = db.query(parentQuery);
+											java.sql.ResultSet rsParent = db.query(parentQueryText);
 											rsParent.beforeFirst();
 											while (rsParent.next()) {
 												Template parentTemplate = l.getSubjectMap().getTemplate();

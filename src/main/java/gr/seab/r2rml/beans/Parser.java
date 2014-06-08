@@ -370,8 +370,12 @@ public class Parser {
 			    	String tempField = rnColumn.asLiteral().toString();
 			    	
 			    	//objectFields.add(tempField);
+			    	String templateText = "{" + tempField + "}";
+	    			Template template = new Template(templateText, TermType.LITERAL, baseNs, resultModel);
+			    	predicateObjectMap.setObjectTemplate(template);
+			    	
 			    	predicateObjectMap.setObjectColumn(tempField);
-			    	log.info("Added object column: " + tempField);
+			    	log.info("Added object column and template from column: " + tempField);
 			    }
 			    
 			    NodeIterator iterLanguage = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "language"));

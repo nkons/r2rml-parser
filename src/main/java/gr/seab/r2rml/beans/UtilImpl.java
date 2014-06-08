@@ -75,7 +75,7 @@ public class UtilImpl implements Util {
 				}
 				if (rs.getString(field) != null) {
 					String before = result.substring(0, result.indexOf(field));
-					before = before.substring(0, before.lastIndexOf('{'));
+					before = before.substring(0, Math.max(before.lastIndexOf('{'), 0));
 
 					String after = result.substring(result.indexOf(field) + field.length());
 					after = after.substring(after.indexOf('}') + 1);
@@ -89,7 +89,7 @@ public class UtilImpl implements Util {
 			if (template.getTermType() == TermType.IRI && !template.isUri()) {
 				//log.info("Processing URI template with namespace " + template.getText());
 				try {
-					result = template.getNamespace() + "/" + URLEncoder.encode(result, "UTF-8");;
+					result = template.getNamespace() + "/" + URLEncoder.encode(result, "UTF-8");
 				} catch (UnsupportedEncodingException e) {
 					log.error("An error occurred: " + e.getMessage());
 					System.exit(0);
@@ -99,8 +99,10 @@ public class UtilImpl implements Util {
 			if (template.isUri()) {
 				//log.info("Processing URI template " + template.getText());
 				try {
-					int r = Math.max(result.lastIndexOf('#'), result.lastIndexOf('/')) + 1;
-					if (r > -1) result = result.substring(0, r) + URLEncoder.encode(result.substring(r), "UTF-8");;
+					if (result != null) {
+						int r = Math.max(result.lastIndexOf('#'), result.lastIndexOf('/')) + 1;
+						if (r > -1) result = result.substring(0, r) + URLEncoder.encode(result.substring(r), "UTF-8");
+					}
 				} catch (UnsupportedEncodingException e) {
 					log.error("An error occurred: " + e.getMessage());
 					System.exit(0);
