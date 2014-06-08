@@ -22,5 +22,7 @@ public enum TermType {
 	
 	BLANKNODE,
 	
-	LITERAL;
+	LITERAL,
+	
+	AUTO;
 }

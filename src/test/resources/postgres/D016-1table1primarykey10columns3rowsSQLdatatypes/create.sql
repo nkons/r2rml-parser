@@ -8,7 +8,7 @@ CREATE TABLE "Patient" (
 "BirthDate" DATE,
 "EntranceDate" TIMESTAMP,
 "PaidInAdvance" BOOLEAN,
-"Photo" VARBINARY(200),
+"Photo" BIT(680),
 PRIMARY KEY ("ID")
 );
 

@@ -252,7 +252,7 @@ public class Parser {
 			    		}
 			    	}
 	    		} else {
-	    			Template template = new Template(templateText, TermType.LITERAL, baseNs, resultModel);
+	    			Template template = new Template(templateText, TermType.IRI, baseNs, resultModel);
 			    	subjectMap.setTemplate(template);
 	    		}
 		    	log.info("Added subject template " + templateText + " from column " + tempColumn);
@@ -371,7 +371,7 @@ public class Parser {
 			    	
 			    	//objectFields.add(tempField);
 			    	String templateText = "{" + tempField + "}";
-	    			Template template = new Template(templateText, TermType.LITERAL, baseNs, resultModel);
+	    			Template template = new Template(templateText, TermType.AUTO, baseNs, resultModel);
 			    	predicateObjectMap.setObjectTemplate(template);
 			    	
 			    	predicateObjectMap.setObjectColumn(tempField);

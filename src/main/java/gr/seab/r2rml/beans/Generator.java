@@ -331,7 +331,7 @@ public class Generator {
 									
 									Property p = resultModel.createProperty(predicate);
 									
-									if (objectTemplate != null) {
+									if (objectTemplate != null && objectTemplate.getTermType() != TermType.AUTO) {
 										//Literal o = resultModel.createLiteral(u.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));
 										//if (!util.isUriTemplate(resultModel, predicateObjectMap.getObjectTemplate())) {
 										if (objectTemplate.getTermType() == TermType.LITERAL) {
