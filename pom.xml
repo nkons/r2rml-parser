@@ -140,6 +140,16 @@
 			</roles>
 			<timezone>+2</timezone>
 		</developer>
+		<developer>
+			<name>Tze-John Tang</name>
+			<email>tze-john.tang at abbvie.com</email>
+			<organization>AbbVie</organization>
+			<organizationUrl>http://www.abbvie.com</organizationUrl>
+			<roles>
+				<role>committer</role>
+			</roles>
+			<timezone>-6</timezone>
+		</developer>
 	</developers>
 	
 </project>

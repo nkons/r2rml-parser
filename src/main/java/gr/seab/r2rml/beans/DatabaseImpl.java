@@ -62,8 +62,11 @@ public class DatabaseImpl implements Database {
 			try {
 				String driver = properties.getProperty("db.driver");
 				Class.forName(driver);
-				String databaseType = util.findDatabaseType(driver);
-				String dbConnectionString = "jdbc:" + databaseType + "://" + properties.getProperty("db.host") + ":" + properties.getProperty("db.port") + "/" + properties.getProperty("db.name");
+				String dbConnectionString = properties.getProperty("db.url");
+				if (dbConnectionString == null) {
+					String databaseType = util.findDatabaseType(driver);
+					dbConnectionString = "jdbc:" + databaseType + "://" + properties.getProperty("db.host") + ":" + properties.getProperty("db.port") + "/" + properties.getProperty("db.name");
+				}
 				connection = DriverManager.getConnection(dbConnectionString, properties.getProperty("db.login"), properties.getProperty("db.password"));
 			
 				log.info("Established source (relational) connection.");

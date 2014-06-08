@@ -119,6 +119,8 @@ public class UtilImpl implements Util {
 			return "mysql";
 		} else if (driver.contains("postgresql")) {
 			return "postgresql";
+		} else if (driver.contains("oracle")) {
+			return "oracle";
 		} else {
 			System.out.println("Unknown database type.");
 			System.exit(1);
@@ -324,7 +326,8 @@ public class UtilImpl implements Util {
     			|| sqlDataType.equals("float4")
     			|| sqlDataType.equals("float8")
     			|| sqlDataType.equals("real")
-    			|| sqlDataType.equals("double precision")) {
+    			|| sqlDataType.equals("double precision")
+    			|| sqlDataType.equals("number")) {
         	return XSDDatatype.XSDdouble;
     	} else if (sqlDataType.equals("boolean")
     			|| sqlDataType.equals("bool")) {

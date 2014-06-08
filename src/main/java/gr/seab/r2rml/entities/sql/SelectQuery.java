@@ -15,6 +15,7 @@ package gr.seab.r2rml.entities.sql;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
@@ -71,12 +72,13 @@ public class SelectQuery {
 		int start = q.toUpperCase().indexOf("SELECT") + 7;
 		int end = q.toUpperCase().indexOf("FROM");
 
-		ArrayList<String> fields = new ArrayList<String>(Arrays.asList(q.substring(start, end).split(",")));
-		ArrayList<String> processedFields = new ArrayList<String>(); 
+		List<String> fields = splitFields(q.substring(start, end));
+		List<String> processedFields = new ArrayList<String>(); 
 		
 		for (int i = 0; i < fields.size(); i++) {
-			if (createSelectFieldTable(fields.get(i).trim()) != null) {
-				processedFields.add(fields.get(i));
+			String strippedFieldName = StringUtils.strip(fields.get(i));
+			if (createSelectFieldTable(strippedFieldName) != null) {
+				processedFields.add(strippedFieldName);
 			}
 		}
 		
@@ -204,4 +206,27 @@ public class SelectQuery {
 	public void setTables(ArrayList<SelectTable> tables) {
 		this.tables = tables;
 	}	
+	
+	protected List<String> splitFields(String fieldString) {
+		List<String> tokens = new ArrayList<String>();
+		int parenthesesCount = 0;
+		String token = "";
+		char[] chars = fieldString.toCharArray();
+		for (char c : chars) {
+			if (c == ',' && parenthesesCount == 0) {
+				tokens.add(token);
+				token = "";
+			} else {
+				if (c == '(') {
+					parenthesesCount++;
+				} else if (c == ')') {
+					parenthesesCount--;
+				}
+				token += c;
+			}
+		}
+		tokens.add(token);
+		
+		return tokens;
+	}
 }
