@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gr.seab</groupId>
 	<artifactId>r2rml-parser</artifactId>
-	<version>0.5</version>
+	<version>0.6</version>
 	<packaging>jar</packaging>
 	<name>R2RML Parser</name>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.framework.version>4.0.0.RELEASE</spring.framework.version>
+		<spring.framework.version>4.0.5.RELEASE</spring.framework.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -106,13 +106,13 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.5</version>
+			<version>1.7.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.jena</groupId>
 			<artifactId>apache-jena-libs</artifactId>
 			<type>pom</type>
-			<version>2.11.1</version>
+			<version>2.11.2</version>
 		</dependency>
                 <dependency>
                     <groupId>com.oracle</groupId>
@@ -145,7 +145,7 @@
 		<developer>
 			<name>Nikolaos Konstantinou</name>
 			<email>nkons at cn.ntua.gr</email>
-			<url>http://www.cn.ntua.gr/~nkons/</url>
+			<url>https://www.researchgate.net/profile/Nikolaos_Konstantinou/</url>
 			<organization>Hellenic Academic Libraries Link/National Technical University of Athens (HEAL-Link/NTUA)</organization>
 			<organizationUrl>http://www.seab.gr</organizationUrl>
 			<roles>

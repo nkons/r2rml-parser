@@ -64,8 +64,8 @@ public class DatabaseImpl implements Database {
 				Class.forName(driver);
 				String dbConnectionString = properties.getProperty("db.url");
 				if (dbConnectionString == null) {
-					String databaseType = util.findDatabaseType(driver);
-					dbConnectionString = "jdbc:" + databaseType + "://" + properties.getProperty("db.host") + ":" + properties.getProperty("db.port") + "/" + properties.getProperty("db.name");
+                    log.error("The property db.url cannot be empty! It must contain a valid database connection string.");
+                    System.exit(0);
 				}
 				connection = DriverManager.getConnection(dbConnectionString, properties.getProperty("db.login"), properties.getProperty("db.password"));
 			

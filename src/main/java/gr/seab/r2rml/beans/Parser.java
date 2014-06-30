@@ -52,6 +52,7 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.tdb.TDBFactory;
 import com.hp.hpl.jena.util.FileManager;
+import gr.seab.r2rml.entities.DatabaseType;
 
 /**
  * Parses a valid R2RML file and produces a mapping document
@@ -130,7 +131,9 @@ public class Parser {
 		log.info("Initialized.");
 		
 		try {
-			//First find the logical table views
+            DatabaseType databaseType = util.findDatabaseType(properties.getProperty("db.driver"));
+            mappingDocument.setDatabaseType(databaseType);
+            //First find the logical table views
 			LinkedList<LogicalTableView> logicalTableViews = findLogicalTableViews();
 			mappingDocument.setLogicalTableViews(logicalTableViews);
 			log.info("Mapping document has " + logicalTableViews.size() + " logical table views.");
@@ -647,19 +650,17 @@ public class Parser {
 	}
 	
 	public String createQueryForTable(String tableName) {
-		//If true, we are in postgres, otherwise in mysql
-		String databaseType = util.findDatabaseType(properties.getProperty("db.driver"));
 		
 		String result = "SELECT ";
 		try {
 			ArrayList<String> fields = new ArrayList<String>();
 			
 			java.sql.ResultSet rs;
-			if (databaseType.equals("postgresql")) {
+			if (mappingDocument.getDatabaseType() == DatabaseType.POSTGRESQL) {
 				rs = db.query("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'");
-			} else if (databaseType.equals("mysql")) {
+			} else if (mappingDocument.getDatabaseType() == DatabaseType.MYSQL) {
 				rs = db.query("DESCRIBE " + tableName);
-			} else if (databaseType.equals("oracle")) {
+			} else if (mappingDocument.getDatabaseType() == DatabaseType.ORACLE) {
                 rs = db.query("SELECT column_name FROM all_tab_cols WHERE table_name = '" + tableName + "'");
             } else {
                 rs = null;
@@ -670,14 +671,14 @@ public class Parser {
 			rs.beforeFirst();
 			while (rs.next()) {
 				//mysql: fields.add(rs.getString("Field"));
-				if (databaseType.equals("postgresql") || databaseType.equals("oracle")) {
+				if (mappingDocument.getDatabaseType() == DatabaseType.POSTGRESQL || mappingDocument.getDatabaseType() == DatabaseType.ORACLE) {
 					fields.add("\"" + rs.getString(1) + "\"");
 				} else {
 					fields.add(rs.getString("Field"));
 				}
 			}
 			for (String f : fields) {
-				if (databaseType.equals("postgresql") || databaseType.equals("oracle")) {
+				if (mappingDocument.getDatabaseType() == DatabaseType.POSTGRESQL || mappingDocument.getDatabaseType() == DatabaseType.ORACLE) {
 					result += "\"" + tableName + "\"" + "." + f + ", ";
 				} else {
 					result += tableName + "." + f + ", ";
@@ -686,7 +687,7 @@ public class Parser {
 			result = result.substring(0, result.lastIndexOf(','));
 			rs.close();
 		
-			if (databaseType.equals("postgresql") || databaseType.equals("oracle")) {
+			if (mappingDocument.getDatabaseType() == DatabaseType.POSTGRESQL || mappingDocument.getDatabaseType() == DatabaseType.ORACLE) {
 				result += " FROM " + "\"" + tableName + "\"";
 			} else {
 				result += " FROM " + tableName;

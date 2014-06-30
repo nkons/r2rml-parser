@@ -19,12 +19,13 @@ import java.sql.ResultSet;
 
 import com.hp.hpl.jena.datatypes.BaseDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
+import gr.seab.r2rml.entities.DatabaseType;
 
 public interface Util {
 	
 	String fillTemplate(Template template, ResultSet rs);
 	
-	String findDatabaseType(String driver);
+	DatabaseType findDatabaseType(String driver);
 	
 	String stripQuotes(String input);
 	

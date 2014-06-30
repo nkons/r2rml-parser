@@ -31,6 +31,8 @@ public class MappingDocument {
 	private Map<String, String> prefixes;
 	private ArrayList<Long> timestamps = new ArrayList<Long>();
 	
+    private DatabaseType databaseType = DatabaseType.OTHER;
+    
 	/**
 	 * 
 	 */
@@ -106,4 +108,12 @@ public class MappingDocument {
 	public void setTimestamps(ArrayList<Long> timestamps) {
 		this.timestamps = timestamps;
 	}
+
+    public DatabaseType getDatabaseType() {
+        return databaseType;
+    }
+
+    public void setDatabaseType(DatabaseType databaseType) {
+        this.databaseType = databaseType;
+    }
 }

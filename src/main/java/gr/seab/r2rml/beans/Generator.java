@@ -55,6 +55,7 @@ import com.hp.hpl.jena.tdb.TDBFactory;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
+import gr.seab.r2rml.entities.DatabaseType;
 
 /**
  * Generates the resulting graph, based on the mapping document
@@ -143,7 +144,6 @@ public class Generator {
 			resultModel.remove(statementsToRemove); //.toArray(new Statement[statementsToRemove.size()]));
 			log.info("Removed " + statementsToRemove.size() + " old statements.");
 		}
-		String databaseType = util.findDatabaseType(properties.getProperty("db.driver"));
 
 		boolean executeAllMappings = false;
 		int mappingsExecuted = 0;
@@ -460,7 +460,7 @@ public class Generator {
 											
 											if (parentQuery.getTables().size() == 1) {
 												String parentFieldName = predicateObjectMap.getRefObjectMap().getParent();
-												if (databaseType.equals("mysql")) parentFieldName = parentFieldName.replaceAll("\"", ""); //in mysql, table names must not be enclosed in quotes
+												if (mappingDocument.getDatabaseType() == DatabaseType.MYSQL) parentFieldName = parentFieldName.replaceAll("\"", ""); //in mysql, table names must not be enclosed in quotes
 												boolean containsWhere = parentQueryText.toLowerCase().contains("where");
 												String addition = (containsWhere ? " AND " : " WHERE ") + parentFieldName + " = " + childValue;
 												int order = parentQueryText.toUpperCase().indexOf("ORDER BY");

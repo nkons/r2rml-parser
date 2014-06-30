@@ -41,6 +41,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import gr.seab.r2rml.entities.DatabaseType;
 
 /**
  * Collection of utility functions
@@ -115,19 +116,19 @@ public class UtilImpl implements Util {
 		return result;
 	}
 	
-	public String findDatabaseType(String driver) {
+	public DatabaseType findDatabaseType(String driver) {
 		
 		if (driver.contains("mysql")) {
-			return "mysql";
+			return DatabaseType.MYSQL;
 		} else if (driver.contains("postgresql")) {
-			return "postgresql";
+			return DatabaseType.POSTGRESQL;
 		} else if (driver.contains("oracle")) {
-			return "oracle";
+			return DatabaseType.ORACLE;
 		} else {
-			System.out.println("Unknown database type.");
+			log.error("Unknown database type.");
 			System.exit(1);
 		}
-		return null;
+		return DatabaseType.OTHER;
 	}
 
 	public String stripQuotes(String input) {
