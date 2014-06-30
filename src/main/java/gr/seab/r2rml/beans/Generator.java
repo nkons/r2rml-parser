@@ -460,7 +460,7 @@ public class Generator {
 											
 											if (parentQuery.getTables().size() == 1) {
 												String parentFieldName = predicateObjectMap.getRefObjectMap().getParent();
-												if (!databaseType.equals("postgresql")) parentFieldName = parentFieldName.replaceAll("\"", ""); //in mysql, table names must not be enclosed in quotes
+												if (databaseType.equals("mysql")) parentFieldName = parentFieldName.replaceAll("\"", ""); //in mysql, table names must not be enclosed in quotes
 												boolean containsWhere = parentQueryText.toLowerCase().contains("where");
 												String addition = (containsWhere ? " AND " : " WHERE ") + parentFieldName + " = " + childValue;
 												int order = parentQueryText.toUpperCase().indexOf("ORDER BY");

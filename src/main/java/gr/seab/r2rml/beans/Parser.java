@@ -648,30 +648,36 @@ public class Parser {
 	
 	public String createQueryForTable(String tableName) {
 		//If true, we are in postgres, otherwise in mysql
-		boolean postgres = util.findDatabaseType(properties.getProperty("db.driver")).equals("postgresql");
+		String databaseType = util.findDatabaseType(properties.getProperty("db.driver"));
 		
 		String result = "SELECT ";
 		try {
 			ArrayList<String> fields = new ArrayList<String>();
 			
 			java.sql.ResultSet rs;
-			if (postgres) {
+			if (databaseType.equals("postgresql")) {
 				rs = db.query("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'");
-			} else {
+			} else if (databaseType.equals("mysql")) {
 				rs = db.query("DESCRIBE " + tableName);
-			}
+			} else if (databaseType.equals("oracle")) {
+                rs = db.query("SELECT column_name FROM all_tab_cols WHERE table_name = '" + tableName + "'");
+            } else {
+                rs = null;
+                log.error("Unknown database type. Terminating.");
+                System.exit(0);
+            }
 			
 			rs.beforeFirst();
 			while (rs.next()) {
 				//mysql: fields.add(rs.getString("Field"));
-				if (postgres) {
+				if (databaseType.equals("postgresql") || databaseType.equals("oracle")) {
 					fields.add("\"" + rs.getString(1) + "\"");
 				} else {
 					fields.add(rs.getString("Field"));
 				}
 			}
 			for (String f : fields) {
-				if (postgres) {
+				if (databaseType.equals("postgresql") || databaseType.equals("oracle")) {
 					result += "\"" + tableName + "\"" + "." + f + ", ";
 				} else {
 					result += tableName + "." + f + ", ";
@@ -680,7 +686,7 @@ public class Parser {
 			result = result.substring(0, result.lastIndexOf(','));
 			rs.close();
 		
-			if (postgres) {
+			if (databaseType.equals("postgresql") || databaseType.equals("oracle")) {
 				result += " FROM " + "\"" + tableName + "\"";
 			} else {
 				result += " FROM " + tableName;
