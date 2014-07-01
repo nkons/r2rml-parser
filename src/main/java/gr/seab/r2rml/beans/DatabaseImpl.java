@@ -14,12 +14,13 @@ package gr.seab.r2rml.beans;
 import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,7 @@ public class DatabaseImpl implements Database {
 			properties.load(new FileInputStream(propertiesFilename));
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.exit(0);
+			System.exit(1);
 		}
 	}
 	
@@ -65,7 +66,7 @@ public class DatabaseImpl implements Database {
 				String dbConnectionString = properties.getProperty("db.url");
 				if (dbConnectionString == null) {
                     log.error("The property db.url cannot be empty! It must contain a valid database connection string.");
-                    System.exit(0);
+                    System.exit(1);
 				}
 				connection = DriverManager.getConnection(dbConnectionString, properties.getProperty("db.login"), properties.getProperty("db.password"));
 			
@@ -73,7 +74,7 @@ public class DatabaseImpl implements Database {
 				return connection;
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.exit(0);
+				System.exit(1);
 			}
 		} else {
 			return connection;
@@ -87,18 +88,35 @@ public class DatabaseImpl implements Database {
 		try {
 			if (connection == null) openConnection();
 			
-			if (!StringUtils.containsIgnoreCase(query, "limit") && properties.containsKey("db.limit")) {
-				query += " LIMIT " + properties.getProperty("db.limit");
-			}
-			//log.info(query);
 			//PreparedStatement preparedStatement = connection.prepareStatement(query);
 			Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			result = statement.executeQuery(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.exit(0);
+			System.exit(1);
 		}
 		return result;
+	}
+	
+	/**
+	 * 
+	 * Create a PreparedStatement with the query string and get its metadata. If this works, the query string is ok (but nothing is executed)
+	 * 
+	 */
+	public void testQuery(String query) {
+		try {
+			if (connection == null) openConnection();
+
+			PreparedStatement preparedStatement = connection.prepareStatement(query);
+			
+			ResultSetMetaData m = preparedStatement.getMetaData();
+			log.info ("Query is ok. Retrieves a dataset with " + m.getColumnCount() + " column(s).");
+			
+			preparedStatement.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 	
 	public String getPropertiesFilename() {

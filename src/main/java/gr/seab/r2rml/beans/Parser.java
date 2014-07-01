@@ -12,6 +12,7 @@
 package gr.seab.r2rml.beans;
 
 import gr.seab.r2rml.beans.util.LogicalTableMappingComparator;
+import gr.seab.r2rml.entities.DatabaseType;
 import gr.seab.r2rml.entities.LogicalTableMapping;
 import gr.seab.r2rml.entities.LogicalTableView;
 import gr.seab.r2rml.entities.MappingDocument;
@@ -27,7 +28,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,7 +52,6 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.tdb.TDBFactory;
 import com.hp.hpl.jena.util.FileManager;
-import gr.seab.r2rml.entities.DatabaseType;
 
 /**
  * Parses a valid R2RML file and produces a mapping document
@@ -205,7 +204,7 @@ public class Parser {
 							    	subjectMap.setTemplate(template);
 				    			} else {
 				    				log.error("Unknown term type: " + termType + ". Terminating.");
-				    				System.exit(0);
+				    				System.exit(1);
 				    			}
 				    		}
 				    	}
@@ -250,7 +249,7 @@ public class Parser {
 						    	subjectMap.setTemplate(template);
 			    			} else {
 			    				log.error("Unknown term type: " + termType + ". Terminating.");
-			    				System.exit(0);
+			    				System.exit(1);
 			    			}
 			    		}
 			    	}
@@ -433,7 +432,7 @@ public class Parser {
 			    				template.setTermType(TermType.LITERAL);
 			    			} else {
 			    				log.error("Unknown term type: " + termType + ". Terminating.");
-			    				System.exit(0);
+			    				System.exit(1);
 			    			}
 			    		}
 			    	}
@@ -612,15 +611,8 @@ public class Parser {
 		    	query = query.replaceAll("[\r\n]+", " ");
 		    	if (query.indexOf(';') != -1) query = query.replace(';', ' ');
 		    	
-		    	log.info("Found query: <" + r.getURI() + "> with value: " + query);
-		    	//Testing. Add a LIMIT 10 to avoid large datasets.
-			    try {
-					java.sql.ResultSet rs = db.query(query + " LIMIT 10");
-					rs.close();
-					log.info("Query tested ok.");
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+		    	log.info("Testing query: <" + r.getURI() + "> with value: " + query);
+		    	db.testQuery(query);
 		    	
 		    	SelectQuery selectQuery = new SelectQuery(query, properties);
 
@@ -665,7 +657,7 @@ public class Parser {
             } else {
                 rs = null;
                 log.error("Unknown database type. Terminating.");
-                System.exit(0);
+                System.exit(1);
             }
 			
 			rs.beforeFirst();
@@ -717,7 +709,7 @@ public class Parser {
 			mapModel.read(isMap, baseNs, properties.getProperty("mapping.file.type"));
 		} catch (Exception e) {
 			log.error("Error reading input model");
-			System.exit(0);
+			System.exit(1);
 		}
 		//mapModel.write(System.out, properties.getProperty("mapping.file.type"));
 		

@@ -24,11 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Properties;
-import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -90,8 +90,8 @@ public class ComplianceTests {
 		
 		int counter = 0;
 		for (String key : tests.keySet()) {
-			if (counter == 19) { //(counter > 4 && counter < 6) {
-				String folder = "src/test/resources/postgres/" + key + "/";
+			if (counter > 2 && counter < 26) {
+				String folder = "src/test/resources/oracle/" + key + "/";
 				initialiseSourceDatabase(folder + "create.sql");
 				
 				for (String mappingFile : tests.get(key)) {
@@ -123,7 +123,7 @@ public class ComplianceTests {
 	@Test
 	public void testSingle() {
 		log.info("test single. Careful, database 'test' will be erased and re-created!");
-		String folder = "src/test/resources/postgres/D002-1table2columns1row/";
+		String folder = "src/test/resources/oracle/D011-M2MRelations/";
 		initialiseSourceDatabase(folder + "create.sql");
 		
 		//Override property file
@@ -176,7 +176,7 @@ public class ComplianceTests {
 			System.exit(0);
 		}
 		
-		Set<Statement> stmtToAdd = new HashSet<Statement>();
+		ArrayList<Statement> stmtToAdd = new ArrayList<Statement>();
 		Model newModel = ModelFactory.createDefaultModel();
 		RSIterator rsIter = model.listReifiedStatements();
 		while (rsIter.hasNext()) {
@@ -198,10 +198,35 @@ public class ComplianceTests {
 		
 		String createQuery = fileContents(createFile);
 
-		queryNoResultSet("DROP SCHEMA public CASCADE");
-		queryNoResultSet("CREATE SCHEMA public");
+		//queryNoResultSet("DROP SCHEMA public CASCADE");
+		//queryNoResultSet("CREATE SCHEMA public");
 		
-		queryNoResultSet(createQuery);
+                queryNoResultSet("DROP USER root CASCADE");
+                queryNoResultSet("CREATE USER root IDENTIFIED BY 1234");
+                queryNoResultSet("GRANT CREATE SESSION TO root");
+                queryNoResultSet("GRANT CREATE TABLE TO root");
+                queryNoResultSet("GRANT CREATE TABLESPACE TO root");
+                queryNoResultSet("ALTER USER root QUOTA 10m ON system");
+                
+                String[] tablesToClear = {"Person", "Student", "Student_Sport", "Sport", "Country", "Info", "IOUs", "Lives",
+                    "DEPT", "EMP", "LIKES", "Country", "Patient", "植物", "成分", "Employee", "Target", "Source", "Addresses", "Department",
+                    "People", "Projects", "TaskAssignments"};
+                for (String tableToClear : tablesToClear) {
+                    try {
+                        queryNoResultSet("DROP TABLE \"" + tableToClear + "\" CASCADE CONSTRAINTS");
+                        log.info("Success");
+                    } catch (Exception e) {
+                        log.error("Error.");
+                    }
+                        
+                        
+                }
+                                                                                        
+                //Workaround for Oracle
+                String[] queries = createQuery.split(";");
+                for (String query: queries) {
+                    queryNoResultSet(query);
+                }
 	}
 	
 	private int queryNoResultSet(String query) {
@@ -214,9 +239,48 @@ public class ComplianceTests {
 			log.info("sql query: " + query);
 			rowsAffected = statement.executeUpdate(query);
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+                    log.error(e.getMessage());
 		}
 		return rowsAffected;
+	}
+	
+	private ResultSet query(String query) {
+		ResultSet result = null;
+
+		try {
+			if (connection == null)
+				openConnection();
+
+			java.sql.Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+			log.info("sql query: " + query);
+			result = statement.executeQuery(query);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	@Test
+	public void loadPersons() {
+		if (connection == null)
+			openConnection();
+
+		for (int i = 94300; i < 500000; i++) {
+			String q1 = "INSERT INTO eperson (eperson_id, email, password, salt, digest_algorithm, firstname, lastname, can_log_in, require_certificate, self_registered, last_active, sub_frequency, phone, netid, language) " +
+					"VALUES (" + i +", 'nkons" + i + "@live.com', 'aa07c370f18e6306d481e29d04d28ea322f3ac5d746bd1122b4907518b37875b59283054d9e91fd049f39df2223ba3feb62f9cc2923e5614503d0b9b191d6606', '2d0155aa63818899d177ff988ddde7c5', 'SHA-512', '" + randomString() + "', '" + randomString() + "', 'true', 'false', 'false', NULL, NULL, NULL, NULL, 'en');";
+			String q2 = "INSERT INTO epersongroup2eperson (id, eperson_group_id, eperson_id) VALUES (" + i + ", 1, " + i + ");";
+		
+			try {
+				java.sql.Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+				int a = statement.executeUpdate(q1);
+				int b = statement.executeUpdate(q2);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (i % 1000 == 0)
+				log.info("At " + i);
+		}
 	}
 	
 	private String fileContents(String filePath) {
@@ -244,11 +308,29 @@ public class ComplianceTests {
 
 		try {
 			Class.forName("org.postgresql.Driver");
-			connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test", "postgres", "postgres");
+			//connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test", "postgres", "postgres");
+			
+                        connection = DriverManager.getConnection("jdbc:oracle:thin:@127.0.0.1:1521", "system", "dba");
+                        
+                        //connection = DriverManager.getConnection("jdbc:postgresql://83.212.115.187:5432/ebooks-dspace6", "postgres", "postgres");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	static String randomString() {
+		String palette = "abcdefghijklm  nopqrstuvwxyz";
+		String s = new String();
+
+		int size = new Double((Math.random() * 50) + 2).intValue();
+		for (int i = 0; i < size; i++) {
+			int location = new Double(Math.random() * palette.length())
+					.intValue();
+			s += palette.charAt(location);
+		}
+		// log.info("random word " + s);
+		return s.trim();
 	}
 }

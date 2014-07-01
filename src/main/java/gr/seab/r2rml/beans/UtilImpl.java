@@ -93,7 +93,7 @@ public class UtilImpl implements Util {
 					result = template.getNamespace() + "/" + URLEncoder.encode(result, "UTF-8");
 				} catch (UnsupportedEncodingException e) {
 					log.error("An error occurred: " + e.getMessage());
-					System.exit(0);
+					System.exit(1);
 				}
 			}
 			
@@ -106,7 +106,7 @@ public class UtilImpl implements Util {
 					}
 				} catch (UnsupportedEncodingException e) {
 					log.error("An error occurred: " + e.getMessage());
-					System.exit(0);
+					System.exit(1);
 				}
 			}
 			
@@ -287,7 +287,7 @@ public class UtilImpl implements Util {
     		return XSDDatatype.XSDunsignedShort;
     	} else {
     		log.error("Found unknown datatype " + dataType);
-    		System.exit(0);
+    		System.exit(1);
     	}
 		return null;
 	}
@@ -345,7 +345,7 @@ public class UtilImpl implements Util {
         	return XSDDatatype.XSDdateTime;
         } else {
     		log.error("Found unknown SQL sqlDataType " + sqlDataType);
-    		System.exit(0);
+    		System.exit(1);
     	}
 		return null;
 	}
