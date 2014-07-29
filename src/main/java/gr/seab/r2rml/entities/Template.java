@@ -13,9 +13,7 @@ package gr.seab.r2rml.entities;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 
 /**
@@ -26,11 +24,16 @@ import com.hp.hpl.jena.rdf.model.Model;
  *
  */
 public class Template {
-	private static final Logger log = LoggerFactory.getLogger(Template.class);
+	//private static final Logger log = LoggerFactory.getLogger(Template.class);
 	/**
 	 * The initial template text
 	 */
 	private String text;
+	
+	/**
+	 * The language of the literals (if any) to be created.
+	 */
+	private String language;
 	
 	/**
 	 * The fields, enclosed in brackets. Must correspond to database fields
@@ -52,24 +55,21 @@ public class Template {
 	 */
 	private Model model;
 	
-	/**
-	 * Default constructor. Once called, it finds the included fields.
-	 */
 	public Template(String text, TermType termType, String namespace, Model model) {
 		this.text = text;
 		this.fields = createTemplateFields();
 		this.termType = termType;
 		this.namespace = namespace;
 		this.model = model;
-		
-		String msg = "Template has " + fields.size() + ((fields.size() == 1)? " field: " : " fields: ");
-		for (String f : fields) {
-			msg += f + ", ";
-		}
-		if (msg.lastIndexOf(',') > 0) {
-			msg = msg.substring(0, msg.lastIndexOf(','));
-		}
-		//log.info(msg);
+	}
+
+	public Template(Literal literal, TermType termType, String namespace, Model model) {
+		this.text = literal.getString();
+		this.language = literal.getLanguage();
+		this.fields = createTemplateFields();
+		this.termType = termType;
+		this.namespace = namespace;
+		this.model = model;
 	}
 	
 	public ArrayList<String> createTemplateFields() {
@@ -103,27 +103,26 @@ public class Template {
 		}
 	}
 	
-	/**
-	 * @return the text
-	 */
 	public String getText() {
 		return text;
 	}
-	/**
-	 * @param text the text to set
-	 */
+	
 	public void setText(String text) {
 		this.text = text;
 	}
-	/**
-	 * @return the fields
-	 */
+	
+	public String getLanguage() {
+		return language;
+	}
+	
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+	
 	public ArrayList<String> getFields() {
 		return fields;
 	}
-	/**
-	 * @param fields the fields to set
-	 */
+
 	public void setFields(ArrayList<String> fields) {
 		this.fields = fields;
 	}

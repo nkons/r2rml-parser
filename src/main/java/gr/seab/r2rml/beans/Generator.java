@@ -83,7 +83,7 @@ public class Generator {
 	
 	private boolean verbose;
 	private boolean incremental;
-	private boolean storeOutputModelInDatabase;
+	private boolean storeOutputModelInTdb;
 	private boolean writeReifiedModel;
 	
 	private Model logModel;
@@ -93,8 +93,8 @@ public class Generator {
 	
 	public void createTriples(MappingDocument mappingDocument) {
 		verbose = properties.containsKey("default.verbose") && properties.getProperty("default.verbose").contains("true");
-		storeOutputModelInDatabase = properties.containsKey("jena.storeOutputModelUsingTdb") && properties.getProperty("jena.storeOutputModelUsingTdb").contains("true");
-		incremental = !storeOutputModelInDatabase && properties.containsKey("default.incremental") && properties.getProperty("default.incremental").contains("true");
+		storeOutputModelInTdb = properties.containsKey("jena.storeOutputModelUsingTdb") && properties.getProperty("jena.storeOutputModelUsingTdb").contains("true");
+		incremental = !storeOutputModelInTdb && properties.containsKey("default.incremental") && properties.getProperty("default.incremental").contains("true");
 		writeReifiedModel = incremental;
 		
 		String destinationFileName = properties.getProperty("jena.destinationFileName");
@@ -337,7 +337,7 @@ public class Generator {
 										if (objectTemplate.getTermType() == TermType.LITERAL) {
 											Literal o = null;
 											
-											if (predicateObjectMap.getLanguage() == null) {
+											if (predicateObjectMap.getObjectTemplate().getLanguage() == null) {
 												String value = util.fillTemplate(objectTemplate, rs);
 												if (value != null)  {
 													if (predicateObjectMap.getDataType() != null) {
@@ -349,7 +349,7 @@ public class Generator {
 													}
 												}
 											} else {
-												String language = util.fillTemplate(predicateObjectMap.getLanguage(), rs);
+												String language = predicateObjectMap.getObjectTemplate().getLanguage();
 												String value = util.fillTemplate(objectTemplate, rs);
 												if (value != null) {
 													o = resultModel.createLiteral(value, language);
@@ -416,7 +416,7 @@ public class Generator {
 										
 										if (test != null) {
 											Literal o;
-											if (predicateObjectMap.getLanguage() == null) {
+											if (predicateObjectMap.getObjectTemplate().getLanguage() == null) {
 												
 												if (predicateObjectMap.getDataType() != null) {
 													o = resultModel.createTypedLiteral(test, predicateObjectMap.getDataType());
@@ -426,9 +426,9 @@ public class Generator {
 													if (verbose) log.info("Adding literal triple: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"");
 												}
 											} else {
-												String language = util.fillTemplate(predicateObjectMap.getLanguage(), rs);
+												String language = predicateObjectMap.getObjectTemplate().getLanguage();
 												o = resultModel.createLiteral(test, language);
-												if (verbose) log.info("Adding triple with language: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + predicateObjectMap.getLanguage());
+												if (verbose) log.info("Adding triple with language: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + predicateObjectMap.getObjectTemplate().getLanguage());
 											}
 											
 											Statement st = resultModel.createStatement(s, p, o);
@@ -539,7 +539,7 @@ public class Generator {
 		log.info("Finished generating jena model in memory.");
 		
 		if (!incremental || mappingsExecuted > 0) {
-			if (!storeOutputModelInDatabase) {
+			if (!storeOutputModelInTdb) {
 
 				if ((!incremental && writeReifiedModel) || incremental) {
 					log.info("Generating clean model.");

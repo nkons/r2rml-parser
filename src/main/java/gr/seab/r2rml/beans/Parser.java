@@ -182,7 +182,7 @@ public class Parser {
 		    	RDFNode rnTemplate = iterTemplate.next();
 		    	
 		    	if (rnTemplate.isLiteral()) {
-			    	log.info("Processing literal subject template: " + rnTemplate.asLiteral().toString());
+			    	log.info("Processing literal subject template: " + rnTemplate.asLiteral().getString());
 			    	
 			    	//Verify that it is indeed a literal and not some other type. Property rr:termType can have one of the following
 			    	//values: rr:IRI, rr:BlankNode or rr:Literal
@@ -194,13 +194,13 @@ public class Parser {
 				    			String termType = rnTermType.asResource().getLocalName();
 				    			log.info("Found rr:termType " + termType);
 				    			if ("IRI".equals(termType)) {
-				    				Template template = new Template(rnTemplate.asLiteral().toString(), TermType.IRI, baseNs, resultModel);
+				    				Template template = new Template(rnTemplate.asLiteral(), TermType.IRI, baseNs, resultModel);
 							    	subjectMap.setTemplate(template);
 				    			} else if ("BlankNode".equals(termType)) {
-				    				Template template = new Template(rnTemplate.asLiteral().toString(), TermType.BLANKNODE, baseNs, resultModel);
+				    				Template template = new Template(rnTemplate.asLiteral(), TermType.BLANKNODE, baseNs, resultModel);
 							    	subjectMap.setTemplate(template);
 				    			} else if ("Literal".equals(termType)) {
-				    				Template template = new Template(rnTemplate.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
+				    				Template template = new Template(rnTemplate.asLiteral(), TermType.LITERAL, baseNs, resultModel);
 							    	subjectMap.setTemplate(template);
 				    			} else {
 				    				log.error("Unknown term type: " + termType + ". Terminating.");
@@ -209,7 +209,7 @@ public class Parser {
 				    		}
 				    	}
 		    		} else {
-		    			Template template = new Template(rnTemplate.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
+		    			Template template = new Template(rnTemplate.asLiteral(), TermType.LITERAL, baseNs, resultModel);
 				    	subjectMap.setTemplate(template);
 		    		}
 	    		} else {
@@ -228,7 +228,7 @@ public class Parser {
 		    NodeIterator iterColumn = mapModel.listObjectsOfProperty(rn.asResource(), mapModel.getProperty(rrNs + "column"));
 		    while (iterColumn.hasNext()) {
 		    	RDFNode rnColumn = iterColumn.next();
-		    	String tempColumn = rnColumn.asLiteral().toString();
+		    	String tempColumn = rnColumn.asLiteral().getString();
 		    	String templateText = "{" + tempColumn + "}";
 		    	
 		    	NodeIterator iterTermType = mapModel.listObjectsOfProperty(rn.asResource(), mapModel.getProperty(rrNs + "termType"));
@@ -318,7 +318,7 @@ public class Parser {
 
 			    	if (rnConstant.isLiteral()) {
 			    		log.info("Adding predicate map constant literal: " + rnConstant.asNode().toString() + ".");
-		    			predicates.add(rnConstant.asLiteral().toString());
+		    			predicates.add(rnConstant.asLiteral().getString());
 			    	} else {
 		    			log.info("Adding predicate map constant uri: " + rnConstant.asNode().toString() + ".");
 		    			predicates.add(rnConstant.asResource().getURI());
@@ -333,7 +333,7 @@ public class Parser {
 	    		log.info("Found object: " + rnObject.toString());
 	    		if (rnObject.isLiteral()) {
 			    	log.info("Adding object map constant: " + rnObject.asLiteral().toString() + ". Treating it as a template with no fields.");
-			    	Template template = new Template(rnObject.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
+			    	Template template = new Template(rnObject.asLiteral(), TermType.LITERAL, baseNs, resultModel);
 			    	predicateObjectMap.setObjectTemplate(template);
 	    		} else {
 	    			log.info("Adding object map constant: " + rnObject.asNode().toString() + ". Treating it as a template with no fields.");
@@ -353,8 +353,8 @@ public class Parser {
 			    	RDFNode rnTemplate = iterTemplate.next();
 			    	
 			    	if (rnTemplate.isLiteral()) {
-				    	log.info("Processing object map template: " + rnTemplate.asLiteral().toString());
-				    	Template template = new Template(rnTemplate.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
+				    	log.info("Processing object map template: " + rnTemplate.asLiteral().getString());
+				    	Template template = new Template(rnTemplate.asLiteral(), TermType.LITERAL, baseNs, resultModel);
 				    	predicateObjectMap.setObjectTemplate(template);
 		    		} else {
 		    			log.info("Processing object map template: " + rnTemplate.asNode().toString());
@@ -369,7 +369,7 @@ public class Parser {
 		    	NodeIterator iterColumn = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "column"));
 			    while (iterColumn.hasNext()) {
 			    	RDFNode rnColumn = iterColumn.next();
-			    	String tempField = rnColumn.asLiteral().toString();
+			    	String tempField = rnColumn.asLiteral().getString();
 			    	
 			    	//objectFields.add(tempField);
 			    	String templateText = "{" + tempField + "}";
@@ -383,9 +383,9 @@ public class Parser {
 			    NodeIterator iterLanguage = mapModel.listObjectsOfProperty(rnObjectMap.asResource(), mapModel.getProperty(rrNs + "language"));
 			    while (iterLanguage.hasNext()) {
 			    	RDFNode rnLanguage = iterLanguage.next();
-			    	String language = rnLanguage.asLiteral().toString();
+			    	String language = rnLanguage.asLiteral().getString();
 			    	
-			    	predicateObjectMap.setLanguage(new Template(language, TermType.LITERAL, baseNs, resultModel));
+			    	predicateObjectMap.getObjectTemplate().setLanguage(language);
 			    	log.info("Added language: " + language);
 			    }
 			    
@@ -405,8 +405,8 @@ public class Parser {
 			    while (iterConstant.hasNext()) {
 			    	RDFNode rnConstant = iterConstant.next();
 			    	if (rnConstant.isLiteral()) {
-				    	log.info("Adding object map constant literal: " + rnConstant.asLiteral().toString());
-				    	Template template = new Template(rnConstant.asLiteral().toString(), TermType.LITERAL, baseNs, resultModel);
+				    	log.info("Adding object map constant literal: " + rnConstant.asLiteral().getString());
+				    	Template template = new Template(rnConstant.asLiteral(), TermType.LITERAL, baseNs, resultModel);
 				    	predicateObjectMap.setObjectTemplate(template);
 		    		} else {
 		    			log.info("Adding object map constant iri: " + rnConstant.asNode().toString());
@@ -453,15 +453,15 @@ public class Parser {
 			    		NodeIterator iterChild = mapModel.listObjectsOfProperty(rnJoinCondition.asResource(), mapModel.getProperty(rrNs + "child"));
 			    		while (iterChild.hasNext()) {
 			    			RDFNode rnChild = iterChild.next();
-			    			log.info("Found rr:child " + rnChild.asLiteral().toString());
-			    			refObjectMap.setChild(rnChild.asLiteral().toString());
+			    			log.info("Found rr:child " + rnChild.asLiteral().getString());
+			    			refObjectMap.setChild(rnChild.asLiteral().getString());
 			    		}
 			    		
 			    		NodeIterator iterParent = mapModel.listObjectsOfProperty(rnJoinCondition.asResource(), mapModel.getProperty(rrNs + "parent"));
 			    		while (iterParent.hasNext()) {
 			    			RDFNode rnParent = iterParent.next();
-			    			log.info("Found rr:parent " + rnParent.asLiteral().toString());
-			    			refObjectMap.setParent(rnParent.asLiteral().toString());
+			    			log.info("Found rr:parent " + rnParent.asLiteral().getString());
+			    			refObjectMap.setParent(rnParent.asLiteral().getString());
 			    		}
 			    	}
 			    	predicateObjectMap.setRefObjectMap(refObjectMap);
@@ -551,7 +551,7 @@ public class Parser {
 		    	LogicalTableMapping logicalTableMapping = new LogicalTableMapping();
 
 	    		LogicalTableView logicalTableView = new LogicalTableView();
-	    		String newTable = rn.asLiteral().toString();
+	    		String newTable = rn.asLiteral().getString();
 	    		newTable = util.stripQuotes(newTable);
 	    		log.info("Found table name: " + newTable);
 	    		SelectQuery sq = new SelectQuery(createQueryForTable(newTable), properties);
@@ -587,7 +587,7 @@ public class Parser {
 		//prevent java.util.ConcurrentModificationException
 		for (Iterator<LogicalTableMapping> it = results.iterator(); it.hasNext(); ) {
 			LogicalTableMapping logicalTableMapping = it.next();
-			if (logicalTableMapping.getView() == null ) {
+			if (logicalTableMapping.getView() == null || logicalTableMapping.getUri() == null) {
 				it.remove();
 			}
 		}

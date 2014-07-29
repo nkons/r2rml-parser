@@ -395,7 +395,7 @@ public class UtilImpl implements Util {
 			for (PredicateObjectMap predicateObjectMap : logicalTableMapping.getPredicateObjectMaps()) {
 				s += predicateObjectMap.getObjectColumn();
 				s += predicateObjectMap.getDataType() != null ?  predicateObjectMap.getDataType().toString() : "null";
-				s += predicateObjectMap.getLanguage();
+				s += predicateObjectMap.getObjectTemplate().getLanguage();
 				if (predicateObjectMap.getObjectTemplate() != null) {
 					s += predicateObjectMap.getObjectTemplate().getText();
 				} else {
