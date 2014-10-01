@@ -764,9 +764,14 @@ public class Parser {
 			
 		} else {
 			//resultModel = ModelFactory.createInfModel(ReasonerRegistry.getRDFSReasoner(), resultBaseModel);
+			Map<String, String> prefixes = mapModel.getNsPrefixMap();
+			prefixes.putAll(resultBaseModel.getNsPrefixMap());
+			
 			resultModel = ModelFactory.createDefaultModel();
-			resultModel.setNsPrefixes(mapModel.getNsPrefixMap());
-			mappingDocument.setPrefixes(mapModel.getNsPrefixMap());
+			resultModel.setNsPrefixes(prefixes);
+			resultModel.add(resultBaseModel);
+
+			mappingDocument.setPrefixes(prefixes);
 		}
 	}
 	
