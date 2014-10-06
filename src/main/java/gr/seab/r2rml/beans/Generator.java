@@ -98,7 +98,8 @@ public class Generator {
 		writeReifiedModel = incremental;
 		
 		String destinationFileName = properties.getProperty("jena.destinationFileName");
-		String reifiedModelFileName = destinationFileName.substring(0, destinationFileName.lastIndexOf('.')) + "-reified" + destinationFileName.substring(destinationFileName.lastIndexOf('.'));
+		int dot = destinationFileName.lastIndexOf('.') > -1 ? destinationFileName.lastIndexOf('.') : destinationFileName.length();
+		String reifiedModelFileName = destinationFileName.substring(0, dot) + "-reified" + destinationFileName.substring(dot);
 		
 		logModel = ModelFactory.createDefaultModel();
 		String logNs = properties.getProperty("default.namespace");
