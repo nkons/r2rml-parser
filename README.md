@@ -12,9 +12,9 @@ R2RML implementation written fully in Java 7, using Apache Jena 2.11, Spring 4.0
 
 ## Licence
 
-This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 Unported License.
+This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 Unported License.
 
-http://creativecommons.org/licenses/by-nc/3.0/
+http://creativecommons.org/licenses/by-nc/4.0/
 
 You are free to use and distribute this work as long as you provide proper reference and respect the license terms.
 
@@ -22,7 +22,7 @@ You are free to use and distribute this work as long as you provide proper refer
 
 1. N. Konstantinou, D. Kouis, N. Mitrou: ["Incremental Export of Relational Database Contents into RDF Graphs"](https://www.researchgate.net/publication/262098563_Incremental_Export_of_Relational_Database_Contents_into_RDF_Graphs). In 4th International Conference on Web Intelligence, Mining and Semantics (WIMS'14), Thessaloniki, Greece, June 2014 [(doi:10.1145/2611040.2611082)](http://dx.doi.org/10.1145/2611040.2611082) [(slides)](http://www.slideshare.net/nkons/wims14-v2)
 
-1. N. Konstantinou, D.E. Spanos, N. Houssos, N. Mitrou: ["Exposing Scholarly Information as Linked Open Data: RDFizing DSpace contents"](https://www.researchgate.net/publication/236881378_Exposing_Scholarly_Information_as_Linked_Open_Data_RDFizing_DSpace_contents). In The Electronic Library, Vol. 32, No. 6, 2014 (to appear)
+1. N. Konstantinou, D.E. Spanos, N. Houssos, N. Mitrou: ["Exposing Scholarly Information as Linked Open Data: RDFizing DSpace contents"](https://www.researchgate.net/publication/236881378_Exposing_Scholarly_Information_as_Linked_Open_Data_RDFizing_DSpace_contents). In The Electronic Library, Vol. 32, No. 6, 2014
 
 1. N. Konstantinou, D.E. Spanos, N. Mitrou: ["Transient and persistent RDF views over relational databases in the context of digital repositories"](https://www.researchgate.net/publication/258235039_Transient_and_persistent_RDF_views_over_relational_databases_in_the_context_of_digital_repositories). In 7th Metadata and Semantics Research Conference (MTSR'13), Thessaloniki, Greece, Springer, CCIS 390, pp. 342-354, November 2013 [(doi:10.1007/978-3-319-03437-9_33)](http://dx.doi.org/10.1007/978-3-319-03437-9_33) [(slides)](http://www.slideshare.net/nkons/transient-and-persistent-rdf-views-over-relational-databases-in-the-context-of-digital-repositories)
 

@@ -1,9 +1,9 @@
 /**
- * Licensed under the Creative Commons Attribution-NonCommercial 3.0 Unported 
+ * Licensed under the Creative Commons Attribution-NonCommercial 4.0 Unported 
  * License (the "License"). You may not use this file except in compliance with
  * the License. You may obtain a copy of the License at:
  * 
- *  http://creativecommons.org/licenses/by-nc/3.0/
+ *  http://creativecommons.org/licenses/by-nc/4.0/
  *  
  * Unless required by applicable law or agreed to in writing, software distributed
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
@@ -11,7 +11,6 @@
  */
 package gr.seab.r2rml.beans;
 
-import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -35,26 +34,12 @@ public class DatabaseImpl implements Database {
 
 	private Connection connection;
 	
-	private Properties properties = new Properties();
-	
-	private String propertiesFilename;
+	private Properties properties;
 	
 	private Util util;
 	
 	public DatabaseImpl() {
 		
-	}
-	
-	/**
-	 * 
-	 */
-	public DatabaseImpl(String propertiesFilename) {
-		try {
-			properties.load(new FileInputStream(propertiesFilename));
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
 	}
 	
 	public Connection openConnection() {
@@ -73,7 +58,7 @@ public class DatabaseImpl implements Database {
 				log.info("Established source (relational) connection.");
 				return connection;
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Error establishing source (relational) connection! Please check your connection settings.");
 				System.exit(1);
 			}
 		} else {
@@ -92,7 +77,7 @@ public class DatabaseImpl implements Database {
 			Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			result = statement.executeQuery(query);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			log.error("Error executing query! Query was: " + query);
 			System.exit(1);
 		}
 		return result;
@@ -114,19 +99,11 @@ public class DatabaseImpl implements Database {
 			
 			preparedStatement.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			log.error("Error testing query! Query was: " + query);
 			System.exit(1);
 		}
 	}
-	
-	public String getPropertiesFilename() {
-		return propertiesFilename;
-	}
-	
-	public void setPropertiesFilename(String propertiesFilename) {
-		this.propertiesFilename = propertiesFilename;
-	}
-	
+		
 	public Util getUtil() {
 		return util;
 	}

@@ -1,9 +1,9 @@
 /**
- * Licensed under the Creative Commons Attribution-NonCommercial 3.0 Unported 
+ * Licensed under the Creative Commons Attribution-NonCommercial 4.0 Unported 
  * License (the "License"). You may not use this file except in compliance with
  * the License. You may obtain a copy of the License at:
  * 
- *  http://creativecommons.org/licenses/by-nc/3.0/
+ *  http://creativecommons.org/licenses/by-nc/4.0/
  *  
  * Unless required by applicable law or agreed to in writing, software distributed
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
@@ -24,9 +24,6 @@ import gr.seab.r2rml.entities.TermType;
 import gr.seab.r2rml.entities.sparql.LocalResultSet;
 import gr.seab.r2rml.entities.sql.SelectQuery;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,7 +93,7 @@ public class Parser {
 	/**
 	 * The properties, as read from the properties file.
 	 */
-	private Properties properties = new Properties();
+	private Properties properties;
 	
 	private boolean verbose;
 	
@@ -105,21 +102,6 @@ public class Parser {
 	private Util util;
 	
 	public Parser() {
-		
-	}
-	
-	public Parser(String propertiesFilename) {
-		this.propertiesFilename = propertiesFilename;
-		try {
-			if (StringUtils.isNotEmpty(propertiesFilename)) {
-				properties.load(new FileInputStream(propertiesFilename));
-				log.info("Loaded properties from " + propertiesFilename);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	@SuppressWarnings("unchecked")
