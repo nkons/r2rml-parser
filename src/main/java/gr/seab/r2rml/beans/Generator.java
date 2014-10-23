@@ -11,6 +11,7 @@
  */
 package gr.seab.r2rml.beans;
 
+import gr.seab.r2rml.entities.DatabaseType;
 import gr.seab.r2rml.entities.LogicalTableMapping;
 import gr.seab.r2rml.entities.MappingDocument;
 import gr.seab.r2rml.entities.PredicateObjectMap;
@@ -55,7 +56,6 @@ import com.hp.hpl.jena.tdb.TDBFactory;
 import com.hp.hpl.jena.util.FileManager;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
-import gr.seab.r2rml.entities.DatabaseType;
 
 /**
  * Generates the resulting graph, based on the mapping document
@@ -542,6 +542,11 @@ public class Generator {
 		if (!incremental || mappingsExecuted > 0) {
 			if (!storeOutputModelInTdb) {
 
+				String destinationFileSyntax = properties.getProperty("jena.destinationFileSyntax");
+				String showXmlDeclarationProperty = properties.getProperty("jena.showXmlDeclaration");
+				boolean showXmlDeclaration = (destinationFileSyntax.equalsIgnoreCase("RDF/XML") || destinationFileSyntax.equalsIgnoreCase("RDF/XML-ABBREV"))
+												&& showXmlDeclarationProperty.equalsIgnoreCase("true");
+				
 				if ((!incremental && writeReifiedModel) || incremental) {
 					log.info("Generating clean model.");
 					Model cleanModel = ModelFactory.createDefaultModel();
@@ -586,10 +591,18 @@ public class Generator {
 						try {
 							Calendar c0 = Calendar.getInstance();
 					        long t0 = c0.getTimeInMillis();
+					        
+					        //Force showXmlDeclaration
 					        BufferedWriter out = new BufferedWriter(new FileWriter(destinationFileName));
-					        cleanModel.write(out, properties.getProperty("jena.destinationFileSyntax"));
+					        if (showXmlDeclaration) {
+					        	out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+					        	out.newLine();
+					        }
+					        
+					        cleanModel.write(out, destinationFileSyntax);
 					        out.close();
-							Calendar c1 = Calendar.getInstance();
+					        
+					        Calendar c1 = Calendar.getInstance();
 					        long t1 = c1.getTimeInMillis();
 					        log.info("Writing clean model to disk took " + (t1 - t0) + " milliseconds.");
 						} catch (FileNotFoundException e) {
@@ -609,9 +622,16 @@ public class Generator {
 					try {
 						Calendar c0 = Calendar.getInstance();
 				        long t0 = c0.getTimeInMillis();
+				        
 				        BufferedWriter out = new BufferedWriter(new FileWriter(destinationFileName));
-						resultModel.write(out, properties.getProperty("jena.destinationFileSyntax"));
+				        if (showXmlDeclaration) {
+					        out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+					        out.newLine();
+				        }
+
+				        resultModel.write(out, destinationFileSyntax);
 						out.close();
+						
 						Calendar c1 = Calendar.getInstance();
 				        long t1 = c1.getTimeInMillis();
 				        log.info("Writing model to disk took " + (t1 - t0) + " milliseconds.");
