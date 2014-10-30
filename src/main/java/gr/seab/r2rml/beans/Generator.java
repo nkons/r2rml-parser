@@ -85,6 +85,7 @@ public class Generator {
 	private boolean incremental;
 	private boolean storeOutputModelInTdb;
 	private boolean writeReifiedModel;
+	private boolean encodeURLs;
 	
 	private Model logModel;
 		
@@ -95,6 +96,7 @@ public class Generator {
 		verbose = properties.containsKey("default.verbose") && properties.getProperty("default.verbose").contains("true");
 		storeOutputModelInTdb = properties.containsKey("jena.storeOutputModelUsingTdb") && properties.getProperty("jena.storeOutputModelUsingTdb").contains("true");
 		incremental = !storeOutputModelInTdb && properties.containsKey("default.incremental") && properties.getProperty("default.incremental").contains("true");
+		encodeURLs = properties.containsKey("jena.encodeURLs") && properties.getProperty("jena.encodeURLs").contains("true");
 		writeReifiedModel = incremental;
 		
 		String destinationFileName = properties.getProperty("jena.destinationFileName");
@@ -274,7 +276,7 @@ public class Generator {
 					rs.beforeFirst();
 					while (rs.next()) {
 						Template subjectTemplate = logicalTableMapping.getSubjectMap().getTemplate();
-						String resultSubject = (subjectTemplate != null) ? util.fillTemplate(subjectTemplate, rs) : null;
+						String resultSubject = (subjectTemplate != null) ? util.fillTemplate(subjectTemplate, rs, encodeURLs) : null;
 						
 						if (resultSubject != null) {
 							//if (StringUtils.isNotEmpty(logicalTableMapping.getSubjectMap().getClassUri())) {
@@ -339,7 +341,7 @@ public class Generator {
 											Literal o = null;
 											
 											if (predicateObjectMap.getObjectTemplate().getLanguage() == null) {
-												String value = util.fillTemplate(objectTemplate, rs);
+												String value = util.fillTemplate(objectTemplate, rs, encodeURLs);
 												if (value != null)  {
 													if (predicateObjectMap.getDataType() != null) {
 														o = resultModel.createTypedLiteral(value, predicateObjectMap.getDataType());
@@ -351,7 +353,7 @@ public class Generator {
 												}
 											} else {
 												String language = predicateObjectMap.getObjectTemplate().getLanguage();
-												String value = util.fillTemplate(objectTemplate, rs);
+												String value = util.fillTemplate(objectTemplate, rs, encodeURLs);
 												if (value != null) {
 													o = resultModel.createLiteral(value, language);
 													if (verbose) log.info("Adding literal triple with language: <" + s.getURI() + ">, <" + p.getURI() + ">, \"" + o.getString() + "\"@" + o.getLanguage());
@@ -370,7 +372,7 @@ public class Generator {
 											}
 										} else if (objectTemplate.getTermType() == TermType.IRI) {
 											if (verbose) log.info("Filling in IRI template " + objectTemplate.getText());
-											String value = util.fillTemplate(objectTemplate, rs);
+											String value = util.fillTemplate(objectTemplate, rs, encodeURLs);
 											if (value != null) {
 												RDFNode o = resultModel.createResource(value);
 												if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
@@ -385,7 +387,7 @@ public class Generator {
 											}
 										} else if (objectTemplate.getTermType() == TermType.BLANKNODE) {
 											if (verbose) log.info("filling in blanknode template " + objectTemplate.getText());
-											String value = util.fillTemplate(objectTemplate, rs);
+											String value = util.fillTemplate(objectTemplate, rs, encodeURLs);
 											if (value != null) {
 												RDFNode o = resultModel.createResource(AnonId.create(value));
 												if (verbose) log.info("Adding resource triple: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");
@@ -482,7 +484,7 @@ public class Generator {
 											rsParent.beforeFirst();
 											while (rsParent.next()) {
 												Template parentTemplate = l.getSubjectMap().getTemplate();
-												String parentSubject = util.fillTemplate(parentTemplate, rsParent);
+												String parentSubject = util.fillTemplate(parentTemplate, rsParent, encodeURLs);
 												RDFNode o = resultModel.createResource(parentSubject);
 												Statement st = resultModel.createStatement(s, p, o);
 												if (verbose) log.info("Adding triple referring to a parent statement subject: <" + s.getURI() + ">, <" + p.getURI() + ">, <" + o.asResource().getURI() + ">");

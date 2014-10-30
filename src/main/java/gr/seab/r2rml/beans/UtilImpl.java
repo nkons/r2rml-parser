@@ -59,7 +59,7 @@ public class UtilImpl implements Util {
 		
 	}
 	
-	public String fillTemplate(Template template, ResultSet rs) {
+	public String fillTemplate(Template template, ResultSet rs, boolean encodeURLs) {
 		//log.info("filling in template " + template.getText());
 		String result = new String();
 		if (template!= null && template.getText() != null) {
@@ -89,24 +89,35 @@ public class UtilImpl implements Util {
 			
 			if (template.getTermType() == TermType.IRI && !template.isUri()) {
 				//log.info("Processing URI template with namespace " + template.getText());
-				try {
-					result = template.getNamespace() + "/" + URLEncoder.encode(result, "UTF-8");
-				} catch (UnsupportedEncodingException e) {
-					log.error("An error occurred: " + e.getMessage());
-					System.exit(1);
+				if (encodeURLs) {
+					try {
+						result = template.getNamespace() + "/" + URLEncoder.encode(result, "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						log.error("An error occurred: " + e.getMessage());
+						System.exit(1);
+					}
+				} else {
+					result = template.getNamespace() + "/" + result;
 				}
 			}
 			
 			if (template.isUri()) {
 				//log.info("Processing URI template " + template.getText());
-				try {
-					if (result != null) {
-						int r = Math.max(result.lastIndexOf('#'), result.lastIndexOf('/')) + 1;
-						if (r > -1) result = result.substring(0, r) + URLEncoder.encode(result.substring(r), "UTF-8");
+				
+				if (result != null) {
+					int r = Math.max(result.lastIndexOf('#'), result.lastIndexOf('/')) + 1;
+					if (r > -1) {
+						if (encodeURLs) {
+							try {
+								result = result.substring(0, r) + URLEncoder.encode(result.substring(r), "UTF-8");
+							} catch (UnsupportedEncodingException e) {
+								log.error("An error occurred: " + e.getMessage());
+								System.exit(1);
+							}
+						} else {
+							result = result.substring(0, r) + result.substring(r);
+						}
 					}
-				} catch (UnsupportedEncodingException e) {
-					log.error("An error occurred: " + e.getMessage());
-					System.exit(1);
 				}
 			}
 			

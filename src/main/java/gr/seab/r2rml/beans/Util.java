@@ -23,7 +23,7 @@ import gr.seab.r2rml.entities.DatabaseType;
 
 public interface Util {
 	
-	String fillTemplate(Template template, ResultSet rs);
+	String fillTemplate(Template template, ResultSet rs, boolean encodeURLs);
 	
 	DatabaseType findDatabaseType(String driver);
 	
