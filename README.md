@@ -4,7 +4,7 @@ An R2RML implementation that can export relational database contents as RDF grap
 
 For more information, please [visit the wiki](https://github.com/nkons/r2rml-parser/wiki).
 
-Please send any feedback/questions by email to [nkons@live.com](mailto:nkons@live.com), or by direct message (dm) via twitter to [@nkonstantinou](https://twitter.com/nkonstantinou). We'll be happy to discuss how to export your data into RDF.
+Please send any feedback/questions by email to [nkons@live.com](mailto:nkons@live.com), by direct message (dm) via twitter to [@nkonstantinou](https://twitter.com/nkonstantinou), or ["open an issue"](https://github.com/nkons/r2rml-parser/issues). We'll be happy to discuss how to export your data into RDF.
 
 ## Implementation details
 
@@ -19,6 +19,10 @@ http://creativecommons.org/licenses/by-nc/4.0/
 You are free to use and distribute this work as long as you provide proper reference and respect the license terms.
 
 ## Publications
+
+1. N. Konstantinou, D.E. Spanos: ["Creating Linked Data from Relational Databases"](http://dx.doi.org/10.1007/978-3-319-16074-0_4). In Book ["Materializing the Web of Linked Data"](http://www.springer.com/gp/book/9783319160733), Pages 73-102, Springer, 2015
+
+1. N. Konstantinou, D.E. Spanos, D. Kouis, N. Mitrou: ["An Approach for the Incremental Export of Relational Databases into RDF Graphs"](https://www.researchgate.net/publication/275251864_An_Approach_for_the_Incremental_Export_of_Relational_Databases_into_RDF_Graphs), In International Journal on Artificial Intelligence Tools, 24 (2), 2015 [(doi:10.1142/S0218213015400138)](http://dx.doi.org/10.1142/S0218213015400138)
 
 1. N. Konstantinou, D. Kouis, N. Mitrou: ["Incremental Export of Relational Database Contents into RDF Graphs"](https://www.researchgate.net/publication/262098563_Incremental_Export_of_Relational_Database_Contents_into_RDF_Graphs). In 4th International Conference on Web Intelligence, Mining and Semantics (WIMS'14), Thessaloniki, Greece, June 2014 [(doi:10.1145/2611040.2611082)](http://dx.doi.org/10.1145/2611040.2611082) [(fulltext)](http://people.cn.ntua.gr/nkons/papers/74-Konstantinou-updated.pdf) [(slides)](http://www.slideshare.net/nkons/wims14-v2)
 
