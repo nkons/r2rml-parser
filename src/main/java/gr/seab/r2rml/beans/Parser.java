@@ -380,6 +380,8 @@ public class Parser {
 				    	log.info("Found datatype xsd:" + dataType);
 				    	BaseDatatype baseDataType = util.findDataType(dataType);
 				    	predicateObjectMap.setDataType(baseDataType);
+			    	} else {
+			    		predicateObjectMap.setDataType(new BaseDatatype(rnDataType.asResource().getURI()));
 			    	}
 			    }
 			    
