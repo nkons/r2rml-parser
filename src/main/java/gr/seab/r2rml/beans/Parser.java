@@ -535,26 +535,27 @@ public class Parser {
 		    	LogicalTableMapping logicalTableMapping = new LogicalTableMapping();
 
 	    		LogicalTableView logicalTableView = new LogicalTableView();
-	    		String newTable = rn.asLiteral().getString();
-	    		newTable = util.stripQuotes(newTable);
+	    		String oldTable = rn.asLiteral().getString();
+	    		String newTable = util.stripQuotes(oldTable);
 	    		log.info("Found table name: " + newTable);
 	    		SelectQuery sq = new SelectQuery(createQueryForTable(newTable), properties);
 	    		log.info("Setting SQL query for table " + newTable + ": " + sq.getQuery());
 	    		logicalTableView.setSelectQuery(sq);
 	    		if (r.getURI() == null) {
 			    	//figure out to which TriplesMap this rr:tableName belongs
-			    	log.info("Found rr:tableName without parent.");
+			    	log.info("Found rr:tableName " + oldTable + " without parent.");
 			    	//LocalResultSet sparqlResults = util.sparql(mapModel, "SELECT ?x WHERE { ?x rr:logicalTable ?z . ?z rr:tableName " + newTable + " . } ");
 			    	if (util.findDatabaseType(properties.getProperty("db.driver")).equals("postgresql")) {
 			    		newTable = "\"\\\"" + newTable + "\\\"\"";
 			    	} else {
 			    		newTable = "\"" + newTable + "\"";
 			    	}
-			    	LocalResultSet sparqlResults = util.sparql(mapModel, "SELECT ?x WHERE { ?x rr:logicalTable ?z . ?z rr:tableName " + newTable + " . } ");
-			    	
+			    	LocalResultSet sparqlResults = util.sparql(mapModel, "SELECT ?x WHERE { ?x rr:logicalTable ?z . ?z rr:tableName '" + oldTable + "' . } ");
+
 			    	if (sparqlResults.getRows().size() > 0) {
 			    		String triplesMapUri = sparqlResults.getRows().get(0).getResources().get(0).getUri();
 			    		logicalTableMapping.setUri(triplesMapUri);
+			    		log.info("The rr:tableName " + oldTable + " is in triples map " + triplesMapUri);
 			    	} else {
 			    		log.error("Could not find triples map.");
 			    	}
@@ -631,7 +632,7 @@ public class Parser {
 		try {
 			ArrayList<String> fields = new ArrayList<String>();
 			
-			java.sql.ResultSet rs;
+			java.sql.ResultSet rs = null;
 			if (mappingDocument.getDatabaseType() == DatabaseType.POSTGRESQL) {
 				rs = db.query("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'");
 			} else if (mappingDocument.getDatabaseType() == DatabaseType.MYSQL) {
@@ -643,7 +644,7 @@ public class Parser {
                 log.error("Unknown database type. Terminating.");
                 System.exit(1);
             }
-			
+
 			rs.beforeFirst();
 			while (rs.next()) {
 				//mysql: fields.add(rs.getString("Field"));
@@ -692,7 +693,7 @@ public class Parser {
 		try {
 			mapModel.read(isMap, baseNs, properties.getProperty("mapping.file.type"));
 		} catch (Exception e) {
-			log.error("Error reading input model");
+			log.error("Error reading mapping file");
 			System.exit(1);
 		}
 		//mapModel.write(System.out, properties.getProperty("mapping.file.type"));
@@ -702,7 +703,12 @@ public class Parser {
 		Model resultBaseModel = ModelFactory.createDefaultModel();
 		if (StringUtils.isNotBlank(inputModelFileName)) {
 			InputStream isRes = FileManager.get().open(inputModelFileName);
-			resultBaseModel.read(isRes, baseNs, properties.getProperty("input.model.type"));
+			try {
+				resultBaseModel.read(isRes, baseNs, properties.getProperty("input.model.type"));
+			} catch (Exception e) {
+				log.error("Error reading input model");
+				System.exit(1);
+			}
 		}
 		//resultBaseModel.write(System.out, properties.getProperty("input.model.type"));
 		
