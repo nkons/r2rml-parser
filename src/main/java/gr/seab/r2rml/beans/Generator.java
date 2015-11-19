@@ -451,6 +451,12 @@ public class Generator {
 											LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
 											
 											String childValue = rs.getString(predicateObjectMap.getRefObjectMap().getChild().replaceAll("\"", "")); //table names need to be e.g. Sport instead of "Sport", and this is why we remove the quotes
+											try {
+												Double.parseDouble(childValue);
+											} catch (NumberFormatException e) {
+												if (verbose) log.info("child value is not a number");
+												childValue = "'" + childValue + "'";
+											}
 											if (verbose) log.info("child value is " + childValue); 
 											
 											SelectQuery parentQuery;
