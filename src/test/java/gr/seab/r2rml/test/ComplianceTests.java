@@ -11,12 +11,6 @@
  */
 package gr.seab.r2rml.test;
 
-import gr.seab.r2rml.beans.Generator;
-import gr.seab.r2rml.beans.Parser;
-import gr.seab.r2rml.beans.Util;
-import gr.seab.r2rml.entities.MappingDocument;
-import gr.seab.r2rml.entities.sparql.LocalResultSet;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -46,6 +40,13 @@ import com.hp.hpl.jena.rdf.model.ReifiedStatement;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.util.FileManager;
 
+import gr.seab.r2rml.beans.Database;
+import gr.seab.r2rml.beans.Generator;
+import gr.seab.r2rml.beans.Parser;
+import gr.seab.r2rml.beans.Util;
+import gr.seab.r2rml.entities.MappingDocument;
+import gr.seab.r2rml.entities.sparql.LocalResultSet;
+
 @ContextConfiguration(locations = { "classpath:test-context.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
 @TransactionConfiguration(defaultRollback = false)
@@ -54,6 +55,8 @@ public class ComplianceTests {
 	private static final Logger log = LoggerFactory.getLogger(ComplianceTests.class);
 
 	private Connection connection;
+	
+	private static Properties properties = new Properties();
 
 	@Test
 	public void testAll() {
@@ -123,16 +126,25 @@ public class ComplianceTests {
 	@Test
 	public void testSingle() {
 		log.info("test single. Careful, database 'test' will be erased and re-created!");
-		String folder = "src/test/resources/postgres/D011-M2MRelations/";
+		String folder = "src/test/resources/postgres/D014-3tables1primarykey1foreignkey/";
 		initialiseSourceDatabase(folder + "create.sql");
 		
-		//Override property file
+		//Load property file
+		try {
+			properties.load(new FileInputStream("src/test/resources/test.properties"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		//Override certain properties
+		properties.setProperty("mapping.file", folder + "r2rmla.ttl");
+		properties.setProperty("jena.destinationFileName", folder + "r2rmla.nq");
+		
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-context.xml");
+		Database db = (Database) context.getBean("db");
+		db.setProperties(properties);
+		
 		Parser parser = (Parser) context.getBean("parser");
-		Properties p = parser.getProperties();
-			p.setProperty("mapping.file", folder + "r2rmla.ttl");
-			p.setProperty("jena.destinationFileName", folder + "r2rmla.nq");
-		parser.setProperties(p);
+		parser.setProperties(properties);
 		MappingDocument mappingDocument = parser.parse();
 
 		Generator generator = (Generator) context.getBean("generator");
@@ -218,8 +230,6 @@ public class ComplianceTests {
                     } catch (Exception e) {
                         log.error("Error.");
                     }
-                        
-                        
                 }
                                                                                         
                 //Workaround for Oracle
@@ -308,11 +318,9 @@ public class ComplianceTests {
 
 		try {
 			Class.forName("org.postgresql.Driver");
-			//connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test", "postgres", "postgres");
-			
-                        connection = DriverManager.getConnection("jdbc:oracle:thin:@127.0.0.1:1521", "system", "dba");
-                        
-                        //connection = DriverManager.getConnection("jdbc:postgresql://83.212.115.187:5432/ebooks-dspace6", "postgres", "postgres");
+			connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test", "postgres", "postgres");
+			//connection = DriverManager.getConnection("jdbc:oracle:thin:@127.0.0.1:1521", "system", "dba");
+            //connection = DriverManager.getConnection("jdbc:postgresql://83.212.115.187:5432/ebooks-dspace6", "postgres", "postgres");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {

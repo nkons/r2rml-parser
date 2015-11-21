@@ -9,7 +9,7 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 map:groups
-    rr:logicalTable [ rr:tableName '"epersongroup"'; ];
+    rr:logicalTable [ rr:tableName "epersongroup"; ];
     rr:subjectMap [
         rr:template 'http://data.example.org/repository/group/{"eperson_group_id"}';
         rr:class foaf:Group;

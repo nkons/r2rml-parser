@@ -40,4 +40,7 @@ public interface Util {
 	String md5(String s);
 	
 	String md5(LogicalTableMapping logicalTableMapping);
+	
+	boolean isNumber(String s);
+	
 }
