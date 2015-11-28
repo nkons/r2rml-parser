@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -451,7 +452,7 @@ public class Generator {
 											LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
 											
 											String childValue = rs.getString(predicateObjectMap.getRefObjectMap().getChild().replaceAll("\"", "")); //table names need to be e.g. Sport instead of "Sport", and this is why we remove the quotes
-											if (!util.isNumber(childValue)) {
+											if (childValue != null && !StringUtils.isNumeric(childValue)) {
 												childValue = "'" + childValue + "'";
 											}
 											if (verbose) log.info("child value is " + childValue); 

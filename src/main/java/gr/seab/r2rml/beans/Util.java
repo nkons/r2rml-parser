@@ -41,6 +41,4 @@ public interface Util {
 	
 	String md5(LogicalTableMapping logicalTableMapping);
 	
-	boolean isNumber(String s);
-	
 }
