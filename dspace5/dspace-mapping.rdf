@@ -1,6 +1,6 @@
 #
 # Downloaded from https://github.com/nkons/r2rml-parser/
-# Mapping file works wiht DSpace 3.x, 4.x
+# Mapping file works wiht DSpace 5.x
 #
 
 @prefix map: <#>.
@@ -12,176 +12,114 @@
 @prefix dcterms: <http://purl.org/dc/terms/>.
 @prefix dctype: <http://purl.org/dc/dcmitype/>.
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix edm: <http://www.europeana.eu/schemas/edm/> .
-@prefix ore: <http://www.openarchives.org/ore/terms/> .
 
-### DSpace mapping to Europeana Data Model (EDM) draft
+### DSpace general mappings
 
 map:items
     rr:logicalTable <#item-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
-        rr:class edm:ProvidedCHO;
-    ];
-	rr:predicateObjectMap [
-      rr:predicate edm:dataProvider;
-      rr:objectMap [ rr:constant 'Data Provider' ];
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
+        rr:class dcterms:BibliographicResource;
     ].
-
-map:aggregatedItems
-    rr:logicalTable <#bitstream-view>;
+    
+map:collections
+    rr:logicalTable <#collection-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/data/aggregation/{"thehandle"}';
-        rr:class ore:Aggregation ;
-    ];
-	rr:predicateObjectMap [
-      rr:predicate edm:rights;
-      rr:objectMap [ rr:constant 'http://creativecommons.org/licenses/by/4.0/' ];
-    ];
-	rr:predicateObjectMap [
-      rr:predicate edm:dataProvider;
-      rr:objectMap [ rr:constant 'Data Provider' ];
-    ];
-	rr:predicateObjectMap [
-      rr:predicate edm:provider;
-      rr:objectMap [ rr:constant 'Data Provider' ];
-    ];
-		rr:predicateObjectMap [
-        rr:predicate edm:aggregatedCHO;
-        rr:objectMap [ rr:template 'http://repository.example.com/handle/{"thehandle"}';
-							rr:termType rr:IRI ];
-    ];
-	rr:predicateObjectMap [
-      rr:predicate edm:object;
-      rr:objectMap [ rr:template 'http://repository.example.com/bitstream/{"thehandle"}/{"sequence_id"}/{"filename"}';
-		rr:termType rr:IRI];
-    ];
-	rr:predicateObjectMap [
-      rr:predicate edm:isShownAt;
-      rr:objectMap [ rr:template 'http://hdl.handle.net/{"thehandle"}';
-		rr:termType rr:IRI];
-    ].
-	
-map:bitstreams
-    rr:logicalTable <#bitstream-view>;
-    rr:subjectMap [
-        rr:template 'http://repository.example.com/bitstream/{"thehandle"}/{"sequence_id"}/{"filename"}';
-        rr:class edm:WebResource;
+        rr:template 'http://data.example.org/repository/collection/{"handle"}';
+        rr:class dcterms:BibliographicResource;
     ];
     rr:predicateObjectMap [
-      rr:predicate dc:format;
-      rr:objectMap [ rr:column '"mimetype"' ];
-    ];
-	rr:predicateObjectMap [
-      rr:predicate edm:rights;
-      rr:objectMap [ rr:column '"text_value"' ];
+      rr:predicate rdfs:label;
+      rr:objectMap [ rr:column '"name"' ];
     ].
-	
-map:edm-type
-    rr:logicalTable <#edm-type-view>;
+
+map:communities
+    rr:logicalTable <#community-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/community/{"handle"}';
+        rr:class dcterms:BibliographicResource;
     ];
     rr:predicateObjectMap [
-        rr:predicate edm:type;
-                rr:objectMap [ rr:column '"text_value"' ];
-
+      rr:predicate rdfs:label;
+      rr:objectMap [ rr:column '"name"' ];
     ].
-	
+
 ### Dublin Core descriptions
-	
+
 map:dc-contributor
     rr:logicalTable <#dc-contributor-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:contributor;
-        rr:objectMap [ rr:template 'http://repository.example.com/persons#{"text_value"}';
-							rr:termType rr:IRI ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 map:dc-contributor-advisor
     rr:logicalTable <#dc-contributor-advisor-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:contributor;
-        rr:objectMap [ rr:template 'http://repository.example.com/persons#{"text_value"}';
-							rr:termType rr:IRI ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
-map:dc-contributor-alternative
-    rr:logicalTable <#dc-contributor-alternative-view>;
-    rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
-    ];
-    rr:predicateObjectMap [
-        rr:predicate dc:contributor;
-        rr:objectMap [ rr:template 'http://repository.example.com/persons#{"text_value"}';
-							rr:termType rr:IRI ];
-    ].
-	
 map:dc-contributor-author
     rr:logicalTable <#dc-contributor-author-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:creator;
-        rr:objectMap [ rr:template 'http://repository.example.com/persons#{"text_value"}';
-							rr:termType rr:IRI ];
+        rr:predicate dc:contributor;
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 map:dc-contributor-editor
     rr:logicalTable <#dc-contributor-editor-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:contributor;
-        rr:objectMap [ rr:template 'http://repository.example.com/persons#{"text_value"}';
-							rr:termType rr:IRI ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 map:dc-contributor-illustrator
     rr:logicalTable <#dc-contributor-illustrator-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dc:contributor;
-        rr:objectMap [ rr:template 'http://repository.example.com/persons#{"text_value"}';
-							rr:termType rr:IRI ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 map:dc-contributor-other
     rr:logicalTable <#dc-contributor-other-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:creator;
-        rr:objectMap [ rr:template 'http://repository.example.com/persons#{"text_value"}';
-							rr:termType rr:IRI ];
+        rr:predicate dc:contributor;
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 map:dc-coverage-spatial
     rr:logicalTable <#dc-coverage-spatial-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:spatial;
-		rr:objectMap [ rr:template 'http://repository.example.com/spatial_terms#{"text_value"}';
-							rr:termType rr:IRI ];
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 map:dc-coverage-temporal
     rr:logicalTable <#dc-coverage-temporal-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:temporal;
@@ -191,62 +129,114 @@ map:dc-coverage-temporal
 map:dc-creator
     rr:logicalTable <#dc-creator-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:creator;
-        rr:objectMap [ rr:template 'http://repository.example.com/persons#{"text_value"}';
-							rr:termType rr:IRI ];
+        rr:predicate dcterms:creator;
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
-	
+
 map:dc-date
     rr:logicalTable <#dc-date-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:date;
+        rr:predicate dcterms:date;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 #map:dc-date-accessioned
 
+#map:dc-date-available
+#    rr:logicalTable <#dc-date-available-view>;
+#    rr:subjectMap [
+#        rr:template 'http://data.example.org/repository/item/{"handle"}';
+#    ];
+#    rr:predicateObjectMap [
+#        rr:predicate dcterms:available;
+#        rr:objectMap [ rr:column '"text_value"' ];
+#    ].
+
+map:dc-date-copyright
+    rr:logicalTable <#dc-date-copyright-view>;
+    rr:subjectMap [
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:dateCopyrighted;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
 map:dc-date-created
     rr:logicalTable <#dc-date-created-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:created;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
+#map:dc-date-issued
+#    rr:logicalTable <#dc-date-issued-view>;
+#    rr:subjectMap [
+#        rr:template 'http://data.example.org/repository/item/{"handle"}';
+#    ];
+#    rr:predicateObjectMap [
+#        rr:predicate dcterms:issued;
+#        rr:objectMap [ rr:column '"text_value"' ];
+#    ].
+
+#map:dc-date-submitted
+#    rr:logicalTable <#dc-date-submitted-view>;
+#    rr:subjectMap [
+#        rr:template 'http://data.example.org/repository/item/{"handle"}';
+#    ];
+#    rr:predicateObjectMap [
+#        rr:predicate dcterms:dateSubmitted;
+#        rr:objectMap [ rr:column '"text_value"' ];
+#    ].
+
 #map:dc-date-updated
 
-map:dc-description
-    rr:logicalTable <#dc-description-view>;
-    rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
-    ];
-    rr:predicateObjectMap [
-        rr:predicate dc:description;
-        rr:objectMap [ rr:column '"text_value"' ];
-    ].
+#map:dc-description
+#    rr:logicalTable <#dc-description-view>;
+#    rr:subjectMap [
+#        rr:template 'http://data.example.org/repository/item/{"handle"}';
+#    ];
+#    rr:predicateObjectMap [
+#        rr:predicate dcterms:description;
+#        rr:objectMap [ rr:column '"text_value"' ];
+#    ].
 
 map:dc-description-abstract
     rr:logicalTable <#dc-description-abstract-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:abstract;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
+#map:dc-description-provenance
+#    rr:logicalTable <#dc-description-provenance-view>;
+#    rr:subjectMap [
+#        rr:template 'http://data.example.org/repository/item/{"handle"}';
+#    ];
+#    rr:predicateObjectMap [
+#        rr:predicate dcterms:provenance;
+#        rr:objectMap [ rr:column '"text_value"' ];
+#    ].
+
+#map:dc-description-sponsorship
+#map:dc-description-statementofresponsibility
+
 map:dc-description-tableofcontents
     rr:logicalTable <#dc-description-tableofcontents-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:tableOfContents;
@@ -258,7 +248,7 @@ map:dc-description-tableofcontents
 map:dc-format
     rr:logicalTable <#dc-format-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:format;
@@ -268,7 +258,7 @@ map:dc-format
 map:dc-format-extent
     rr:logicalTable <#dc-format-extent-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:extent;
@@ -278,7 +268,7 @@ map:dc-format-extent
 map:dc-format-medium
     rr:logicalTable <#dc-format-medium-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:medium;
@@ -290,31 +280,30 @@ map:dc-format-medium
 map:dc-identifier
     rr:logicalTable <#dc-identifier-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:identifier;
+        rr:predicate dcterms:identifier;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
-map:dc-identifier-uri
-    rr:logicalTable <#dc-identifier-uri-view>;
-    rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
-    ];
-    rr:predicateObjectMap [
-        rr:predicate dc:identifier;
-        rr:objectMap [ rr:template '{"text_value"}' ];
-    ].
-	
+#map:dc-identifier-citation
+#map:dc-identifier-govdoc
+#map:dc-identifier-isbn
+#map:dc-identifier-issn
+#map:dc-identifier-sici
+#map:dc-identifier-ismn
+#map:dc-identifier-other
+#map:dc-identifier-uri
+
 map:dc-language
     rr:logicalTable <#dc-language-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:language;
-        rr:objectMap [ rr:template '{"text_value"}' ];
+        rr:predicate dcterms:language;
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
     
 #map:dc-language-iso
@@ -322,12 +311,11 @@ map:dc-language
 map:dc-publisher
     rr:logicalTable <#dc-publisher-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:publisher;
-        rr:objectMap [ rr:template 'http://repository.example.com/publishers#{"text_value"}';
-							rr:termType rr:IRI ];
+        rr:predicate dcterms:publisher;
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 #map:dc-relation
@@ -338,7 +326,7 @@ map:dc-publisher
 map:dc-relation-haspart
     rr:logicalTable <#dc-relation-haspart-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:hasPart;
@@ -350,7 +338,7 @@ map:dc-relation-haspart
 map:dc-relation-hasversion
     rr:logicalTable <#dc-relation-hasversion-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:hasVersion;
@@ -362,7 +350,7 @@ map:dc-relation-hasversion
 map:dc-relation-isreferencedby
     rr:logicalTable <#dc-relation-isreferencedby-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:isReferencedBy;
@@ -372,7 +360,7 @@ map:dc-relation-isreferencedby
 map:dc-relation-requires
     rr:logicalTable <#dc-relation-requires-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:requires;
@@ -382,7 +370,7 @@ map:dc-relation-requires
 map:dc-relation-replaces
     rr:logicalTable <#dc-relation-replaces-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:replaces;
@@ -392,7 +380,7 @@ map:dc-relation-replaces
 map:dc-relation-isreplacedby
     rr:logicalTable <#dc-relation-isreplacedby-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:isReplacedBy;
@@ -404,10 +392,10 @@ map:dc-relation-isreplacedby
 map:dc-rights
     rr:logicalTable <#dc-rights-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:rights;
+        rr:predicate dcterms:license;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
@@ -416,10 +404,10 @@ map:dc-rights
 map:dc-source
     rr:logicalTable <#dc-source-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:source;
+        rr:predicate dcterms:source;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
@@ -428,12 +416,11 @@ map:dc-source
 map:dc-subject
     rr:logicalTable <#dc-subject-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:subject;
-                rr:objectMap [ rr:template 'http://repository.example.com/subjects#{"text_value"}';
-							rr:termType rr:IRI ];
+        rr:predicate dcterms:subject;
+        rr:objectMap [ rr:template 'http://id.loc.gov/authorities/classification/{"text_value"}';];
     ].
 
 #map:dc-subject-classification
@@ -446,17 +433,17 @@ map:dc-subject
 map:dc-title
     rr:logicalTable <#dc-title-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:title;
+        rr:predicate dcterms:title;
         rr:objectMap [ rr:column '"text_value"' ];
     ].
 
 map:dc-title-alternative
     rr:logicalTable <#dc-title-alternative-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
         rr:predicate dcterms:alternative;
@@ -466,21 +453,54 @@ map:dc-title-alternative
 map:dc-type
     rr:logicalTable <#dc-type-view>;
     rr:subjectMap [
-        rr:template 'http://repository.example.com/handle/{"thehandle"}';
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
     ];
     rr:predicateObjectMap [
-        rr:predicate dc:type;
-                rr:objectMap [ rr:template 'http://repository.example.com/types#{"text_value"}';
-							rr:termType rr:IRI ];
+        rr:predicate dcterms:type;
+        rr:objectMap [ rr:column '"text_value"' ];
     ].
-	    
+
+### MADS descriptions
+
+map:mods-accessCondition
+    rr:logicalTable <#mods-accessCondition-view>;
+    rr:subjectMap [
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:rights;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+map:mods-note
+    rr:logicalTable <#mods-note-view>;
+    rr:subjectMap [
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:description;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+
+### LOM descriptions
+
+map:lom-classification-keyword
+    rr:logicalTable <#lom-classification-keyword-view>;
+    rr:subjectMap [
+        rr:template 'http://data.example.org/repository/item/{"handle"}';
+    ];
+    rr:predicateObjectMap [
+        rr:predicate dcterms:subject;
+        rr:objectMap [ rr:column '"text_value"' ];
+    ].
+    
 ################################################ views ################################################
 
 ## custom views ##
 
 <#item-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, i.item_id
+    SELECT h.handle AS handle, i.item_id
     FROM handle AS h, item AS i WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -489,77 +509,44 @@ map:dc-type
 
 <#collection-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, c.collection_id AS id, c.name AS name
-    FROM handle AS h, collection AS c WHERE
+    SELECT h.handle AS handle, c.collection_id AS id, mv.text_value AS name
+    FROM handle AS h, collection AS c, metadatavalue as mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    h.resource_type_id=3 AND
+    h.resource_type_id=mv.resource_type_id AND
     h.resource_id=c.collection_id AND
-    h.resource_type_id=3
+    c.collection_id=mv.resource_id AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='title' AND
+    mfr.qualifier IS NULL
     """.
 
 <#community-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, c.community_id AS id, c.name AS name
-    FROM handle AS h, community AS c WHERE
-    h.resource_id=c.community_id AND
-    h.resource_type_id=4
-    """.
-	
-<#edm-type-view>
-    rr:sqlQuery """
-    SELECT h.handle AS thehandle,
-	replace(replace(replace(replace(replace(replace(replace(replace(replace(
-		mv.text_value,'Book','TEXT'),
-		'Educational Material','TEXT'),
-		'Article','TEXT'),
-		'Survey','TEXT'),
-		'Audiovisual Content','VIDEO'),
-		'Poster','IMAGE'),
-		'Leaflet','IMAGE'),
-		'Photo','IMAGE'),
-		'Map','IMAGE')
-		AS text_value
-    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-    i.in_archive=TRUE AND
-    h.resource_id=i.item_id AND
-    h.resource_type_id=2 AND
+    SELECT h.handle AS handle, c.collection_id AS id, mv.text_value AS name
+    FROM handle AS h, collection AS c, metadatavalue as mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    h.resource_type_id=4 AND
+    h.resource_type_id=mv.resource_type_id AND
+    h.resource_id=c.collection_id AND
+    c.collection_id=mv.resource_id AND
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
-    mv.text_value is not null AND
-    i.item_id=mv.item_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-    mfr.element='type' AND
+    mfr.element='title' AND
     mfr.qualifier IS NULL
     """.
-		
-<#bitstream-view>
-    rr:sqlQuery """
-	SELECT h.handle AS thehandle, b.name AS filename, b.sequence_id AS sequence_id, bfr.mimetype AS mimetype, mv.text_value AS text_value FROM
-	handle AS h, item AS i, item2bundle AS ib, bundle AS bundle, bitstream AS b,bundle2bitstream AS bb, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr, bitstreamformatregistry AS bfr WHERE  
-	h.resource_type_id=2 AND
-	h.resource_id = ib.item_id AND
-	ib.bundle_id=bb.bundle_id AND
-	h.resource_id=i.item_id AND i.withdrawn='f' AND
-	bb.bitstream_id = b.bitstream_id AND
-	b.bitstream_format_id=bfr.bitstream_format_id AND
-	bundle.bundle_id=ib.bundle_id AND
-	bundle.name='ORIGINAL' AND
-	b.deleted = 'f' AND
-	i.in_archive=TRUE AND
-	h.resource_id=i.item_id AND
-	h.resource_type_id=2 AND
-	msr.metadata_schema_id=mfr.metadata_schema_id AND
-	mfr.metadata_field_id=mv.metadata_field_id AND
-	mv.text_value is not null AND
-	i.item_id=mv.item_id AND
-	msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-	mfr.element='rights' AND
-	mfr.qualifier IS NULL
-    """.
 
-###### schemas: dublin core, edm ######
+#   <#Bitstreams>
+
+#   <#BitstreamFormats>
+
+
+###### schemas: dublin core, mods, lom ######
 
 <#dc-contributor-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -567,7 +554,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='contributor' AND
     mfr.qualifier IS NULL
@@ -575,7 +562,7 @@ map:dc-type
 
 <#dc-contributor-advisor-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -583,31 +570,15 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='contributor' AND
     mfr.qualifier='advisor'
     """.
-
-<#dc-contributor-alternative-view>
-    rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
-    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
-    i.in_archive=TRUE AND
-    h.resource_id=i.item_id AND
-    h.resource_type_id=2 AND
-    msr.metadata_schema_id=mfr.metadata_schema_id AND
-    mfr.metadata_field_id=mv.metadata_field_id AND
-    mv.text_value is not null AND
-    i.item_id=mv.item_id AND
-    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
-    mfr.element='contributor' AND
-    mfr.qualifier='alternative'
-    """.
-	
+    
 <#dc-contributor-author-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -615,7 +586,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='contributor' AND
     mfr.qualifier='author'
@@ -623,7 +594,7 @@ map:dc-type
 
 <#dc-contributor-editor-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -631,7 +602,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='contributor' AND
     mfr.qualifier='editor'
@@ -639,7 +610,7 @@ map:dc-type
 
 <#dc-contributor-illustrator-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -647,7 +618,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='contributor' AND
     mfr.qualifier='illustrator'
@@ -655,7 +626,7 @@ map:dc-type
 
 <#dc-contributor-other-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -663,7 +634,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='contributor' AND
     mfr.qualifier='other'
@@ -671,7 +642,7 @@ map:dc-type
 
 <#dc-coverage-spatial-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -679,7 +650,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='coverage' AND
     mfr.qualifier='spatial'
@@ -687,7 +658,7 @@ map:dc-type
 
 <#dc-coverage-temporal-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -695,7 +666,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='coverage' AND
     mfr.qualifier='temporal'
@@ -703,7 +674,7 @@ map:dc-type
     
 <#dc-creator-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -711,15 +682,15 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='creator' AND
     mfr.qualifier IS NULL
     """.
-	
+
 <#dc-date-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -727,7 +698,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='date' AND
     mfr.qualifier IS NULL
@@ -735,7 +706,7 @@ map:dc-type
 
 <#dc-date-accessioned-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -743,15 +714,15 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='date' AND
     mfr.qualifier='accessioned'
     """.
     
-<#dc-date-created-view>
+<#dc-date-available-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -759,15 +730,47 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
+    mfr.qualifier='available'
+    """.
+
+<#dc-date-copyright-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
+    mfr.qualifier='copyright'
+    """.
+    
+<#dc-date-created-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='date' AND
     mfr.qualifier='created'
-    """.
+    """.    
     
-<#dc-date-updated-view>
+<#dc-date-issued-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -775,7 +778,39 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
+    mfr.qualifier='issued'
+    """.
+    
+<#dc-date-submitted-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='date' AND
+    mfr.qualifier='submitted'
+    """.    
+    
+<#dc-date-updated-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='date' AND
     mfr.qualifier='updated'
@@ -783,7 +818,7 @@ map:dc-type
     
 <#dc-description-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -791,7 +826,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='description' AND
     mfr.qualifier IS NULL
@@ -799,7 +834,7 @@ map:dc-type
 
 <#dc-description-abstract-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -807,15 +842,63 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='description' AND
     mfr.qualifier='abstract'
+    """.        
+    
+<#dc-description-provenance-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='description' AND
+    mfr.qualifier='provenance'
+    """.        
+    
+<#dc-description-sponsorship-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='description' AND
+    mfr.qualifier='sponsorship'
+    """.
+
+<#dc-description-statementofresponsibility-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='description' AND
+    mfr.qualifier='statementofresponsibility'
     """.
         
 <#dc-description-tableofcontents-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -823,7 +906,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='description' AND
     mfr.qualifier='tableofcontents'
@@ -831,7 +914,7 @@ map:dc-type
 
 <#dc-description-uri-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -839,7 +922,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='description' AND
     mfr.qualifier='uri'
@@ -847,7 +930,7 @@ map:dc-type
 
 <#dc-format-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -855,7 +938,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='format' AND
     mfr.qualifier IS NULL
@@ -863,7 +946,7 @@ map:dc-type
 
 <#dc-format-extent-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -871,7 +954,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='format' AND
     mfr.qualifier='extent'
@@ -879,7 +962,7 @@ map:dc-type
     
 <#dc-format-medium-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -887,7 +970,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='format' AND
     mfr.qualifier='medium'
@@ -895,7 +978,7 @@ map:dc-type
 
 <#dc-format-mimetype-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -903,7 +986,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='format' AND
     mfr.qualifier='mimetype'
@@ -911,7 +994,7 @@ map:dc-type
 
 <#dc-identifier-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -919,15 +1002,15 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='identifier' AND
     mfr.qualifier IS NULL
-    """. 
+    """.
     
-<#dc-identifier-uri-view>
+<#dc-identifier-citation-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -935,7 +1018,119 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='citation'
+    """.    
+
+<#dc-identifier-govdoc-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='govdoc'
+    """.    
+    
+<#dc-identifier-isbn-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='isbn'
+    """.    
+    
+<#dc-identifier-issn-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='issn'
+    """.    
+    
+<#dc-identifier-sici-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='sici'
+    """.    
+    
+<#dc-identifier-ismn-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='ismn'
+    """.    
+    
+<#dc-identifier-other-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='identifier' AND
+    mfr.qualifier='other'
+    """.        
+    
+<#dc-identifier-uri-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='identifier' AND
     mfr.qualifier='uri'
@@ -943,7 +1138,7 @@ map:dc-type
 
 <#dc-language-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -951,7 +1146,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='language' AND
     mfr.qualifier IS NULL
@@ -959,7 +1154,7 @@ map:dc-type
 
 <#dc-language-iso-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -967,7 +1162,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='language' AND
     mfr.qualifier='iso'
@@ -975,7 +1170,7 @@ map:dc-type
 
 <#dc-publisher-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -983,7 +1178,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='publisher' AND
     mfr.qualifier IS NULL
@@ -991,7 +1186,7 @@ map:dc-type
 
 <#dc-relation-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -999,7 +1194,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier IS NULL
@@ -1007,7 +1202,7 @@ map:dc-type
 
 <#dc-relation-isformatof-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1015,7 +1210,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='isformatof'
@@ -1023,7 +1218,7 @@ map:dc-type
 
 <#dc-relation-ispartof-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1031,7 +1226,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='ispartof'
@@ -1039,7 +1234,7 @@ map:dc-type
 
 <#dc-relation-ispartofseries-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1047,7 +1242,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='ispartofseries'
@@ -1055,7 +1250,7 @@ map:dc-type
 
 <#dc-relation-haspart-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1063,7 +1258,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='haspart'
@@ -1071,7 +1266,7 @@ map:dc-type
 
 <#dc-relation-isversionof-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1079,7 +1274,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='isversionof'
@@ -1087,7 +1282,7 @@ map:dc-type
 
 <#dc-relation-hasversion-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1095,7 +1290,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='hasversion'
@@ -1103,7 +1298,7 @@ map:dc-type
 
 <#dc-relation-isbasedon-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1111,7 +1306,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='isbasedon'
@@ -1119,7 +1314,7 @@ map:dc-type
 
 <#dc-relation-isreferencedby-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1127,7 +1322,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='isreferencedby'
@@ -1135,7 +1330,7 @@ map:dc-type
 
 <#dc-relation-requires-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1143,7 +1338,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='requires'
@@ -1151,7 +1346,7 @@ map:dc-type
 
 <#dc-relation-replaces-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1159,7 +1354,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='replaces'
@@ -1167,7 +1362,7 @@ map:dc-type
 
 <#dc-relation-isreplacedby-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1175,7 +1370,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='isreplacedby'
@@ -1183,7 +1378,7 @@ map:dc-type
 
 <#dc-relation-uri-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1191,7 +1386,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='relation' AND
     mfr.qualifier='uri'
@@ -1199,7 +1394,7 @@ map:dc-type
 
 <#dc-rights-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1207,7 +1402,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='rights' AND
     mfr.qualifier IS NULL
@@ -1215,7 +1410,7 @@ map:dc-type
 
 <#dc-rights-uri-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1223,7 +1418,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='rights' AND
     mfr.qualifier='uri'
@@ -1231,7 +1426,7 @@ map:dc-type
 
 <#dc-source-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1239,7 +1434,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='source' AND
     mfr.qualifier IS NULL
@@ -1247,7 +1442,7 @@ map:dc-type
 
 <#dc-source-uri-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1255,7 +1450,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='source' AND
     mfr.qualifier='uri'
@@ -1263,7 +1458,7 @@ map:dc-type
     
 <#dc-subject-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1271,15 +1466,15 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='subject' AND
     mfr.qualifier IS NULL
     """.
     
-<#dc-title-view>
+<#dc-subject-classification-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1287,7 +1482,103 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='classification'
+    """.
+    
+<#dc-subject-ddc-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='ddc'
+    """.
+
+<#dc-subject-lcc-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='lcc'
+    """.
+    
+<#dc-subject-lcsh-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='lcsh'
+    """.    
+    
+<#dc-subject-mesh-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='mesh'
+    """.    
+    
+<#dc-subject-other-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
+    mfr.element='subject' AND
+    mfr.qualifier='other'
+    """.    
+    
+<#dc-title-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='title' AND
     mfr.qualifier IS NULL
@@ -1295,7 +1586,7 @@ map:dc-type
 
 <#dc-title-alternative-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1303,7 +1594,7 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='title' AND
     mfr.qualifier='alternative'
@@ -1311,7 +1602,7 @@ map:dc-type
     
 <#dc-type-view>
     rr:sqlQuery """
-    SELECT h.handle AS thehandle, mv.text_value AS text_value
+    SELECT h.handle AS handle, mv.text_value AS text_value
     FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
     i.in_archive=TRUE AND
     h.resource_id=i.item_id AND
@@ -1319,8 +1610,56 @@ map:dc-type
     msr.metadata_schema_id=mfr.metadata_schema_id AND
     mfr.metadata_field_id=mv.metadata_field_id AND
     mv.text_value is not null AND
-    i.item_id=mv.item_id AND
+    i.item_id=mv.resource_id AND
     msr.namespace='http://dublincore.org/documents/dcmi-terms/' AND
     mfr.element='type' AND
     mfr.qualifier IS NULL
     """.
+
+<#mods-accessCondition-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://www.loc.gov/standards/mods/mods.xsd' AND
+    mfr.element='accessCondition' AND
+    mfr.qualifier IS NULL
+    """.
+    
+<#mods-note-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://www.loc.gov/standards/mods/mods.xsd' AND
+    mfr.element='note'
+    """.
+
+<#lom-classification-keyword-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle, mv.text_value AS text_value
+    FROM handle AS h, item AS i, metadatavalue AS mv, metadataschemaregistry AS msr, metadatafieldregistry AS mfr WHERE
+    i.in_archive=TRUE AND
+    h.resource_id=i.item_id AND
+    h.resource_type_id=2 AND
+    msr.metadata_schema_id=mfr.metadata_schema_id AND
+    mfr.metadata_field_id=mv.metadata_field_id AND
+    mv.text_value is not null AND
+    i.item_id=mv.resource_id AND
+    msr.namespace='http://ltsc.ieee.org/xsd/LOM' AND
+    mfr.element='classification' AND
+    mfr.qualifier='keyword'
+    """.
+    
