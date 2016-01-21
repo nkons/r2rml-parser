@@ -87,6 +87,7 @@ public class Generator {
 	private boolean storeOutputModelInTdb;
 	private boolean writeReifiedModel;
 	private boolean encodeURLs;
+	private boolean forceUri;
 	
 	private Model logModel;
 		
@@ -99,6 +100,7 @@ public class Generator {
 		incremental = !storeOutputModelInTdb && properties.containsKey("default.incremental") && properties.getProperty("default.incremental").contains("true");
 		encodeURLs = properties.containsKey("jena.encodeURLs") && properties.getProperty("jena.encodeURLs").contains("true");
 		writeReifiedModel = incremental;
+		forceUri = properties.containsKey("default.forceURI") && properties.getProperty("default.forceURI").contains("true");
 		
 		String destinationFileName = properties.getProperty("jena.destinationFileName");
 		int dot = destinationFileName.lastIndexOf('.') > -1 ? destinationFileName.lastIndexOf('.') : destinationFileName.length();
@@ -362,13 +364,27 @@ public class Generator {
 											}
 											
 											if (o != null) {
-												Statement st = resultModel.createStatement(s, p, o);
-												subjects.add(st.getSubject().getURI());
-												if (incremental || writeReifiedModel) {
-													ReifiedStatement rst = resultModel.createReifiedStatement(st);
-													rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
+												if (forceUri && o.getString().startsWith("http://")) {
+													if (verbose) log.info("Changing literal to URI: <" + o.getString() + ">");
+													RDFNode oToUri = resultModel.createResource(o.getString());
+													
+													Statement st = resultModel.createStatement(s, p, oToUri);
+													subjects.add(st.getSubject().getURI());
+													if (incremental || writeReifiedModel) {
+														ReifiedStatement rst = resultModel.createReifiedStatement(st);
+														rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
+													} else {
+														resultModel.add(st);
+													}
 												} else {
-													resultModel.add(st);
+													Statement st = resultModel.createStatement(s, p, o);
+													subjects.add(st.getSubject().getURI());
+													if (incremental || writeReifiedModel) {
+														ReifiedStatement rst = resultModel.createReifiedStatement(st);
+														rst.addProperty(DC.source, resultModel.createResource(logicalTableMapping.getUri()));
+													} else {
+														resultModel.add(st);
+													}
 												}
 											}
 										} else if (objectTemplate.getTermType() == TermType.IRI) {

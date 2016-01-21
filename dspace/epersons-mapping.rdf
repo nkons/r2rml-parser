@@ -1,6 +1,6 @@
 #
 # Downloaded from https://github.com/nkons/r2rml-parser/
-# Mapping file works wiht DSpace 3.x, 4.x
+# Mapping file works with DSpace 3.x, 4.x
 #
 
 @prefix map: <#>.
