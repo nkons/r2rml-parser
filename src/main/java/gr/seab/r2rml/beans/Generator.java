@@ -364,7 +364,7 @@ public class Generator {
 											}
 											
 											if (o != null) {
-												if (forceUri && o.getString().startsWith("http://")) {
+												if (forceUri && o.getString().startsWith("http")) {
 													if (verbose) log.info("Changing literal to URI: <" + o.getString() + ">");
 													RDFNode oToUri = resultModel.createResource(o.getString());
 													
