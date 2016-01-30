@@ -343,7 +343,7 @@ public class Generator {
 										if (objectTemplate.getTermType() == TermType.LITERAL) {
 											Literal o = null;
 											
-											if (predicateObjectMap.getObjectTemplate().getLanguage() == null) {
+											if (predicateObjectMap.getObjectTemplate().getLanguage() == null || "".equals(predicateObjectMap.getObjectTemplate().getLanguage())) {
 												String value = util.fillTemplate(objectTemplate, rs, encodeURLs);
 												if (value != null)  {
 													if (predicateObjectMap.getDataType() != null) {
@@ -436,7 +436,7 @@ public class Generator {
 										
 										if (test != null) {
 											Literal o;
-											if (predicateObjectMap.getObjectTemplate().getLanguage() == null) {
+											if (predicateObjectMap.getObjectTemplate().getLanguage() == null || "".equals(predicateObjectMap.getObjectTemplate().getLanguage())) {
 												
 												if (predicateObjectMap.getDataType() != null) {
 													o = resultModel.createTypedLiteral(test, predicateObjectMap.getDataType());
