@@ -1,0 +1,222 @@
+@prefix map: <#>.
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix vcard: <http://www.w3.org/2001/vcard-rdf/3.0#> . 
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . 
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> . 
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix conf: <http://ufc.br/rdb2rdfmb/conf/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . 
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+map:Person
+	rr:logicalTable [ rr:sqlQuery """
+		SELECT PerID AS ID, Email AS foaf_mbox, FirstName AS foaf_name, LastName AS foaf_name2
+		FROM persons
+	""" ];
+
+	rr:subjectMap [
+		rr:template 'http://data.example.com/person/{"ID"}';
+		rr:class foaf:Person; 
+	];
+	rr:predicateObjectMap [ 
+		rr:predicate foaf:name; 
+		rr:objectMap [
+			rr:template '{"foaf_name"} {"foaf_name2"}';
+			rr:termType rr:Literal; 
+		]
+	].
+
+
+
+map:Concept
+	rr:logicalTable [ rr:sqlQuery """
+		SELECT TopicID AS ID, TopicName AS skos_prefLabel, ParentID AS skos_broader 
+		FROM topics
+	""" ];
+
+	rr:subjectMap [
+		rr:template 'http://data.example.com/concept/{"ID"}';
+		rr:class skos:Concept; 
+	];
+	rr:predicateObjectMap [
+		rr:predicate skos:prefLabel;
+		rr:objectMap [ rr:column 'skos_prefLabel' ; ] 
+	];
+	rr:predicateObjectMap [ 
+		rr:predicate skos:broader; 
+		rr:objectMap [
+			rr:parentTriplesMap map:Concept; 
+			rr:joinCondition [
+				rr:child 'skos_broader';
+				rr:parent 'TopicID'; 
+			]
+		]
+	].
+
+
+map:Person_research_interests
+	rr:logicalTable [ rr:sqlQuery """
+		SELECT persons.PerID AS ID_foaf_Person, rel_paper_topic.TopicID AS conf_research_interests
+		FROM persons, rel_person_paper, papers, rel_paper_topic, topics 
+		WHERE persons.PerID = rel_person_paper.PersonID
+		AND rel_person_paper.PaperID = papers.PaperID 
+		AND papers.PaperID = rel_paper_topic.PaperID 
+		AND rel_paper_topic.TopicID = topics.TopicID
+	""" ];
+		
+	rr:subjectMap [
+		rr:template 'http://data.example.com/person/{"ID_foaf_Person"}'; 
+		rr:class foaf:Person;
+	];
+	rr:predicateObjectMap [
+		rr:predicate conf:research_interests; 
+		rr:objectMap [
+			rr:parentTriplesMap map:Concept; 
+			rr:joinCondition [
+				rr:child 'conf_research_interests';
+				rr:parent 'TopicID'; 
+			]
+		]
+	].
+
+
+map:PostalAddress
+	rr:logicalTable [ rr:sqlQuery """
+		SELECT Address || ' ' || Postcode || ' ' || Country AS ID,Country AS vcard_country, Address AS vcard_street, Location AS vcard_locality, Postcode AS vcard_pcode
+		FROM organizations
+	""" ];
+ 
+	rr:subjectMap [
+		rr:template 'http://data.example.com/postalAddress/{"ID"}';
+		rr:class conf:PostalAddress; 
+	];
+	rr:predicateObjectMap [
+		rr:predicate vcard:country;
+		rr:objectMap [ rr:column 'vcard_country' ; ] 
+	];
+	rr:predicateObjectMap [
+		rr:predicate vcard:pcode;
+		rr:objectMap [ rr:column 'vcard_pcode' ;]
+	];
+
+	rr:predicateObjectMap [
+		rr:predicate vcard:street;
+		rr:objectMap [ rr:column 'vcard_street' ;]
+	].
+
+map:Organization
+	rr:logicalTable [ rr:sqlQuery """
+		SELECT OrgID AS ID, Homepage AS foaf_homepage, Name AS rdfs_label, Address AS vcard_ADR, Location AS vcard_ADR2, Postcode AS vcard_ADR3, Country AS vcard_ADR4 
+		FROM organizations
+	""" ];
+ 
+	rr:subjectMap [
+		rr:template 'http://data.example.com/organization/{"ID"}';
+		rr:class conf:Organization; 
+	];
+	rr:predicateObjectMap [
+		rr:predicate rdfs:label;
+		rr:objectMap [ rr:column 'rdfs_label'; ]
+	].
+
+
+map:Document
+	rr:logicalTable [ rr:sqlQuery """
+		SELECT PaperID AS ID, Title AS dc_title, Year AS dc_date, 
+		(SELECT Name || ', ' || location from conferences where conferences.ConfID=papers.conference) AS conf_conference
+		FROM papers
+		WHERE papers.Year > 2002
+	""" ];
+
+	rr:subjectMap [
+		rr:template 'http://data.example.com/document/{"ID"}';
+		rr:class foaf:Document; 
+	];
+	rr:predicateObjectMap [ 
+		rr:predicate conf:conference; 
+		rr:objectMap [ rr:column 'conf_conference' ; ]
+	];
+	rr:predicateObjectMap [
+		rr:predicate dc:date;
+		rr:objectMap [ rr:column 'dc_date' ; ]
+	]; 
+	rr:predicateObjectMap [
+		rr:predicate dc:title;
+		rr:objectMap [ rr:column 'dc_title' ;] 
+	].
+
+map:Document_Creator
+	rr:logicalTable [ rr:sqlQuery """
+		SELECT papers.PaperID AS ID_foaf_Document, rel_person_paper.PersonID AS dc_creator
+		FROM papers, rel_person_paper, persons
+		WHERE papers.PaperID = rel_person_paper.PaperID
+		AND rel_person_paper.PersonID = persons.PerID
+		AND papers.Year > 2002
+	""" ];
+
+	rr:subjectMap [
+		rr:template 'http://data.example.com/document/{"ID_foaf_Document"}';
+		rr:class foaf:Document; 
+	];
+	rr:predicateObjectMap [ 
+		rr:predicate dc:creator; 
+		rr:objectMap [
+			rr:parentTriplesMap map:Person; 
+			rr:joinCondition [
+				rr:child 'dc_creator';
+				rr:parent 'PerID'; 
+			     ]
+		]
+	].
+
+map:Document_subject
+	rr:logicalTable [ rr:sqlQuery """
+		SELECT papers.PaperID AS ID_foaf_Document, rel_paper_topic.TopicID AS skos_subject
+	FROM papers, rel_paper_topic, topics
+	WHERE papers.PaperID = rel_paper_topic.PaperID
+	AND rel_paper_topic.TopicID = topics.TopicID
+	AND papers.Year > 2002
+	""" ];
+
+	rr:subjectMap [
+		rr:template 'http://data.example.com/document/{"ID_foaf_Document"}';
+		rr:class foaf:Document; 
+	];
+	rr:predicateObjectMap [
+		rr:predicate skos:subject; 
+		rr:objectMap [
+			rr:parentTriplesMap map:Concept; 
+			rr:joinCondition [
+				rr:child 'skos_subject';
+				rr:parent 'TopicID'; 
+			]
+		] 
+	].
+
+map:Person_has_affiliation
+	rr:logicalTable [ rr:sqlQuery """
+		SELECT persons.PerID AS ID_foaf_Person, rel_person_organization.OrganizationID AS conf_has_affiliation
+	FROM persons, rel_person_organization, organizations
+	WHERE persons.PerID = rel_person_organization.PersonID
+	AND rel_person_organization.OrganizationID = organizations.OrgID
+	""" ];
+
+	rr:subjectMap [
+		rr:template 'http://data.example.com/person/{"ID_foaf_Person"}';
+		rr:class foaf:Person; 
+	];
+	rr:predicateObjectMap [
+		rr:predicate conf:has_affiliation; 
+		rr:objectMap [
+			rr:parentTriplesMap map:Organization; 
+			rr:joinCondition [
+				rr:child 'conf_has_affiliation';
+				rr:parent 'OrgID'; 
+			]
+		] 
+	].
+
+		
+

@@ -1,0 +1,222 @@
+@prefix rr:    <http://www.w3.org/ns/r2rml#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix dcam:  <http://purl.org/dc/dcam/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix conf:  <http://ufc.br/rdb2rdfmb/conf/> .
+@prefix vcard: <http://www.w3.org/2001/vcard-rdf/3.0#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix map:   <http://example.com/base#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+<http://data.example.com/concept/4>
+        a               skos:Concept ;
+        skos:broader    <http://data.example.com/concept/5> ;
+        skos:prefLabel  "Semantic Annotation" .
+
+<http://data.example.com/organization/3>
+        a           conf:Organization ;
+        rdfs:label  "International University in Germany" .
+
+<http://data.example.com/person/10>
+        a                        foaf:Person ;
+        conf:has_affiliation     <http://data.example.com/organization/9> ;
+        conf:research_interests  <http://data.example.com/concept/2> , <http://data.example.com/concept/3> , <http://data.example.com/concept/13> ;
+        foaf:name                "Sonia Bergamaschi" .
+
+<http://data.example.com/person/6>
+        a                        foaf:Person ;
+        conf:has_affiliation     <http://data.example.com/organization/7> ;
+        conf:research_interests  <http://data.example.com/concept/10> , <http://data.example.com/concept/11> , <http://data.example.com/concept/14> ;
+        foaf:name                "Andy Seaborne" .
+
+<http://data.example.com/concept/9>
+        a               skos:Concept ;
+        skos:broader    <http://data.example.com/concept/16> ;
+        skos:prefLabel  "Text Mining" .
+
+<http://data.example.com/organization/8>
+        a           conf:Organization ;
+        rdfs:label  "Institute for the Protection and Security of the Citizen" .
+
+<http://data.example.com/concept/3>
+        a               skos:Concept ;
+        skos:prefLabel  "Artificial Intelligence" .
+
+<http://data.example.com/document/8>
+        a                foaf:Document ;
+        dc:creator       <http://data.example.com/person/12> ;
+        dc:date          2006 ;
+        dc:title         "D2R Server - Publishing Relational Databases on the Web as SPARQL Endpoints" ;
+        conf:conference  "15th International World Wide Web Conference, Edinburgh" .
+
+<http://data.example.com/organization/2>
+        a           conf:Organization ;
+        rdfs:label  "University of Karlsruhe" .
+
+<http://data.example.com/postalAddress/De Boelelaan 1081a 1081 HV The Netherlands>
+        a              conf:PostalAddress ;
+        vcard:country  "The Netherlands" ;
+        vcard:pcode    "1081 HV" ;
+        vcard:street   "De Boelelaan 1081a" .
+
+<http://data.example.com/concept/11>
+        a               skos:Concept ;
+        skos:broader    <http://data.example.com/concept/5> ;
+        skos:prefLabel  "Semantic Web Infrastructure" .
+
+<http://data.example.com/person/5>
+        a                        foaf:Person ;
+        conf:has_affiliation     <http://data.example.com/organization/6> , <http://data.example.com/organization/5> ;
+        conf:research_interests  <http://data.example.com/concept/5> , <http://data.example.com/concept/11> , <http://data.example.com/concept/13> ;
+        foaf:name                "Borys Omelayenko" .
+
+<http://data.example.com/concept/8>
+        a               skos:Concept ;
+        skos:prefLabel  "World Wide Web" .
+
+<http://data.example.com/organization/7>
+        a           conf:Organization ;
+        rdfs:label  "Hewlett-Packard Laboratories, Bristol" .
+
+<http://data.example.com/postalAddress/De Boelelaan 1105 1081 HV The Netherlands>
+        a              conf:PostalAddress ;
+        vcard:country  "The Netherlands" ;
+        vcard:pcode    "1081 HV" ;
+        vcard:street   "De Boelelaan 1105" .
+
+<http://data.example.com/concept/2>
+        a               skos:Concept ;
+        skos:broader    <http://data.example.com/concept/15> ;
+        skos:prefLabel  "Knowledge Systems" .
+
+<http://data.example.com/concept/16>
+        a               skos:Concept ;
+        skos:broader    <http://data.example.com/concept/3> ;
+        skos:prefLabel  "Knowledge Discovery" .
+
+<http://data.example.com/document/7>
+        a         foaf:Document ;
+        dc:date   2006 ;
+        dc:title  "The Semantic Web Revisited" .
+
+<http://data.example.com/organization/1>
+        a           conf:Organization ;
+        rdfs:label  "USC Information Sciences Institute" .
+
+<http://data.example.com/postalAddress/Filton Road BS34 8QZ UK>
+        a              conf:PostalAddress ;
+        vcard:country  "UK" ;
+        vcard:pcode    "BS34 8QZ" ;
+        vcard:street   "Filton Road" .
+
+<http://data.example.com/concept/10>
+        a               skos:Concept ;
+        skos:prefLabel  "Databases" .
+
+<http://data.example.com/person/4>
+        a                        foaf:Person ;
+        conf:has_affiliation     <http://data.example.com/organization/3> ;
+        conf:research_interests  <http://data.example.com/concept/3> , <http://data.example.com/concept/5> ;
+        foaf:name                "Andreas Eberhart" .
+
+<http://data.example.com/concept/7>
+        a               skos:Concept ;
+        skos:broader    <http://data.example.com/concept/8> ;
+        skos:prefLabel  "Web Services" .
+
+<http://data.example.com/organization/6>
+        a           conf:Organization ;
+        rdfs:label  "Vrije Universiteit Amsterdam" .
+
+<http://data.example.com/concept/1>
+        a               skos:Concept ;
+        skos:broader    <http://data.example.com/concept/3> ;
+        skos:prefLabel  "Knowledge Representation Languages" .
+
+<http://data.example.com/concept/15>
+        a               skos:Concept ;
+        skos:prefLabel  "Knowledge Management" .
+
+<http://data.example.com/document/6>
+        a                foaf:Document ;
+        dc:creator       <http://data.example.com/person/5> ;
+        dc:date          2003 ;
+        dc:title         "Integrating Vocabularies: Discovering and Representing Vocabulary Maps" ;
+        conf:conference  "International Semantic Web Conference 2002, Sardinia" ;
+        skos:subject     <http://data.example.com/concept/13> , <http://data.example.com/concept/11> , <http://data.example.com/concept/5> .
+
+<http://data.example.com/person/9>
+        a                        foaf:Person ;
+        conf:has_affiliation     <http://data.example.com/organization/8> ;
+        conf:research_interests  <http://data.example.com/concept/10> , <http://data.example.com/concept/11> , <http://data.example.com/concept/14> ;
+        foaf:name                "Alberto Reggiori" .
+
+<http://data.example.com/person/3>
+        a                     foaf:Person ;
+        conf:has_affiliation  <http://data.example.com/organization/1> ;
+        foaf:name             "Jim Blythe" .
+
+<http://data.example.com/concept/6>
+        a               skos:Concept ;
+        skos:broader    <http://data.example.com/concept/5> ;
+        skos:prefLabel  "Semantic Web Languages" .
+
+<http://data.example.com/organization/5>
+        a           conf:Organization ;
+        rdfs:label  "Department of Computer Science" .
+
+<http://data.example.com/person/12>
+        a          foaf:Person ;
+        foaf:name  "Christian Bizer" .
+
+<http://data.example.com/concept/14>
+        a               skos:Concept ;
+        skos:broader    <http://data.example.com/concept/16> ;
+        skos:prefLabel  "Query Languages" .
+
+<http://data.example.com/person/2>
+        a                        foaf:Person ;
+        conf:has_affiliation     <http://data.example.com/organization/1> ;
+        conf:research_interests  <http://data.example.com/concept/5> , <http://data.example.com/concept/15> ;
+        foaf:name                "Varun Ratnakar" .
+
+<http://data.example.com/concept/5>
+        a               skos:Concept ;
+        skos:broader    <http://data.example.com/concept/8> ;
+        skos:prefLabel  "Semantic Web" .
+
+<http://data.example.com/organization/4>
+        a           conf:Organization ;
+        rdfs:label  "AIFB" .
+
+<http://data.example.com/person/11>
+        a                        foaf:Person ;
+        conf:has_affiliation     <http://data.example.com/organization/9> ;
+        conf:research_interests  <http://data.example.com/concept/2> , <http://data.example.com/concept/3> , <http://data.example.com/concept/13> ;
+        foaf:name                "Francesco Guerra" .
+
+<http://data.example.com/concept/13>
+        a               skos:Concept ;
+        skos:prefLabel  "E-Business" .
+
+<http://data.example.com/document/4>
+        a                foaf:Document ;
+        dc:creator       <http://data.example.com/person/9> , <http://data.example.com/person/6> ;
+        dc:date          2003 ;
+        dc:title         "Three Implementations of SquishQL, a Simple RDF Query Language" ;
+        conf:conference  "International Semantic Web Conference 2002, Sardinia" ;
+        skos:subject     <http://data.example.com/concept/14> , <http://data.example.com/concept/11> , <http://data.example.com/concept/10> .
+
+<http://data.example.com/organization/9>
+        a           conf:Organization ;
+        rdfs:label  "Dipartimento di Ingegneria dell'Informazione" .
+
+<http://data.example.com/person/1>
+        a                        foaf:Person ;
+        conf:has_affiliation     <http://data.example.com/organization/1> ;
+        conf:research_interests  <http://data.example.com/concept/5> , <http://data.example.com/concept/15> ;
+        foaf:name                "Yolanda Gil" .
