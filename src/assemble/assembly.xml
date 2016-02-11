@@ -13,6 +13,8 @@
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>dspace/**</include>
+				<include>dspace5/**</include>
+				<include>iswc/**</include>
 				<include>r2rml-parser.bat</include>
 				<include>r2rml-parser.sh</include>
 			</includes>

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gr.seab</groupId>
 	<artifactId>r2rml-parser</artifactId>
-	<version>0.7</version>
+	<version>0.8</version>
 	<packaging>jar</packaging>
 	<name>R2RML Parser</name>
 	<properties>
