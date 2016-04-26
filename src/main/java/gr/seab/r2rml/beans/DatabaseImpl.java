@@ -66,23 +66,21 @@ public class DatabaseImpl implements Database {
 		}
 		return null;
 	}
-	
-	public ResultSet query(String query) {
-		ResultSet result = null;
-		
+
+	public Statement newStatement() {
+		Statement statement;
 		try {
 			if (connection == null) openConnection();
-			
-			//PreparedStatement preparedStatement = connection.prepareStatement(query);
-			Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-			result = statement.executeQuery(query);
-		} catch (SQLException e) {
-			log.error("Error executing query! Query was: " + query);
+
+			statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+			return statement;
+		} catch (Exception e) {
+			log.error("Error creating a statement!", e);
 			System.exit(1);
 		}
-		return result;
+		throw new IllegalStateException("Filed to create a statement.");
 	}
-	
+
 	/**
 	 * 
 	 * Create a PreparedStatement with the query string and get its metadata. If this works, the query string is ok (but nothing is executed)
