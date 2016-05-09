@@ -849,13 +849,17 @@ public class Generator {
 	private String getStringValue(String field, ResultSet rs) {
 		String result = null;
 		try {
-			if(findFieldDataType(field, rs).getURI().equals(XSDDatatype.XSDdate.getURI())) {
+			if (rs.getObject(field) == null) return null;
+
+			BaseDatatype fieldDataType = findFieldDataType(field, rs);
+
+			if (fieldDataType != null && fieldDataType.getURI().equals(XSDDatatype.XSDdate.getURI())) {
 				result = xsdDateFormat.format(rs.getDate(field));
 			} else {
 				result = rs.getString(field);
 			}
 		} catch (Exception e) {
-			log.error(e.toString());
+			log.error("Failed to get value as string for column " + field, e);
 		}
 		return result;
 	}
