@@ -11,6 +11,8 @@
  */
 package gr.seab.r2rml.beans;
 
+import com.hp.hpl.jena.datatypes.RDFDatatype;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import gr.seab.r2rml.entities.DatabaseType;
 import gr.seab.r2rml.entities.LogicalTableMapping;
 import gr.seab.r2rml.entities.MappingDocument;
@@ -28,6 +30,7 @@ import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -90,6 +93,8 @@ public class Generator {
 	private boolean forceUri;
 	
 	private Model logModel;
+
+	private static final SimpleDateFormat xsdDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		
 	public Generator() {
 	}
@@ -285,7 +290,7 @@ public class Generator {
 				java.sql.Statement sqlStmt = db.newStatement();
 
 				try {
-					java.sql.ResultSet rs = sqlStmt.executeQuery(selectQuery.getQuery());
+					ResultSet rs = sqlStmt.executeQuery(selectQuery.getQuery());
 
 					if (verbose) log.info("Iterating over " + selectQuery.getQuery());
 					rs.beforeFirst();
@@ -437,15 +442,10 @@ public class Generator {
 											//log.info("Cleaning. Field is now " + field);
 										}
 										
-										String test = null;
-										try {
-											test = rs.getString(field);
-											BaseDatatype xsdDataType = findFieldDataType(field, rs);
-											predicateObjectMap.setDataType(xsdDataType);
-										} catch (Exception e) {
-											log.error(e.toString());
-										}
-										
+										String test = getStringValue(field, rs);
+										BaseDatatype xsdDataType = findFieldDataType(field, rs);
+										predicateObjectMap.setDataType(xsdDataType);
+
 										if (test != null) {
 											Literal o;
 											if (predicateObjectMap.getObjectTemplate().getLanguage() == null || "".equals(predicateObjectMap.getObjectTemplate().getLanguage())) {
@@ -513,7 +513,7 @@ public class Generator {
 											
 											if (verbose) log.info("Modified parent SQL query to " + parentQuery);
 											java.sql.Statement parentSqlStmt = db.newStatement();
-											java.sql.ResultSet rsParent = parentSqlStmt.executeQuery(parentQueryText);
+											ResultSet rsParent = parentSqlStmt.executeQuery(parentQueryText);
 											rsParent.beforeFirst();
 											while (rsParent.next()) {
 												Template parentTemplate = l.getSubjectMap().getTemplate();
@@ -845,7 +845,21 @@ public class Generator {
         mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //4 Finished logging.
         //log.info("4 Finished logging.");
 	}
-	
+
+	private String getStringValue(String field, ResultSet rs) {
+		String result = null;
+		try {
+			if(findFieldDataType(field, rs).getURI().equals(XSDDatatype.XSDdate.getURI())) {
+				result = xsdDateFormat.format(rs.getDate(field));
+			} else {
+				result = rs.getString(field);
+			}
+		} catch (Exception e) {
+			log.error(e.toString());
+		}
+		return result;
+	}
+
 	BaseDatatype findFieldDataType(String field, ResultSet rs) {
 		field = field.trim();
 		if (verbose) log.info("Figuring out datatype of field: " + field);
