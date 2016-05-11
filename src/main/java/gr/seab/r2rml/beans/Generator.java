@@ -11,6 +11,8 @@
  */
 package gr.seab.r2rml.beans;
 
+import com.hp.hpl.jena.datatypes.RDFDatatype;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import gr.seab.r2rml.entities.DatabaseType;
 import gr.seab.r2rml.entities.LogicalTableMapping;
 import gr.seab.r2rml.entities.MappingDocument;
@@ -28,6 +30,7 @@ import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -90,6 +93,8 @@ public class Generator {
 	private boolean forceUri;
 	
 	private Model logModel;
+
+	private static final SimpleDateFormat xsdDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		
 	public Generator() {
 	}
@@ -214,20 +219,28 @@ public class Generator {
 				String selectQueryHash = util.md5(logicalTableMapping.getView().getSelectQuery().getQuery());
 
 				String logicalTableMappingHash = util.md5(logicalTableMapping);
-				
-				ResultSet rsSelectQueryResultsHash = db.query(logicalTableMapping.getView().getSelectQuery().getQuery());
-				String selectQueryResultsHash = util.md5(rsSelectQueryResultsHash);
-				
-				if (selectQueryHash.equals(lastRunStatistics.get("selectQueryHash"))
-						&& logicalTableMappingHash.equals(lastRunStatistics.get("logicalTableMappingHash"))
-						&& selectQueryResultsHash.equals(lastRunStatistics.get("selectQueryResultsHash"))) {
-					executeMapping = false || executeAllMappings;
-					if (verbose) {
-						if (!executeMapping) {
-							log.info("Will skip triple generation from " + logicalTableMapping.getUri() + ". Found the same (a) select query (b) logical table mapping and (c) select query results.");	
+
+				java.sql.Statement st = db.newStatement();
+				try {
+					ResultSet rsSelectQueryResultsHash = st.executeQuery(logicalTableMapping.getView().getSelectQuery().getQuery());
+					String selectQueryResultsHash = util.md5(rsSelectQueryResultsHash);
+
+					if (selectQueryHash.equals(lastRunStatistics.get("selectQueryHash"))
+							&& logicalTableMappingHash.equals(lastRunStatistics.get("logicalTableMappingHash"))
+							&& selectQueryResultsHash.equals(lastRunStatistics.get("selectQueryResultsHash"))) {
+						executeMapping = false || executeAllMappings;
+						if (verbose) {
+							if (!executeMapping) {
+								log.info("Will skip triple generation from " + logicalTableMapping.getUri() + ". Found the same (a) select query (b) logical table mapping and (c) select query results.");
+							}
 						}
 					}
+				} catch (SQLException sqle) {
+					log.error("Failed to execute query: " + logicalTableMapping.getView().getSelectQuery().getQuery(), sqle);
+				} finally {
+					try { st.close(); } catch (SQLException e) { /* ignore exception */ }
 				}
+				
 			}
 			
 			ArrayList<String> subjects = new ArrayList<String>();
@@ -272,9 +285,13 @@ public class Generator {
 				}
 				
 				//Then insert the newly generated ones
-			    try {
-					SelectQuery selectQuery = logicalTableMapping.getView().getSelectQuery();
-					java.sql.ResultSet rs = db.query(selectQuery.getQuery());
+				SelectQuery selectQuery = logicalTableMapping.getView().getSelectQuery();
+
+				java.sql.Statement sqlStmt = db.newStatement();
+
+				try {
+					ResultSet rs = sqlStmt.executeQuery(selectQuery.getQuery());
+
 					if (verbose) log.info("Iterating over " + selectQuery.getQuery());
 					rs.beforeFirst();
 					while (rs.next()) {
@@ -425,15 +442,10 @@ public class Generator {
 											//log.info("Cleaning. Field is now " + field);
 										}
 										
-										String test = null;
-										try {
-											test = rs.getString(field);
-											BaseDatatype xsdDataType = findFieldDataType(field, rs);
-											predicateObjectMap.setDataType(xsdDataType);
-										} catch (Exception e) {
-											log.error(e.toString());
-										}
-										
+										String test = getStringValue(field, rs);
+										BaseDatatype xsdDataType = findFieldDataType(field, rs);
+										predicateObjectMap.setDataType(xsdDataType);
+
 										if (test != null) {
 											Literal o;
 											if (predicateObjectMap.getObjectTemplate().getLanguage() == null || "".equals(predicateObjectMap.getObjectTemplate().getLanguage())) {
@@ -500,7 +512,8 @@ public class Generator {
 											}
 											
 											if (verbose) log.info("Modified parent SQL query to " + parentQuery);
-											java.sql.ResultSet rsParent = db.query(parentQueryText);
+											java.sql.Statement parentSqlStmt = db.newStatement();
+											ResultSet rsParent = parentSqlStmt.executeQuery(parentQueryText);
 											rsParent.beforeFirst();
 											while (rsParent.next()) {
 												Template parentTemplate = l.getSubjectMap().getTemplate();
@@ -517,6 +530,7 @@ public class Generator {
 												}
 											}
 											rsParent.close();
+											parentSqlStmt.close();
 										} else {
 											if (verbose) log.info("Object URIs will be the subjects of the referenced triples, created previously by the logical table mapping with the uri " + predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
 											LogicalTableMapping l = mappingDocument.findLogicalTableMappingByUri(predicateObjectMap.getRefObjectMap().getParentTriplesMapUri());
@@ -548,8 +562,11 @@ public class Generator {
 					}
 					
 					rs.close();
+					sqlStmt.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
+				} finally {
+					try { sqlStmt.close(); } catch (Exception e) {}
 				}
 			} else {
 				log.info("Skipping triple generation from " + logicalTableMapping.getUri() + ". Nothing changed here.");
@@ -790,10 +807,18 @@ public class Generator {
 					
 					if (verbose) log.info("Logging selectQueryResultsHash");
 					Property pSelectQueryResultsHash = logModel.createProperty(logNs + "selectQueryResultsHash");
-					ResultSet rsSelectQueryResultsHash = db.query(logicalTableMapping.getView().getSelectQuery().getQuery());
-					Literal oSelectQueryResultsHash = logModel.createLiteral(String.valueOf(util.md5(rsSelectQueryResultsHash)));
-					logModel.add(s, pSelectQueryResultsHash, oSelectQueryResultsHash);
-					
+					java.sql.Statement stmt = db.newStatement();
+					try {
+						ResultSet rsSelectQueryResultsHash =
+								stmt.executeQuery(logicalTableMapping.getView().getSelectQuery().getQuery());
+						Literal oSelectQueryResultsHash = logModel.createLiteral(String.valueOf(util.md5(rsSelectQueryResultsHash)));
+						logModel.add(s, pSelectQueryResultsHash, oSelectQueryResultsHash);
+					} catch (SQLException e) {
+						log.error("Failed to execute query: " + logicalTableMapping.getView().getSelectQuery().getQuery(), e);
+					} finally {
+						try { stmt.close(); } catch (SQLException e) {}
+					}
+
 //					if (verbose) log.info("Logging tripleCount");
 //					Property pTripleCount = logModel.createProperty(logNs + "tripleCount");
 //					Literal oTripleCount = logModel.createLiteral(String.valueOf(logicalTableMapping.getTriples().size()));
@@ -820,7 +845,25 @@ public class Generator {
         mappingDocument.getTimestamps().add(Calendar.getInstance().getTimeInMillis()); //4 Finished logging.
         //log.info("4 Finished logging.");
 	}
-	
+
+	private String getStringValue(String field, ResultSet rs) {
+		String result = null;
+		try {
+			if (rs.getObject(field) == null) return null;
+
+			BaseDatatype fieldDataType = findFieldDataType(field, rs);
+
+			if (fieldDataType != null && fieldDataType.getURI().equals(XSDDatatype.XSDdate.getURI())) {
+				result = xsdDateFormat.format(rs.getDate(field));
+			} else {
+				result = rs.getString(field);
+			}
+		} catch (Exception e) {
+			log.error("Failed to get value as string for column " + field, e);
+		}
+		return result;
+	}
+
 	BaseDatatype findFieldDataType(String field, ResultSet rs) {
 		field = field.trim();
 		if (verbose) log.info("Figuring out datatype of field: " + field);

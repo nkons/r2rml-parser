@@ -629,16 +629,18 @@ public class Parser {
 	public String createQueryForTable(String tableName) {
 		
 		String result = "SELECT ";
+		ArrayList<String> fields = new ArrayList<String>();
+
+		java.sql.Statement stmt = db.newStatement();
+
 		try {
-			ArrayList<String> fields = new ArrayList<String>();
-			
-			java.sql.ResultSet rs = null;
+			java.sql.ResultSet rs;
 			if (mappingDocument.getDatabaseType() == DatabaseType.POSTGRESQL) {
-				rs = db.query("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'");
+				rs = stmt.executeQuery("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tableName + "'");
 			} else if (mappingDocument.getDatabaseType() == DatabaseType.MYSQL) {
-				rs = db.query("DESCRIBE " + tableName);
+				rs = stmt.executeQuery("DESCRIBE " + tableName);
 			} else if (mappingDocument.getDatabaseType() == DatabaseType.ORACLE) {
-                rs = db.query("SELECT column_name FROM all_tab_cols WHERE table_name = '" + tableName + "'");
+                rs = stmt.executeQuery("SELECT column_name FROM all_tab_cols WHERE table_name = '" + tableName + "'");
             } else {
                 rs = null;
                 log.error("Unknown database type. Terminating.");
@@ -663,6 +665,7 @@ public class Parser {
 			}
 			result = result.substring(0, result.lastIndexOf(','));
 			rs.close();
+			stmt.close();
 		
 			if (mappingDocument.getDatabaseType() == DatabaseType.POSTGRESQL || mappingDocument.getDatabaseType() == DatabaseType.ORACLE) {
 				result += " FROM " + "\"" + tableName + "\"";
@@ -672,7 +675,9 @@ public class Parser {
 			result += " ORDER BY " + fields.get(0); //add order to ensure same order regardless the implementation
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Failed to create query for table " + tableName, e);
+		} finally {
+			try { stmt.close(); } catch (Exception e) {}
 		}
 		
 		log.info("Result is: " + result);

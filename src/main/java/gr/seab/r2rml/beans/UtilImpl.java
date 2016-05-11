@@ -93,7 +93,7 @@ public class UtilImpl implements Util {
 					try {
 						result = template.getNamespace() + "/" + URLEncoder.encode(result, "UTF-8");
 					} catch (UnsupportedEncodingException e) {
-						log.error("An error occurred: " + e.getMessage());
+						log.error("An error occurred!", e);
 						System.exit(1);
 					}
 				} else {
@@ -111,7 +111,7 @@ public class UtilImpl implements Util {
 							try {
 								result = result.substring(0, r) + URLEncoder.encode(result.substring(r), "UTF-8");
 							} catch (UnsupportedEncodingException e) {
-								log.error("An error occurred: " + e.getMessage());
+								log.error("An error occurred!", e);
 								System.exit(1);
 							}
 						} else {
