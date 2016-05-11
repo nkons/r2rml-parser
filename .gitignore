@@ -1,4 +1,9 @@
 *.iml
 **/target
 
+.classpath
+.project
+.settings/
+.metadata/
 
+*.log
