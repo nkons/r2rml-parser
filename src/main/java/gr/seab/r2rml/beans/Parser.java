@@ -11,7 +11,6 @@
  */
 package gr.seab.r2rml.beans;
 
-import gr.seab.r2rml.beans.util.LogicalTableMappingComparator;
 import gr.seab.r2rml.entities.DatabaseType;
 import gr.seab.r2rml.entities.LogicalTableMapping;
 import gr.seab.r2rml.entities.LogicalTableView;
@@ -26,8 +25,6 @@ import gr.seab.r2rml.entities.sql.SelectQuery;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -104,7 +101,6 @@ public class Parser {
 	public Parser() {
 	}
 	
-	@SuppressWarnings("unchecked")
 	public MappingDocument parse() {
 
 		init();
@@ -131,9 +127,21 @@ public class Parser {
 			}
 			
 			//Sorting: evaluate first the logical table mappings without reference to a parent triples map
-			@SuppressWarnings("rawtypes")
-			Comparator c =  new LogicalTableMappingComparator();
-			Collections.sort(mappingDocument.getLogicalTableMappings(), c);
+			LinkedList<LogicalTableMapping> first = new LinkedList<LogicalTableMapping>();
+			LinkedList<LogicalTableMapping> second = new LinkedList<LogicalTableMapping>();
+			for (LogicalTableMapping ltm : mappingDocument.getLogicalTableMappings()) {
+				for (PredicateObjectMap p : ltm.getPredicateObjectMaps()) {
+					if (p.getRefObjectMap() != null &&
+						p.getRefObjectMap().getParentTriplesMapUri() != null &&
+						StringUtils.isNotBlank(p.getRefObjectMap().getParentTriplesMapUri())) {
+						second.add(ltm);
+					} else {
+						first.add(ltm);
+					}
+				}
+			}
+			first.addAll(second);
+			mappingDocument.setLogicalTableMappings(first);
 			
 			if (verbose) {
 				log.info("Logical table mappings will be parsed in the following order:");
