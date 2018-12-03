@@ -89,7 +89,7 @@ public class SelectQuery {
 		String tokens[] = q.substring(start).split("\\s+");
 		
 		//if there are aliases
-		if (StringUtils.containsIgnoreCase(q.substring(start), "AS")) {
+		if (StringUtils.containsIgnoreCase(q.substring(start), " AS ")) {
 			for (int i = 0; i < tokens.length; i++) {
 				if ("AS".equalsIgnoreCase(tokens[i])) {
 					if (tokens[i+1].endsWith(",")) {
