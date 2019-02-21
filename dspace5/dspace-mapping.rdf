@@ -541,6 +541,56 @@ map:lom-classification-keyword
 
 #   <#BitstreamFormats>
 
+ 	## Relations between items, collection and communities
+	
+map:rel-collection2item
+    rr:logicalTable <#rel-collection-item-view>;
+    rr:subjectMap [
+        rr:template 'http://data.example.org/repository/collection/{"handle_coll"}';
+    ];
+    rr:predicateObjectMap [
+      rr:predicate dc:hasPart;
+      rr:objectMap [ 
+		rr:termType  rr:IRI;
+	  rr:template 'http://data.example.org/repository/item/{handle_item}' ];
+    ].	
+	
+map:rel-community2community
+    rr:logicalTable <#rel-community-community-view>;
+    rr:subjectMap [
+        rr:template 'http://data.example.org/repository/community/{"handle_sub"}';
+    ];
+    rr:predicateObjectMap [
+      rr:predicate dc:hasPart;
+      rr:objectMap [ 
+		rr:termType  rr:IRI;
+	  rr:template 'http://data.example.org/repository/community/{handle_obj}' ];
+    ].	
+		
+
+map:rel-community2collection
+    rr:logicalTable <#rel-community-collection-view>;
+    rr:subjectMap [
+        rr:template 'http://data.example.org/repository/community/{"handle_comm"}';
+    ];
+    rr:predicateObjectMap [
+      rr:predicate dc:hasPart;
+      rr:objectMap [
+		rr:termType  rr:IRI;
+		rr:template 'http://data.example.org/repository/collection/{handle_coll}' ];
+    ].
+
+map:rel-communities-item
+    rr:logicalTable <#rel-communities-item-view>;
+    rr:subjectMap [
+        rr:template 'http://data.example.org/repository/community/{"handle_comm"}';
+    ];
+    rr:predicateObjectMap [
+      rr:predicate dc:hasPart;
+      rr:objectMap [ 
+		rr:termType  rr:IRI;
+	  rr:template 'http://data.example.org/repository/item/{handle_item}' ];
+    ].		   
 
 ###### schemas: dublin core, mods, lom ######
 
@@ -1662,4 +1712,54 @@ map:lom-classification-keyword
     mfr.element='classification' AND
     mfr.qualifier='keyword'
     """.
+    
+    	
+## Views: Relations between items, collection 
+<#rel-community-collection-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle_comm, h2.handle AS handle_coll
+    FROM community2collection AS c2c, handle AS h, handle AS h2 WHERE
+    c2c.community_id=h.resource_id AND
+	c2c.collection_id=h2.resource_id AND
+	h.resource_type_id=4 AND
+	h2.resource_type_id=3
+    """.	
+	
+<#rel-communities-item-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle_comm, h2.handle AS handle_item 
+	FROM 	communities2item AS c2i, handle AS h, handle AS h2, item  
+	WHERE     c2i.community_id=h.resource_id AND 	
+	c2i.item_id=h2.resource_id  AND 	
+	h.resource_type_id=3 AND 	
+	h2.resource_type_id=2 AND   
+	c2i.item_id =item.item_id AND  	
+	item.discoverable=TRUE AND  
+	item.withdrawn=FALSE AND 	
+	item.in_archive=TRUE 
+	""".
+	
+<#rel-community-community-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle_sub, h2.handle AS handle_obj
+	FROM community2community AS c2c, handle AS h, handle AS h2 WHERE
+    c2c.parent_comm_id=h.resource_id AND
+	c2c.child_comm_id=h2.resource_id AND
+	h.resource_type_id=4 AND
+	h2.resource_type_id=4
+    """.
+
+<#rel-collection-item-view>
+    rr:sqlQuery """
+    SELECT h.handle AS handle_coll, h2.handle AS handle_item 
+	FROM collection2item AS c2i, handle AS h, handle AS h2, item  WHERE     
+	c2i.collection_id=h.resource_id AND 	
+	c2i.item_id=h2.resource_id AND 	
+	h.resource_type_id=3 AND 
+	h2.resource_type_id=2 AND  
+	c2i.item_id =item.item_id AND 
+	item.discoverable=TRUE AND  
+	item.withdrawn=FALSE AND 
+	item.in_archive=TRUE 
+	""".
     
