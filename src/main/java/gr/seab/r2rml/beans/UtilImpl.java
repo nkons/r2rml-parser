@@ -304,7 +304,8 @@ public class UtilImpl implements Util {
 				|| sqlDataType.contains("varbit")
 				|| sqlDataType.contains("cidr")
 				|| sqlDataType.contains("inet")
-				|| sqlDataType.contains("macaddr")) {
+				|| sqlDataType.contains("macaddr")
+				|| sqlDataType.contains("uuid")) {
     		//return XSDDatatype.XSDstring;
 			//if the sql field type is a string, it is ok to omit the xsd datatype from the result
 			return null;
