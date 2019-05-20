@@ -76,7 +76,7 @@ public class UtilImpl implements Util {
 				}
 			}
 			
-			if (template.getTermType() == TermType.IRI && !template.isUri()) {
+			if (result != null && template.getTermType() == TermType.IRI && !isUri(result, template.getModel())) {
 				//log.info("Processing URI template with namespace " + template.getText());
 				if (encodeURLs) {
 					try {
@@ -87,6 +87,16 @@ public class UtilImpl implements Util {
 					}
 				} else {
 					result = template.getNamespace() + "/" + result;
+				}
+			}
+			if(result != null && template.getTermType() == TermType.IRI && isUri(result, template.getModel())){
+				if (encodeURLs) {
+					try {
+						result = URLEncoder.encode(result, "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						log.error("An error occurred!", e);
+						System.exit(1);
+					}
 				}
 			}
 			
@@ -443,6 +453,20 @@ public class UtilImpl implements Util {
 			log.error(ex.getMessage());
 		}
 		return digest;
+	}
+
+	public static boolean isUri(String s, Model model){
+
+			for (String key : model.getNsPrefixMap().keySet()) {
+				//log.info("checking if " + s + " contains '" + key + ":' or " + model.getNsPrefixMap().get(key));
+				if (s.contains(key + ":") || s.contains(model.getNsPrefixMap().get(key))) return true;
+			}
+
+			if (s.contains("http")) {
+				return true;
+			} else {
+				return false;
+			}
 	}
 	
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import gr.seab.r2rml.beans.UtilImpl;
 
 /**
  * The template is a component of the form http://data.example.com/film/{film_id}. Encloses fields in brackets.
@@ -77,18 +78,7 @@ public class Template {
 	}
 	
 	public boolean isUri() {
-		String s = text;
-		
-		for (String key : model.getNsPrefixMap().keySet()) {
-			//log.info("checking if " + s + " contains '" + key + ":' or " + model.getNsPrefixMap().get(key));
-			if (s.contains(key + ":") || s.contains(model.getNsPrefixMap().get(key))) return true;
-		}
-		
-		if (s.contains("http")) {
-			return true;
-		} else {
-			return false;
-		}
+		return UtilImpl.isUri(this.text, model);
 	}
 	
 	public String getText() {
