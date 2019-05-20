@@ -13,7 +13,7 @@ public class PredicateObjectMap {
 	/**
 	 * The predicate value(s).
 	 */
-	private ArrayList<String> predicates;
+	private ArrayList<Template> predicates;
 	
 	/**
 	 * Holds the template through which the objects will be generated.
@@ -44,13 +44,13 @@ public class PredicateObjectMap {
 	/**
 	 * @return the predicates
 	 */
-	public ArrayList<String> getPredicates() {
+	public ArrayList<Template> getPredicates() {
 		return predicates;
 	}
 	/**
 	 * @param predicates the predicates to set
 	 */
-	public void setPredicates(ArrayList<String> predicates) {
+	public void setPredicates(ArrayList<Template> predicates) {
 		this.predicates = predicates;
 	}
 	/**

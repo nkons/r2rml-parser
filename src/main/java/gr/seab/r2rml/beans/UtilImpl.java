@@ -403,8 +403,8 @@ public class UtilImpl implements Util {
 					s += predicateObjectMap.getObjectColumn();
 				}
 				
-				for (String predicate : predicateObjectMap.getPredicates()) {
-					s += predicate;
+				for (Template predicate : predicateObjectMap.getPredicates()) {
+					s += predicate.getText();
 				}
 				
 				s += predicateObjectMap.getRefObjectMap() != null? predicateObjectMap.getRefObjectMap().getParentTriplesMapUri() : "null";
