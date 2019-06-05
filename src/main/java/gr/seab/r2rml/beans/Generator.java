@@ -338,9 +338,9 @@ public class Generator {
 									}
 								}
 								
-								for (String predicate : predicateObjectMap.getPredicates()) {
+								for (Template predicate : predicateObjectMap.getPredicates()) {
 									
-									Property p = resultModel.createProperty(predicate);
+									Property p = resultModel.createProperty(util.fillTemplate(predicate, rs, encodeURLs));
 									
 									if (objectTemplate != null && objectTemplate.getTermType() != TermType.AUTO) {
 										//Literal o = resultModel.createLiteral(u.fillTemplate(predicateObjectMap.getObjectTemplate(), rs));

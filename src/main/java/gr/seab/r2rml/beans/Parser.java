@@ -279,11 +279,20 @@ public class Parser {
 	    	PredicateObjectMap predicateObjectMap = new PredicateObjectMap();
 	    	
 	    	NodeIterator iterPredicate = mapModel.listObjectsOfProperty(rnPredicateObject.asResource(), mapModel.getProperty(rrNs + "predicate"));
-	    	ArrayList<String> predicates = new ArrayList<String>();
+	    	ArrayList<Template> predicates = new ArrayList<Template>();
 	    	while (iterPredicate.hasNext()) { //can return more than 1
 		    	RDFNode rnPredicate = iterPredicate.next();
 		    	if (verbose) log.info("Predicate is: " + rnPredicate.asResource().getURI());
-		    	predicates.add(rnPredicate.asResource().getURI());
+				log.info("Found predicate: " + rnPredicate.toString());
+				if (rnPredicate.isLiteral()) {
+					log.info("Adding predicate map constant: " + rnPredicate.asLiteral().toString() + ". Treating it as a template with no fields.");
+					Template template = new Template(rnPredicate.asLiteral(), TermType.LITERAL, baseNs, resultModel);
+					predicates.add(template);
+				} else {
+					log.info("Adding predicate map constant: " + rnPredicate.asNode().toString() + ". Treating it as a template with no fields.");
+					Template template = new Template(rnPredicate.asNode().toString(), TermType.IRI, baseNs, resultModel);
+					predicates.add(template);
+				}
 		    }
 	    	
 	    	NodeIterator iterPredicateMap = mapModel.listObjectsOfProperty(rnPredicateObject.asResource(), mapModel.getProperty(rrNs + "predicateMap"));
@@ -294,14 +303,35 @@ public class Parser {
 			    while (iterConstant.hasNext()) {
 			    	RDFNode rnConstant = iterConstant.next();
 
-			    	if (rnConstant.isLiteral()) {
-			    		log.info("Adding predicate map constant literal: " + rnConstant.asNode().toString() + ".");
-		    			predicates.add(rnConstant.asLiteral().getString());
-			    	} else {
-		    			log.info("Adding predicate map constant uri: " + rnConstant.asNode().toString() + ".");
-		    			predicates.add(rnConstant.asResource().getURI());
-			    	}
+					if (rnConstant.isLiteral()) {
+						log.info("Adding predicate map constant: " + rnConstant.asLiteral().toString() + ". Treating it as a template with no fields.");
+						Template template = new Template(rnConstant.asLiteral(), TermType.LITERAL, baseNs, resultModel);
+						predicates.add(template);
+					} else {
+						log.info("Adding predicate map constant: " + rnConstant.asNode().toString() + ". Treating it as a template with no fields.");
+						Template template = new Template(rnConstant.asNode().toString(), TermType.IRI, baseNs, resultModel);
+						predicates.add(template);
+					}
 			    }
+				NodeIterator iterTemplate = mapModel.listObjectsOfProperty(rnPredicateMap.asResource(), mapModel.getProperty(rrNs + "template"));
+				while (iterTemplate.hasNext()) { //should return only 1
+					RDFNode rnTemplate = iterTemplate.next();
+
+					if (rnTemplate.isLiteral()) {
+						log.info("Processing predicate map template: " + rnTemplate.asLiteral().getString());
+						Template template = new Template(rnTemplate.asLiteral(), TermType.LITERAL, baseNs, resultModel);
+						predicates.add(template);
+
+					} else {
+						log.info("Processing predicate map template: " + rnTemplate.asNode().toString());
+						Template template = new Template(rnTemplate.asNode().toString(), TermType.IRI, baseNs, resultModel);
+						predicates.add(template);
+
+					}
+					//predicateObjectMap.setObjectColumn(predicateObjectMap.getObjectTemplate().getFields().get(0));
+					//System.out.println("added objectQuery " + "SELECT " + predicateObjectMap.getObjectTemplate().getFields().get(0) + " FROM " + mappingDocument.findLogicalTableMappingByUri(r.getURI()).getView().getQuery().getTables().get(0).getName());
+					//System.out.println("added objectTemplate " + rnTemplate.asLiteral().toString());
+				}
 		    }
 	    	predicateObjectMap.setPredicates(predicates);
 	    	
